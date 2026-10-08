@@ -14,6 +14,7 @@ Regole:
 - Leggi di `docs/specifiche.md` solo le sezioni citate nel prompt.
 - Architettura: logica di gioco pura in Kotlin (package `game`, senza dipendenze Android, testabile con JUnit); caricamento parole in `data`; UI Compose in `ui` con un ViewModel che espone uno stato immutabile. Casualità sempre tramite un `Random` iniettabile.
 - Testi dell'interfaccia in `res/values/strings.xml`, in italiano.
+- In un `Box`, i pulsanti sovrapposti (icone in un angolo, FAB) vanno dichiarati DOPO il contenuto a tutto schermo: un figlio scorrevole o cliccabile dichiarato dopo copre i precedenti e ne intercetta i tocchi.
 - Non eseguire `gradlew build`/`test`/`assemble`: la build la esegue l'agente `esecutore-build`. Puoi usare grep e letture mirate.
 - Non modificare test esistenti per farli passare: se un test sembra sbagliato, segnalalo nel resoconto.
 

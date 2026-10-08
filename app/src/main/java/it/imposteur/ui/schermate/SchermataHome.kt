@@ -43,9 +43,6 @@ fun SchermataHome(
 ) {
     var chiediNuova by rememberSaveable { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
-    IconButton(onClick = onImpostazioni, modifier = Modifier.align(Alignment.TopEnd)) {
-        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.impostazioni_apri))
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,6 +80,10 @@ fun SchermataHome(
             onClick = onRegole,
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) { Text(stringResource(R.string.come_si_gioca), style = MaterialTheme.typography.titleMedium) }
+    }
+    // Dopo la Column, così sta sopra: la Column scorrevole intercetterebbe il tocco
+    IconButton(onClick = onImpostazioni, modifier = Modifier.align(Alignment.TopEnd)) {
+        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.impostazioni_apri))
     }
     }
     if (chiediNuova) {

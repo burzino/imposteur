@@ -22,6 +22,9 @@ data class Partita(
         }
     }
 
+    fun ordineDiParola(): List<Int> =
+        List(giocatori.size) { (primoGiocatore + it) % giocatori.size }
+
     fun testoSvelamento(): String {
         val nomi = impostori.sorted().map { giocatori[it] }
         val righe = mutableListOf<String>()

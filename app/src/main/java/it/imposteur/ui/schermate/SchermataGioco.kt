@@ -9,8 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,30 +59,68 @@ fun SchermataGioco(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Text(
+                stringResource(R.string.gioco_titolo),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(16.dp))
+            TestoAdattivo(
+                testo = stringResource(R.string.gioco_inizia, partita.giocatori[partita.primoGiocatore]),
+                stile = MaterialTheme.typography.headlineMedium,
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.gioco_ordine_titolo),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.Start),
+            )
+            Spacer(Modifier.height(8.dp))
+            val ordine = partita.ordineDiParola()
+            LazyColumn(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(
-                    stringResource(R.string.gioco_titolo),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                )
-                TestoAdattivo(
-                    testo = stringResource(R.string.gioco_inizia, partita.giocatori[partita.primoGiocatore]),
-                    stile = MaterialTheme.typography.displaySmall,
-                )
-                Text(
-                    stringResource(R.string.gioco_istruzioni),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                )
+                itemsIndexed(ordine) { posizione, indice ->
+                    val primo = posizione == 0
+                    val sfondo = if (primo) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surfaceVariant
+                    val testo = if (primo) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(sfondo, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(testo, CircleShape),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                "${posizione + 1}",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = sfondo,
+                            )
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        TestoAdattivo(
+                            testo = partita.giocatori[indice],
+                            stile = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = if (primo) FontWeight.Bold else FontWeight.Normal,
+                            ),
+                            color = testo,
+                            maxRighe = 1,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
             }
+            Spacer(Modifier.height(12.dp))
             Column(
                 modifier = Modifier.navigationBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -67,6 +67,7 @@
     <string name="gioco_titolo">Si gioca!</string>
     <string name="gioco_inizia">Parla per primo: %1$s</string>
     <string name="gioco_istruzioni">Discutete a voce, poi votate. Quando avete deciso, premete Rivela.</string>
+    <string name="gioco_ordine_titolo">Ordine di parola</string>
     <string name="gioco_rivela">Rivela</string>
     <string name="gioco_conferma_rivela">Rivelare i ruoli?</string>
     <string name="gioco_conferma_messaggio">Verrà mostrato chi era l\'impostore.</string>
