@@ -212,7 +212,7 @@ fun SchermataConfigurazione(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = { chiediAzzera = true }, enabled = stato.paroleTotali > 0) {
+                TextButton(onClick = { chiediAzzera = true }, enabled = stato.paroleRimanenti < stato.paroleTotali) {
                     Text(stringResource(R.string.config_azzera))
                 }
             }

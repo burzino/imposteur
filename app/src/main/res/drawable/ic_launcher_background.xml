@@ -5,7 +5,15 @@
     <path android:pathData="M0,0 H108 V108 H0 Z">
         <aapt:attr name="android:fillColor">
             <gradient android:type="radial" android:centerX="54" android:centerY="54" android:gradientRadius="76"
-                android:startColor="#5B2A86" android:endColor="#2E1247" />
+                android:startColor="#1E1029" android:endColor="#060309" />
         </aapt:attr>
     </path>
+    <group android:pivotX="54" android:pivotY="88" android:scaleY="0.3">
+        <path android:pathData="M4,88 A50,50 0 1 0 104,88 A50,50 0 1 0 4,88 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="radial" android:centerX="54" android:centerY="88" android:gradientRadius="50"
+                    android:startColor="#14FFFFFF" android:endColor="#00FFFFFF" />
+            </aapt:attr>
+        </path>
+    </group>
 </vector>

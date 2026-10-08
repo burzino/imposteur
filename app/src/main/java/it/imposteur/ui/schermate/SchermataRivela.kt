@@ -5,7 +5,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.semantics.Role
+import it.imposteur.data.MotivoSegnalazione
+import it.imposteur.data.Segnalazione
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -30,7 +54,7 @@ import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
 
 @Composable
-fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit) {
+fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit) {
     BackHandler(onBack = onCambiaImpostazioni)
     // Fissa la partita svelata: un cambio di partita durante la transizione non la altera.
     var fissata by remember { mutableStateOf(partitaViva) }
@@ -38,10 +62,15 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
     val partita = fissata ?: return
 
     val nomiImpostori = partita.impostori.sorted().map { partita.giocatori[it] }
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var segnalando by rememberSaveable { mutableStateOf(false) }
+    val messaggioSalvata = stringResource(R.string.segnala_salvata)
+    Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { innerPadding ->
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .safeDrawingPadding()
+            .padding(innerPadding)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -83,7 +112,7 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
         )
     }
     Column(
-        modifier = Modifier.navigationBarsPadding().padding(top = 16.dp),
+        modifier = Modifier.padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Button(onClick = onNuovaPartita, modifier = Modifier.fillMaxWidth().height(56.dp)) {
@@ -92,6 +121,110 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
         OutlinedButton(onClick = onCambiaImpostazioni, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text(stringResource(R.string.rivela_cambia_impostazioni), style = MaterialTheme.typography.titleMedium)
         }
+        TextButton(onClick = { segnalando = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Icon(Icons.Filled.Warning, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.segnala_pulsante), style = MaterialTheme.typography.bodyMedium)
+        }
     }
     }
+    }
+    if (segnalando) {
+        DialogoSegnalaCoppia(
+            parola = partita.voce.parola,
+            affine = partita.voce.affine.takeIf { partita.modalita == Modalita.PAROLA_AFFINE },
+            categoria = partita.voce.categoriaNome,
+            onAnnulla = { segnalando = false },
+            onSalva = { motivi, nota ->
+                segnalando = false
+                onSegnala(
+                    Segnalazione(
+                        tipo = "coppia",
+                        istante = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).toString(),
+                        categoriaId = partita.voce.categoriaId,
+                        parola = partita.voce.parola,
+                        affine = partita.voce.affine,
+                        modalita = partita.modalita.name,
+                        motivi = motivi,
+                        nota = nota,
+                    ),
+                )
+                scope.launch { snackbar.showSnackbar(messaggioSalvata) }
+            },
+        )
+    }
+}
+
+private const val MAX_COMMENTO = 500
+
+@Composable
+private fun DialogoSegnalaCoppia(
+    parola: String,
+    affine: String?,
+    categoria: String,
+    onAnnulla: () -> Unit,
+    onSalva: (List<MotivoSegnalazione>, String) -> Unit,
+) {
+    var motivi by rememberSaveable { mutableStateOf(emptyList<String>()) }
+    var nota by rememberSaveable { mutableStateOf("") }
+    val etichette = listOf(
+        MotivoSegnalazione.TROPPO_SIMILI to R.string.segnala_motivo_simili,
+        MotivoSegnalazione.TROPPO_DIVERSE to R.string.segnala_motivo_diverse,
+        MotivoSegnalazione.POCO_CONOSCIUTA to R.string.segnala_motivo_poco_conosciuta,
+        MotivoSegnalazione.CATEGORIA_SBAGLIATA to R.string.segnala_motivo_categoria,
+    )
+    AlertDialog(
+        onDismissRequest = onAnnulla,
+        title = { Text(stringResource(R.string.segnala_titolo)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    if (affine != null) stringResource(R.string.segnala_sottotitolo_coppia, parola, affine) else parola,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(stringResource(R.string.segnala_categoria, categoria), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(8.dp))
+                etichette.forEach { (motivo, testo) ->
+                    val scelto = motivo.name in motivi
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .toggleable(
+                                value = scelto,
+                                role = Role.Checkbox,
+                                onValueChange = { motivi = if (it) motivi + motivo.name else motivi - motivo.name },
+                            ),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(checked = scelto, onCheckedChange = null)
+                        Text(stringResource(testo), modifier = Modifier.padding(start = 12.dp))
+                    }
+                }
+                OutlinedTextField(
+                    value = nota,
+                    onValueChange = { nota = it.take(MAX_COMMENTO) },
+                    label = { Text(stringResource(R.string.segnala_commento)) },
+                    supportingText = {
+                        Text(
+                            stringResource(R.string.segnala_contatore, nota.length, MAX_COMMENTO),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End,
+                        )
+                    },
+                    minLines = 3,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = motivi.isNotEmpty() || nota.isNotBlank(),
+                onClick = {
+                    onSalva(MotivoSegnalazione.entries.filter { it.name in motivi }, nota.trim())
+                },
+            ) { Text(stringResource(R.string.segnala_salva)) }
+        },
+        dismissButton = { TextButton(onClick = onAnnulla) { Text(stringResource(R.string.annulla)) } },
+    )
 }

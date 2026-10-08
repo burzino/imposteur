@@ -7,7 +7,9 @@ import it.imposteur.data.Aspetto
 import it.imposteur.data.RepositoryAspetto
 import it.imposteur.data.RepositoryConfigurazione
 import it.imposteur.data.RepositoryParole
+import it.imposteur.data.RepositorySegnalazioni
 import it.imposteur.data.RepositorySessione
+import it.imposteur.data.Segnalazione
 import it.imposteur.data.RisultatoCaricamento
 import it.imposteur.game.Categoria
 import it.imposteur.game.Configurazione
@@ -58,6 +60,7 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
     private val repoConfig = RepositoryConfigurazione(application)
     private val repoSessione = RepositorySessione(application)
     private val repoAspetto = RepositoryAspetto(application)
+    private val repoSegnalazioni = RepositorySegnalazioni(application)
     private var gestore = GestorePartite(Random.Default)
     /** True se la partita in UI fa parte della sessione salvata. */
     private var partitaAttiva = false
@@ -76,9 +79,28 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { repoAspetto.salva(a) }
     }
 
+    private val _segnalazioniSalvate = MutableStateFlow(0)
+    val segnalazioniSalvate: StateFlow<Int> = _segnalazioniSalvate.asStateFlow()
+
+    /** Salva una segnalazione (append su file) e aggiorna il contatore. */
+    fun salvaSegnalazione(s: Segnalazione) {
+        viewModelScope.launch {
+            repoSegnalazioni.aggiungi(s)
+            _segnalazioniSalvate.value = repoSegnalazioni.conta()
+        }
+    }
+
+    fun cancellaSegnalazioni() {
+        viewModelScope.launch {
+            repoSegnalazioni.cancellaTutte()
+            _segnalazioniSalvate.value = repoSegnalazioni.conta()
+        }
+    }
+
     private var salvataggio: Job? = null
 
     init {
+        viewModelScope.launch { _segnalazioniSalvate.value = repoSegnalazioni.conta() }
         viewModelScope.launch {
             when (val r = repoParole.carica()) {
                 is RisultatoCaricamento.Ok -> {

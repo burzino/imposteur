@@ -101,8 +101,12 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         }
         composable(Rotte.IMPOSTAZIONI) {
             val aspetto by viewModel.aspetto.collectAsStateWithLifecycle()
+            val salvate by viewModel.segnalazioniSalvate.collectAsStateWithLifecycle()
             SchermataImpostazioni(
                 aspetto = aspetto,
+                segnalazioniSalvate = salvate,
+                onInviaSuggerimento = { viewModel.salvaSegnalazione(it) },
+                onCancellaSegnalazioni = { viewModel.cancellaSegnalazioni() },
                 onCambia = { viewModel.impostaAspetto(it) },
                 onIndietro = { if (navController.inRotta(Rotte.IMPOSTAZIONI)) navController.popBackStack() },
             )
@@ -180,6 +184,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         composable(Rotte.RIVELA) {
             SchermataRivela(
                 partitaViva = stato.partita,
+                onSegnala = { viewModel.salvaSegnalazione(it) },
                 onNuovaPartita = {
                     if (navController.inRotta(Rotte.RIVELA)) {
                         if (viewModel.iniziaPartita()) {

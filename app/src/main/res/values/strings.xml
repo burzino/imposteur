@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Impostore</string>
+    <string name="app_name">Imposteur</string>
 
     <!-- Comuni -->
     <string name="interrompere_partita">Interrompere la partita?</string>
@@ -11,7 +11,7 @@
     <string name="annulla">Annulla</string>
 
     <!-- Home -->
-    <string name="home_titolo">Impostore</string>
+    <string name="home_titolo">Imposteur</string>
     <string name="nuova_partita">Nuova partita</string>
     <string name="riprendi_partita">Riprendi partita</string>
     <string name="partita_in_corso_conferma">Esiste una partita in corso. Iniziarne una nuova?</string>
@@ -87,6 +87,18 @@
     <string name="rivela_categoria">Categoria: %1$s</string>
     <string name="rivela_cambia_impostazioni">Modifica giocatori e opzioni</string>
     <string name="rivela_rigioca">Rigioca (stessi giocatori)</string>
+    <string name="segnala_pulsante">Segnala la coppia</string>
+    <string name="segnala_titolo">Segnala la coppia</string>
+    <string name="segnala_sottotitolo_coppia">%1$s / %2$s</string>
+    <string name="segnala_categoria">Categoria: %1$s</string>
+    <string name="segnala_motivo_simili">Parole troppo simili</string>
+    <string name="segnala_motivo_diverse">Parole troppo diverse</string>
+    <string name="segnala_motivo_poco_conosciuta">Parola poco conosciuta</string>
+    <string name="segnala_motivo_categoria">Categoria sbagliata</string>
+    <string name="segnala_commento">Commento o proposta (facoltativo)</string>
+    <string name="segnala_contatore">%1$d / %2$d</string>
+    <string name="segnala_salva">Salva</string>
+    <string name="segnala_salvata">Segnalazione salvata, grazie!</string>
 
     <!-- Impostazioni -->
     <string name="impostazioni_titolo">Impostazioni</string>
@@ -98,4 +110,14 @@
     <string name="tema_alto_contrasto">Alto contrasto</string>
     <string name="colori_telefono">Colori del telefono</string>
     <string name="colori_telefono_descrizione">Usa i colori dello sfondo (Android 12+)</string>
+
+    <!-- Segnalazioni -->
+    <string name="segnalazioni_titolo">Segnalazioni</string>
+    <string name="segnalazioni_suggerimenti">Suggerimenti sull\'app</string>
+    <string name="segnalazioni_invia">Invia</string>
+    <string name="segnalazioni_salvate">Segnalazioni salvate: %1$d</string>
+    <string name="segnalazioni_cancella">Cancella tutte</string>
+    <string name="segnalazioni_cancella_conferma">Cancellare tutte le segnalazioni salvate?</string>
+    <string name="segnalazioni_cancella_si">Cancella</string>
+    <string name="segnalazioni_locale">Restano solo su questo telefono.</string>
 </resources>
