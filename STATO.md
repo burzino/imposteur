@@ -35,7 +35,15 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - I percorsi locali stanno in `.claude/ambiente-locale.md` (in `.gitignore`); la storia è stata ripulita prima del primo push.
 - Le segnalazioni nella PWA si esportano come file, perché adb non è disponibile.
 
+## Ultimi passi (2026-10-08)
+- Aggiunti: opzioni avanzate (fisarmonica, 6 opzioni), tasto Home in alto, ordine di parola, griglia di Rivedi.
+- Collaudo su OnePlus 9 superato. Corretti il doppio tocco (ritardo di 600 ms) e il dialogo di segnalazione sopra la tastiera. Script di collaudo: `tools/collaudo/ui.py`.
+- Restyling della distribuzione (commit 9c15180): "Tieni premuto per scoprire" (pressione lunga), carta che si gira, fila di avatar, overlay "Tutti pronti!". 150/150 test. In attesa del parere dell'utente.
+
 ## Punti aperti
+- Push dei commit da c498f04 in poi.
+- L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.
+- Specifiche da aggiornare per il restyling (pressione lunga, overlay).
 - Collaudo sul telefono fisico da fare con l utente (ondata 6).
 - Revisione qualità parole in corso (docs/revisione-parole.md). Poi secondo giro di collaudo: affine, doppio tocco, am kill, Recents.
 - Build release firmata: da fare, la chiave la crea l utente.
