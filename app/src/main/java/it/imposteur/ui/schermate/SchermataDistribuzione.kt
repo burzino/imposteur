@@ -281,7 +281,7 @@ private fun FilaAvatar(giocatori: List<String>, corrente: Int) {
 internal fun Passaggio(
     partita: Partita,
     indice: Int,
-    mostraFila: Boolean = true,
+    mostraAvanzamento: Boolean = true,
     onSono: () -> Unit,
 ) {
     val nome = partita.giocatori[indice]
@@ -306,12 +306,15 @@ internal fun Passaggio(
             }
         },
     ) {
-        if (mostraFila) FilaAvatar(partita.giocatori, indice)
-        Text(
-            stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // In Rivedi (CA-54) né fila di avatar né "Giocatore k di N"
+        if (mostraAvanzamento) {
+            FilaAvatar(partita.giocatori, indice)
+            Text(
+                stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         val respiro by rememberInfiniteTransition(label = "respiro").animateFloat(
             initialValue = 1f,
             targetValue = 1.05f,

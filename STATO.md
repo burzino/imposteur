@@ -55,12 +55,13 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Collaudo in Chrome headless (puppeteer-core, script e rapporto nello scratchpad della sessione): 8 flussi OK, console pulita, 360 px senza tagli.
 - Agenti in parallelo: lo sviluppatore A aveva sovrascritto i test del tester; ora sviluppatore.md vieta di toccare i test.
 
+- Rivedi: vale il CA-54 (utente, 2026-10-08): niente "Giocatore k di N" nel Passaggio, anche su Android (`mostraAvanzamento = false`). APK da reinstallare per il collaudo.
+
 ## Prossimi passi PWA
 1. Collaudo sul telefono vero (Android Chrome e iPhone Safari): installazione, vibrazione, wake lock, pressione lunga in Rivedi entro 400 ms dal tocco sul nome (in headless non rivela: probabile ritardo anti doppio tocco di 600 ms, voluto).
 2. Non verificati: persistenza del tema dopo il reload (CA-W14), contenuto del file di segnalazioni esportato, localStorage bloccato, rotazione.
 3. Dominio imposteur.burzi.eu: CNAME su Aruba verso `burzino.github.io.`, poi BASE_PATH=/ nel workflow e dominio personalizzato in Pages.
-4. Rivedi: il codice Android mostra "Giocatore k di N", il CA-54 aggiornato dice di no (la PWA segue il CA-54). Decidere quale vale.
-5. Le action di Pages girano ancora su Node 20 (avviso di deprecazione): aggiornarle quando escono versioni nuove.
+4. Le action di Pages girano ancora su Node 20 (avviso di deprecazione): aggiornarle quando escono versioni nuove.
 
 ## Punti aperti
 - L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.

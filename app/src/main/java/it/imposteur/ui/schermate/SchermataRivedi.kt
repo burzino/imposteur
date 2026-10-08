@@ -85,7 +85,7 @@ fun SchermataRivedi(
             if (revisione.rivelato) {
                 Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi) { onChiudi() }
             } else {
-                Passaggio(partita, revisione.indice, mostraFila = false) { onSono() }
+                Passaggio(partita, revisione.indice, mostraAvanzamento = false) { onSono() }
             }
         }
         return
