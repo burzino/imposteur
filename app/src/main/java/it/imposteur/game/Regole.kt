@@ -4,6 +4,8 @@ object Regole {
     const val MIN_GIOCATORI = 3
     const val MAX_GIOCATORI = 20
     const val MAX_LUNGHEZZA_NOME = 20
+    const val PROBABILITA_TRAPPOLA = 0.10
+    const val MAX_GIRI = 3
 
     fun maxImpostori(numeroGiocatori: Int): Int = maxOf(0, (numeroGiocatori - 1) / 2)
 

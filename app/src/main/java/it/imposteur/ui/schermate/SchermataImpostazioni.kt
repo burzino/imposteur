@@ -62,6 +62,7 @@ fun SchermataImpostazioni(
     onCancellaSegnalazioni: () -> Unit,
     onCambia: (Aspetto) -> Unit,
     onIndietro: () -> Unit,
+    onHome: () -> Unit,
 ) {
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -84,6 +85,7 @@ fun SchermataImpostazioni(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
+                actions = { AzioneHome(onHome) },
             )
         },
     ) { padding ->

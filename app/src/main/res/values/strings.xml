@@ -8,6 +8,8 @@
     <string name="interrompere_conferma">Interrompi</string>
     <string name="interrompere_continua">Continua a giocare</string>
     <string name="indietro">Indietro</string>
+    <string name="torna_home">Torna alla Home</string>
+    <string name="distribuzione_titolo">Distribuzione dei ruoli</string>
     <string name="annulla">Annulla</string>
 
     <!-- Home -->
@@ -35,6 +37,7 @@
     <string name="config_modalita">Modalità</string>
     <string name="modalita_senza_parola">Impostore senza parola</string>
     <string name="modalita_affine">Parola affine</string>
+    <string name="config_numero_impostori_max">Impostori (massimo)</string>
     <string name="config_mostra_categoria">L\'impostore vede la categoria</string>
     <string name="config_categorie">Categorie</string>
     <string name="config_seleziona_tutte">Seleziona tutte</string>
@@ -50,6 +53,38 @@
     <string name="config_azzera_conferma">Rimettere in gioco tutte le parole delle categorie scelte?</string>
     <string name="config_diminuisci">Diminuisci</string>
     <string name="config_aumenta">Aumenta</string>
+
+    <!-- Opzioni avanzate -->
+    <string name="opz_titolo">Opzioni avanzate</string>
+    <string name="opz_regole_classiche">Regole classiche</string>
+    <string name="opz_espandi">Espandi</string>
+    <string name="opz_comprimi">Comprimi</string>
+    <plurals name="opz_attive">
+        <item quantity="one">%d attiva</item>
+        <item quantity="other">%d attive</item>
+    </plurals>
+    <string name="opz_gruppo_ruoli">Ruoli</string>
+    <string name="opz_gruppo_turni">Turni</string>
+    <string name="opz_gruppo_fine">Fine partita</string>
+    <string name="opz_desc_vede_categoria">Aiuta l\'impostore a bluffare.</string>
+    <string name="opz_non_primo">L\'impostore non parla per primo</string>
+    <string name="opz_desc_non_primo">Chi inizia è sempre un civile.</string>
+    <string name="opz_sorpresa">Numero di impostori a sorpresa</string>
+    <string name="opz_desc_sorpresa">Il numero di impostori è casuale, da 1 al massimo scelto.</string>
+    <string name="opz_trappola">Partita trappola</string>
+    <string name="opz_desc_trappola">1 partita su 10 non ha nessun impostore.</string>
+    <string name="opz_ordine_casuale">Ordine di parola casuale</string>
+    <string name="opz_desc_ordine_casuale">L\'ordine viene mescolato, non segue la lista.</string>
+    <string name="opz_giri">Giri di indizi</string>
+    <string name="opz_desc_giri">Quante volte ripetere l\'ordine di parola.</string>
+    <string name="opz_promemoria">Promemoria: ultima possibilità</string>
+    <string name="opz_desc_promemoria">Alla fine ricorda che l\'impostore può ancora vincere indovinando la parola.</string>
+    <string name="opz_breve_non_primo">Non parla per primo</string>
+    <string name="opz_breve_sorpresa">Impostori a sorpresa</string>
+    <string name="opz_breve_trappola">Trappola</string>
+    <string name="opz_breve_ordine_casuale">Ordine casuale</string>
+    <string name="opz_breve_giri">%d giri</string>
+    <string name="opz_breve_promemoria">Promemoria</string>
 
     <!-- Distribuzione -->
     <string name="distribuzione_indicatore">Giocatore %1$d di %2$d</string>
@@ -73,6 +108,7 @@
     <string name="gioco_conferma_messaggio">Verrà mostrato chi era l\'impostore.</string>
     <string name="gioco_conferma_si">Rivela</string>
     <string name="gioco_conferma_no">Non ancora</string>
+    <string name="gioco_giro_n">Giro %1$d</string>
     <string name="gioco_rivedi">Rivedi la parola</string>
 
     <!-- Rivedi la parola -->
@@ -87,6 +123,8 @@
     <string name="rivela_titolo">Il risultato</string>
     <string name="rivela_impostore">L\'impostore era: %1$s</string>
     <string name="rivela_impostori">Gli impostori erano: %1$s</string>
+    <string name="rivela_trappola">Nessun impostore: era una partita trappola!</string>
+    <string name="rivela_promemoria">L\'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!</string>
     <string name="rivela_parola">La parola era: %1$s</string>
     <string name="rivela_affine">La parola affine era: %1$s</string>
     <string name="rivela_categoria">Categoria: %1$s</string>

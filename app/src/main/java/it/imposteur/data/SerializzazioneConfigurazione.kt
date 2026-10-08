@@ -15,6 +15,12 @@ internal data class ConfigurazioneDto(
     val modalita: String = Modalita.SENZA_PAROLA.name,
     val mostraCategoria: Boolean = true,
     val categorieSelezionate: List<String> = emptyList(),
+    val impostoreNonPrimo: Boolean = false,
+    val impostoriSorpresa: Boolean = false,
+    val ordineCasuale: Boolean = false,
+    val partitaTrappola: Boolean = false,
+    val promemoriaUltimaPossibilita: Boolean = false,
+    val giriIndizi: Int = 1,
 )
 
 object SerializzazioneConfigurazione {
@@ -24,6 +30,8 @@ object SerializzazioneConfigurazione {
         ConfigurazioneDto(
             config.numeroGiocatori, config.nomi, config.numeroImpostori, config.modalita.name,
             config.mostraCategoria, config.categorieSelezionate.toList(),
+            config.impostoreNonPrimo, config.impostoriSorpresa, config.ordineCasuale,
+            config.partitaTrappola, config.promemoriaUltimaPossibilita, config.giriIndizi,
         )
     )
 
@@ -44,6 +52,12 @@ object SerializzazioneConfigurazione {
             modalita = Modalita.entries.firstOrNull { it.name == dto.modalita } ?: Modalita.SENZA_PAROLA,
             mostraCategoria = dto.mostraCategoria,
             categorieSelezionate = selezionate,
+            impostoreNonPrimo = dto.impostoreNonPrimo,
+            impostoriSorpresa = dto.impostoriSorpresa,
+            ordineCasuale = dto.ordineCasuale,
+            partitaTrappola = dto.partitaTrappola,
+            promemoriaUltimaPossibilita = dto.promemoriaUltimaPossibilita,
+            giriIndizi = dto.giriIndizi.coerceIn(1, Regole.MAX_GIRI),
         )
     }
 }

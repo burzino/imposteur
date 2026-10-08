@@ -62,6 +62,7 @@ fun SchermataConfigurazione(
     stato: UiState,
     viewModel: ImpostoreViewModel,
     onIndietro: () -> Unit,
+    onHome: () -> Unit,
     onInizia: () -> Unit,
 ) {
     BackHandler(onBack = onIndietro)
@@ -81,6 +82,7 @@ fun SchermataConfigurazione(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
+                actions = { AzioneHome(onHome) },
             )
         },
         bottomBar = {
@@ -156,7 +158,9 @@ fun SchermataConfigurazione(
 
             HorizontalDivider()
             Stepper(
-                etichetta = stringResource(R.string.config_numero_impostori),
+                etichetta = stringResource(
+                    if (config.impostoriSorpresa) R.string.config_numero_impostori_max else R.string.config_numero_impostori,
+                ),
                 valore = config.numeroImpostori,
                 min = 1,
                 max = maxImpostori,
@@ -175,26 +179,6 @@ fun SchermataConfigurazione(
                 selezionata = config.modalita == Modalita.PAROLA_AFFINE,
                 onClick = { viewModel.impostaModalita(Modalita.PAROLA_AFFINE) },
             )
-            if (config.modalita == Modalita.SENZA_PAROLA) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .toggleable(
-                            value = config.mostraCategoria,
-                            role = Role.Switch,
-                            onValueChange = viewModel::impostaMostraCategoria,
-                        )
-                        .padding(vertical = 8.dp),
-                ) {
-                    Text(
-                        stringResource(R.string.config_mostra_categoria),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Switch(checked = config.mostraCategoria, onCheckedChange = null)
-                }
-            }
 
             HorizontalDivider()
             Titolo(stringResource(R.string.config_categorie))
@@ -242,6 +226,8 @@ fun SchermataConfigurazione(
             } else if (ErroreConfigurazione.PoolVuoto in errori) {
                 Messaggio(stringResource(R.string.config_pool_vuoto))
             }
+
+            PannelloOpzioniAvanzate(config = config, onCambia = viewModel::impostaOpzione)
         }
     }
 

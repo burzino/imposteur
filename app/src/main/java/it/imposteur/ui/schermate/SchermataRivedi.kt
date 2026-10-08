@@ -55,6 +55,7 @@ fun SchermataRivedi(
     onInterrompi: () -> Unit,
     onTornaAElenco: () -> Unit,
     onChiudi: () -> Unit,
+    onHome: () -> Unit,
 ) {
     SchermoProtetto()
 
@@ -80,10 +81,12 @@ fun SchermataRivedi(
     if (partita == null) return
 
     if (revisione != null && revisione.indice in partita.giocatori.indices) {
-        if (revisione.rivelato) {
-            Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi) { onChiudi() }
-        } else {
-            Passaggio(partita, revisione.indice) { onSono() }
+        ScaffoldConHome(titolo = R.string.rivedi_titolo, onHome = onHome) {
+            if (revisione.rivelato) {
+                Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi) { onChiudi() }
+            } else {
+                Passaggio(partita, revisione.indice) { onSono() }
+            }
         }
         return
     }
@@ -97,6 +100,7 @@ fun SchermataRivedi(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
+                actions = { AzioneHome(onHome) },
             )
         },
     ) { padding ->

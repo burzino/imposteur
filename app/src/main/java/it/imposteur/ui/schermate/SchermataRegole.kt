@@ -22,7 +22,7 @@ import it.imposteur.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SchermataRegole(onIndietro: () -> Unit) {
+fun SchermataRegole(onIndietro: () -> Unit, onHome: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -32,6 +32,7 @@ fun SchermataRegole(onIndietro: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
+                actions = { AzioneHome(onHome) },
             )
         },
     ) { padding ->

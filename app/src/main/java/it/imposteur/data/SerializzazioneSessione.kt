@@ -4,6 +4,7 @@ import it.imposteur.game.Categoria
 import it.imposteur.game.ChiaveParola
 import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
+import it.imposteur.game.Regole
 import it.imposteur.game.SessioneSalvata
 import it.imposteur.game.StatoDistribuzione
 import it.imposteur.game.VoceParola
@@ -26,6 +27,9 @@ internal data class PartitaDto(
     val modalita: String,
     val mostraCategoria: Boolean,
     val primoGiocatore: Int,
+    val ordine: List<Int>? = null,
+    val giriIndizi: Int = 1,
+    val promemoria: Boolean = false,
 )
 
 @Serializable
@@ -53,6 +57,7 @@ object SerializzazioneSessione {
                     PartitaDto(
                         it.giocatori, it.impostori.sorted(), it.voce.categoriaId, it.voce.parola,
                         it.voce.affine, it.modalita.name, it.mostraCategoria, it.primoGiocatore,
+                        it.ordine, it.giriIndizi, it.promemoriaUltimaPossibilita,
                     ),
                 )
             },
@@ -95,9 +100,11 @@ object SerializzazioneSessione {
             return null
         }
         val n = p.giocatori.size
-        if (n == 0 || p.impostori.isEmpty()) return null
+        if (n == 0) return null
         if (p.impostori.toSet().size != p.impostori.size) return null
         if (p.impostori.any { it !in 0 until n } || p.primoGiocatore !in 0 until n) return null
+        val ordine = p.ordine
+        if (ordine != null && (ordine.size != n || ordine.toSet() != (0 until n).toSet() || ordine[0] != p.primoGiocatore)) return null
         val categoria = categorie.firstOrNull { it.id == p.categoriaId } ?: return null
         val parola = categoria.parole.firstOrNull { norm(it.parola) == norm(p.parola) } ?: return null
         val stato = when (st.tipo) {
@@ -121,6 +128,9 @@ object SerializzazioneSessione {
             modalita = modalita,
             mostraCategoria = p.mostraCategoria,
             primoGiocatore = p.primoGiocatore,
+            ordine = ordine,
+            giriIndizi = p.giriIndizi.coerceIn(1, Regole.MAX_GIRI),
+            promemoriaUltimaPossibilita = p.promemoria,
         )
         return partita to stato
     }

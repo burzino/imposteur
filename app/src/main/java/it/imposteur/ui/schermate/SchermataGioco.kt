@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,18 +41,21 @@ import androidx.compose.ui.unit.dp
 import it.imposteur.R
 import it.imposteur.game.Partita
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SchermataGioco(
     partita: Partita?,
     onRivela: () -> Unit,
     onRivedi: () -> Unit,
     onInterrompiPartita: () -> Unit,
+    onHome: () -> Unit,
 ) {
     var chiediInterruzione by rememberSaveable { mutableStateOf(false) }
     var chiediRivela by rememberSaveable { mutableStateOf(false) }
     BackHandler { chiediInterruzione = true }
 
     if (partita != null) {
+        ScaffoldConHome(titolo = R.string.gioco_titolo, onHome = onHome) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,13 +63,6 @@ fun SchermataGioco(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                stringResource(R.string.gioco_titolo),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(16.dp))
             TestoAdattivo(
                 testo = stringResource(R.string.gioco_inizia, partita.giocatori[partita.primoGiocatore]),
                 stile = MaterialTheme.typography.headlineMedium,
@@ -82,8 +79,22 @@ fun SchermataGioco(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                itemsIndexed(ordine) { posizione, indice ->
-                    val primo = posizione == 0
+                for (giro in 1..partita.giriIndizi.coerceIn(1, 3)) {
+                if (partita.giriIndizi > 1) {
+                    stickyHeader(key = "giro$giro") {
+                        Text(
+                            stringResource(R.string.gioco_giro_n, giro),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(vertical = 4.dp),
+                        )
+                    }
+                }
+                itemsIndexed(ordine, key = { posizione, _ -> "g$giro-$posizione" }) { posizione, indice ->
+                    val primo = giro == 1 && posizione == 0
                     val sfondo = if (primo) MaterialTheme.colorScheme.primaryContainer
                     else MaterialTheme.colorScheme.surfaceVariant
                     val testo = if (primo) MaterialTheme.colorScheme.onPrimaryContainer
@@ -119,6 +130,7 @@ fun SchermataGioco(
                         )
                     }
                 }
+                }
             }
             Spacer(Modifier.height(12.dp))
             Column(
@@ -138,6 +150,7 @@ fun SchermataGioco(
                     Text(stringResource(R.string.gioco_rivela), style = MaterialTheme.typography.titleMedium)
                 }
             }
+        }
         }
     }
 

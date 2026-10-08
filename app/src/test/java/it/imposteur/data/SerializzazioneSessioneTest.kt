@@ -142,7 +142,9 @@ class SerializzazioneSessioneTest {
     @Test fun `CA-40 campo mancante nella partita la scarta`() {
         val (obj, ogg) = oggetti(sessione())
         val (kP, p) = ogg.last()
-        for (campo in (p as JsonObject).keys) {
+        // v1.6: ordine, giriIndizi e promemoria sono facoltativi per leggere i salvataggi precedenti
+        val facoltativi = setOf("ordine", "giriIndizi", "promemoria")
+        for (campo in (p as JsonObject).keys - facoltativi) {
             val mod = JsonObject(obj + (kP to JsonObject(p - campo)))
             val r = SerializzazioneSessione.daStringa(mod.toString(), cats)
             assertNull("campo mancante '$campo' dovrebbe scartare la partita", r.partita)

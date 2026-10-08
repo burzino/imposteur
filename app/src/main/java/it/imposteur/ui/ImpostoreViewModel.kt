@@ -175,6 +175,9 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun impostaModalita(m: Modalita) = modificaConfig { it.copy(modalita = m) }
 
+    /** Modifica generica per le opzioni avanzate; si salva come le altre. */
+    fun impostaOpzione(trasforma: (Configurazione) -> Configurazione) = modificaConfig(trasforma)
+
     fun impostaMostraCategoria(v: Boolean) = modificaConfig { it.copy(mostraCategoria = v) }
 
     fun impostaCategoria(id: String, selezionata: Boolean) = modificaConfig { c ->
@@ -259,6 +262,25 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         partitaAttiva = false
         _revisione.value = null
         _stato.update { it.copy(partita = null, distribuzione = Distribuzione.iniziale(), ripristinabile = null) }
+        persisti()
+    }
+
+    /**
+     * Esce verso la Home senza interrompere la partita: nasconde i ruoli visibili,
+     * rende la partita ripristinabile ("Riprendi partita") e salva la sessione.
+     */
+    fun sospendiPartita() {
+        val s = _stato.value
+        val p = s.partita ?: return
+        _revisione.value = null
+        val dist = Distribuzione.interrompiRivelazione(s.distribuzione)
+        partitaAttiva = true
+        _stato.update {
+            it.copy(
+                distribuzione = dist,
+                ripristinabile = SessioneSalvata(p, dist, gestore.usate, gestore.ultima),
+            )
+        }
         persisti()
     }
 

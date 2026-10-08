@@ -12,23 +12,30 @@ data class Partita(
     val modalita: Modalita,
     val mostraCategoria: Boolean,
     val primoGiocatore: Int,
+    /** Ordine personalizzato (ordine casuale); null = rotazione da primoGiocatore, calcolata al momento. */
+    val ordine: List<Int>? = null,
+    val giriIndizi: Int = 1,
+    val promemoriaUltimaPossibilita: Boolean = false,
 ) {
+    val trappola: Boolean get() = impostori.isEmpty()
+
     fun contenutoPer(indice: Int): ContenutoRuolo {
         val impostore = indice in impostori
         return when {
-            !impostore -> ContenutoRuolo.ParolaSegreta(voce.parola)
+            trappola || !impostore -> ContenutoRuolo.ParolaSegreta(voce.parola)
             modalita == Modalita.PAROLA_AFFINE -> ContenutoRuolo.ParolaSegreta(voce.affine ?: voce.parola)
             else -> ContenutoRuolo.Impostore(if (mostraCategoria) voce.categoriaNome else null)
         }
     }
 
     fun ordineDiParola(): List<Int> =
-        List(giocatori.size) { (primoGiocatore + it) % giocatori.size }
+        ordine ?: List(giocatori.size) { (primoGiocatore + it) % giocatori.size }
 
     fun testoSvelamento(): String {
         val nomi = impostori.sorted().map { giocatori[it] }
         val righe = mutableListOf<String>()
-        righe += if (nomi.size == 1) TestiGioco.impostoriSingolare(nomi[0]) else TestiGioco.impostoriPlurale(nomi)
+        righe += if (nomi.isEmpty()) TestiGioco.NESSUN_IMPOSTORE
+        else if (nomi.size == 1) TestiGioco.impostoriSingolare(nomi[0]) else TestiGioco.impostoriPlurale(nomi)
         righe += TestiGioco.laParolaEra(voce.parola)
         if (modalita == Modalita.PAROLA_AFFINE && voce.affine != null) righe += TestiGioco.laParolaAffineEra(voce.affine)
         righe += TestiGioco.categoria(voce.categoriaNome)
@@ -88,7 +95,19 @@ class GestorePartite(
         usateInterne += chiave(voce)
         ultimaInterna = chiave(voce)
         val n = config.numeroGiocatori
-        val impostori = (0 until n).shuffled(random).take(config.numeroImpostori).toSet()
+        val k = when {
+            config.partitaTrappola && random.nextDouble() < Regole.PROBABILITA_TRAPPOLA -> 0
+            config.impostoriSorpresa -> random.nextInt(1, config.numeroImpostori + 1)
+            else -> config.numeroImpostori
+        }
+        val impostori = (0 until n).shuffled(random).take(k).toSet()
+        val primo = if (config.impostoreNonPrimo && k > 0) {
+            val civili = (0 until n).filter { it !in impostori }
+            civili[random.nextInt(civili.size)]
+        } else random.nextInt(n)
+        val ordine = if (config.ordineCasuale) {
+            listOf(primo) + (0 until n).filter { it != primo }.shuffled(random)
+        } else null
         return RisultatoNuovaPartita.Ok(
             Partita(
                 giocatori = Regole.nomiEffettivi(config),
@@ -96,7 +115,10 @@ class GestorePartite(
                 voce = voce,
                 modalita = config.modalita,
                 mostraCategoria = config.mostraCategoria,
-                primoGiocatore = random.nextInt(n),
+                primoGiocatore = primo,
+                ordine = ordine,
+                giriIndizi = config.giriIndizi.coerceIn(1, Regole.MAX_GIRI),
+                promemoriaUltimaPossibilita = config.promemoriaUltimaPossibilita,
             )
         )
     }

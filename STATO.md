@@ -28,6 +28,11 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Aggiunti: Rivedi la parola; proposte UX 1–7, 13, 14 e 16; tema (Sistema, Chiaro, Scuro, Alto contrasto, più i colori dinamici); segnalazioni di coppie e suggerimenti in `Android/data/it.imposteur/files/segnalazioni.jsonl`, da leggere con adb.
 - La vibrazione è identica per tutti, per non rivelare l'impostore.
 
+## PWA (decisa il 2026-10-08, da avviare dopo la chiusura della v1 Android)
+- Strada A: app web separata in `web/` (TypeScript, Vite e plugin PWA) con lo stesso `parole.json` come unica fonte; le regole sono riportate dalle specifiche e verificate con test equivalenti.
+- L'utente ha un account GitHub. `gh` CLI non è installata. Da decidere: repository pubblico o privato e hosting (GitHub Pages richiede un repository pubblico sul piano gratuito; Cloudflare Pages funziona anche con un repository privato).
+- Le segnalazioni nella PWA si esportano come file, perché adb non è disponibile.
+
 ## Punti aperti
 - Collaudo sul telefono fisico da fare con l utente (ondata 6).
 - Revisione qualità parole in corso (docs/revisione-parole.md). Poi secondo giro di collaudo: affine, doppio tocco, am kill, Recents.

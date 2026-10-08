@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -57,8 +60,9 @@ import it.imposteur.R
 import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit) {
+fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit, onHome: () -> Unit) {
     BackHandler(onBack = onCambiaImpostazioni)
     // Fissa la partita svelata: un cambio di partita durante la transizione non la altera.
     var fissata by remember { mutableStateOf(partitaViva) }
@@ -70,7 +74,15 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
     val scope = rememberCoroutineScope()
     var segnalando by rememberSaveable { mutableStateOf(false) }
     val messaggioSalvata = stringResource(R.string.segnala_salvata)
-    Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { innerPadding ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbar) },
+        topBar = {
+            androidx.compose.material3.TopAppBar(
+                title = { Text(stringResource(R.string.rivela_titolo)) },
+                actions = { AzioneHome(onHome) },
+            )
+        },
+    ) { innerPadding ->
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,17 +98,23 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            stringResource(R.string.rivela_titolo),
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        val testoImpostori = if (nomiImpostori.size == 1) {
+        val testoImpostori = if (nomiImpostori.isEmpty()) {
+            stringResource(R.string.rivela_trappola)
+        } else if (nomiImpostori.size == 1) {
             stringResource(R.string.rivela_impostore, nomiImpostori.first())
         } else {
             stringResource(R.string.rivela_impostori, nomiImpostori.joinToString(", "))
         }
-        TestoAdattivo(testoImpostori, MaterialTheme.typography.headlineMedium, maxRighe = 3)
+        if (partita.trappola) {
+            TestoAdattivo(
+                testoImpostori,
+                MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.tertiary,
+                maxRighe = 3,
+            )
+        } else {
+            TestoAdattivo(testoImpostori, MaterialTheme.typography.headlineMedium, maxRighe = 3)
+        }
         Text(
             stringResource(R.string.rivela_parola, partita.voce.parola),
             style = MaterialTheme.typography.titleLarge,
@@ -114,6 +132,27 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
         )
+        if (partita.promemoriaUltimaPossibilita && !partita.trappola) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(16.dp),
+                ) {
+                    Icon(Icons.Filled.Info, contentDescription = null)
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        stringResource(R.string.rivela_promemoria),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+        }
     }
     Column(
         modifier = Modifier.padding(top = 16.dp),

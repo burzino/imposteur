@@ -9,6 +9,7 @@ Incluso in v1:
 - distribuzione segreta dei ruoli, un giocatore alla volta;
 - schermata di gioco con giocatore che inizia;
 - rivelazione finale e nuova partita;
+- opzioni avanzate facoltative (4.2.1), ordine di parola (5.6) e segnalazione di coppie (4.6);
 - memorizzazione della configurazione tra un avvio e l'altro.
 
 Discussione e voto avvengono a voce, fuori dall'app. Vedi sezione 9 per il fuori perimetro.
@@ -45,11 +46,12 @@ Tutti i campi sono precompilati con l'ultima configurazione salvata (o con i def
 |---|---|---|---|
 | Numero giocatori | stepper "−" / "+" con valore visibile | intero 3–20 | 4 |
 | Nomi | un campo testo per giocatore, etichetta "Giocatore n" | facoltativo; spazi iniziali/finali rimossi; max 20 caratteri; nome vuoto → "Giocatore n"; nomi duplicati (senza distinzione maiuscole/minuscole) non ammessi | vuoto (mostra "Giocatore 1…N") |
-| Numero impostori | stepper | minimo 1; massimo = floor((giocatori − 1) / 2), cioè i civili sono sempre più degli impostori (3-4 giocatori → 1, 5-6 → 2, 7-8 → 3, …, 20 → 9) | 1 |
+| Numero impostori (etichetta "Impostori (massimo)" con "Impostori a sorpresa" attivo, vedi 4.2.1) | stepper | minimo 1; massimo = floor((giocatori − 1) / 2), cioè i civili sono sempre più degli impostori (3-4 giocatori → 1, 5-6 → 2, 7-8 → 3, …, 20 → 9) | 1 |
 | Modalità | scelta singola: "Impostore senza parola" / "Parola affine" | obbligatoria | "Impostore senza parola" |
-| L'impostore vede la categoria | interruttore | visibile e attivo solo se la modalità è "Impostore senza parola"; nascosto (non applicato) in "Parola affine" | attivo |
+| L'impostore vede la categoria | interruttore, nel gruppo "Ruoli" delle Opzioni avanzate (4.2.1) | visibile e attivo solo se la modalità è "Impostore senza parola"; nascosto (non applicato) in "Parola affine" | attivo |
 | Categorie | lista con caselle di selezione, più "Seleziona tutte" / "Deseleziona tutte" | almeno una selezionata | tutte selezionate |
 | Parole ancora da giocare | testo "Parole ancora da giocare: X / Y" e pulsante "Azzera" | vedi sotto | calcolato |
+| Opzioni avanzate | card a fisarmonica, vedi 4.2.1 | tutte facoltative | chiusa, tutte spente |
 
 Regole di validazione:
 - Se il numero giocatori scende, il numero impostori e i nomi in eccesso si adattano: impostori = min(impostori, nuovo massimo). I nomi dei giocatori oltre N restano memorizzati ma non usati.
@@ -60,6 +62,25 @@ Regole di validazione:
 - Quando "Inizia" è disabilitato, sopra il pulsante compare in rosso il primo errore di validazione (in ordine di schermata) con il suo testo dedicato ("Nome già usato", "Seleziona almeno una categoria", "Le categorie scelte non contengono parole utilizzabili"); se l'errore non ha un testo dedicato compare "Controlla la configurazione".
 - "Parole ancora da giocare: X / Y": Y = dimensione del pool iniziale (5.2 passo 1) per le categorie e la modalità attualmente scelte; X = parole di quel pool non presenti tra le usate. Si aggiorna al variare di categorie e modalità. Il pulsante "Azzera" è abilitato solo se X < Y e chiede conferma "Rimettere in gioco tutte le parole delle categorie scelte?" con pulsanti "Annulla" / "Azzera". Confermando, dalle usate si tolgono solo le parole delle categorie scelte (le usate di altre categorie restano); "Annulla" non cambia nulla.
 - "Inizia" salva la configurazione e apre la Distribuzione ruoli. Tasto indietro: torna alla Home (la configurazione corrente viene salvata).
+
+### 4.2.1 Opzioni avanzate
+Card a fisarmonica "Opzioni avanzate", chiusa per default (lo stato aperto/chiuso non è persistito), posta dopo le Categorie. Tutte le opzioni sono spente per default e sono salvate con la configurazione (6).
+
+- **Intestazione della card**: titolo "Opzioni avanzate", badge "N attive" (N = opzioni contate attive, vedi sotto; assente se N = 0) e, a card chiusa, un riassunto: "Regole classiche" se N = 0, altrimenti i nomi brevi delle opzioni attive separati da virgola.
+- **Gruppo "Ruoli"**:
+  - "L'impostore vede la categoria" (interruttore, spostato qui dalla posizione di 4.2; stesse regole: visibile solo in modalità "Impostore senza parola"; default attivo; NON contata nel badge);
+  - "L'impostore non parla per primo" (interruttore);
+  - "Impostori a sorpresa" (interruttore): K è scelto a caso in 1..massimo a ogni partita;
+  - "Partita trappola" (interruttore): ogni tanto nessuno è impostore (probabilità 10%).
+- **Gruppo "Turni"**:
+  - "Ordine casuale" (interruttore);
+  - "Giri di indizi" (scelta singola 1 | 2 | 3, default 1; contata nel badge se > 1).
+- **Gruppo "Fine partita"**:
+  - "Promemoria ultima possibilità" (interruttore).
+- **Badge**: N = numero di interruttori attivi tra "L'impostore non parla per primo", "Impostori a sorpresa", "Partita trappola", "Ordine casuale", "Promemoria ultima possibilità", più 1 se "Giri di indizi" > 1.
+- **Etichetta del selettore impostori**: con "Impostori a sorpresa" attivo diventa "Impostori (massimo)"; altrimenti "Numero impostori". Limiti invariati (min 1, max floor((giocatori − 1) / 2)).
+- Nessuna regola di validazione aggiuntiva: ogni combinazione è ammessa. "Partita trappola" e "Impostori a sorpresa" sono compatibili.
+- In modalità "Parola affine" tutte le opzioni restano disponibili; "L'impostore vede la categoria" resta nascosta (4.2).
 
 ### 4.3 Distribuzione ruoli
 Per ogni giocatore, nell'ordine della lista, si alternano tre stati:
@@ -86,6 +107,7 @@ Regole:
 
 ### 4.4 Schermata di gioco
 - Testo "Si gioca!" e "Parla per primo: <nome>" dove <nome> è il giocatore che inizia, scelto a caso uniformemente tra tutti i giocatori (indipendentemente dal ruolo).
+- Ordine di parola: sotto "Parla per primo: <nome>" l'elenco numerato dei giocatori nell'ordine in cui parlano (5.6), nomi effettivi, senza ruoli. Con "Giri di indizi" > 1 l'elenco si ripete per ogni giro con le intestazioni "Giro 1", "Giro 2", … "Giro n"; con 1 giro nessuna intestazione. L'ordine è solo visualizzato: nessun avanzamento tra giri.
 - Testo di istruzione: "Discutete a voce, poi votate. Quando avete deciso, premete Rivela."
 - Pulsante "Rivela" (in basso) → conferma "Rivelare i ruoli?" con messaggio "Verrà mostrato chi era l'impostore." e pulsanti "Rivela" / "Non ancora" → schermata Rivela ("Non ancora" chiude il dialogo e resta in Gioco).
 - Il ruolo non è mostrato in questa schermata.
@@ -117,12 +139,21 @@ Contenuto:
 - Categoria: "Categoria: <nome categoria>".
 - Pulsanti: "Rigioca (stessi giocatori)" (stessi giocatori e impostazioni: nuova parola, nuovi impostori, nuovo giocatore iniziale → Distribuzione ruoli) e "Modifica giocatori e opzioni" (→ Configurazione, precompilata).
 - Tasto indietro: come "Modifica giocatori e opzioni".
+- Partita trappola (nessun impostore): al posto della riga sull'impostore/i compare "Nessun impostore: era una partita trappola!", seguita da parola, affine (solo modalità affine) e categoria come sopra.
+- Riquadro promemoria: se "Promemoria ultima possibilità" è attivo e c'è almeno un impostore, sotto il risultato compare un riquadro con il testo "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!". Solo testo, nessun controllo; assente nella partita trappola.
 - Entrando in Rivela la partita salvata viene cancellata (la Home non mostra più "Riprendi partita" fino a una nuova partita).
+
+### 4.6 Segnalazioni
+Dall'app si può segnalare una coppia (parola, affine) o un problema dell'app; le segnalazioni sono salvate in locale in un file `segnalazioni.jsonl` (una riga JSON per segnalazione), nessun invio in rete.
+- Segnalazione di tipo "coppia": motivi (troppo simili, troppo diverse, poco conosciuta, categoria sbagliata), nota facoltativa (max 500 caratteri dopo trim) e, dalla v1.4, **proposta di coppia**: due campi facoltativi, parola e affine (trim, max 40 caratteri; vuoto = assente).
+- Proposta valida solo se entrambi i campi sono compilati e diversi (senza distinzione maiuscole/minuscole). Con un solo campo compilato, o con due parole uguali, "Salva" è disattivato e compare un avviso.
+- "Salva" è disattivato anche se non c'è alcun motivo, nota o proposta valida.
+- Le righe salvate prima della proposta restano leggibili (proposta assente); le righe malformate sono saltate.
 
 ## 5. Regole di gioco
 
 ### 5.1 Assegnazione ruoli
-- Con N giocatori e K impostori (1 ≤ K ≤ floor((N−1)/2)), si scelgono K giocatori distinti a caso, con distribuzione uniforme; tutti gli altri sono civili.
+- Con N giocatori e K impostori (1 ≤ K ≤ floor((N−1)/2)), si scelgono K giocatori distinti a caso, con distribuzione uniforme; tutti gli altri sono civili. (Eccezioni con le opzioni avanzate: vedi 5.5.)
 - Gli impostori non vengono comunicati tra loro (ciascuno vede solo la propria schermata).
 - L'ordine di distribuzione è quello della lista dei giocatori (non casuale).
 
@@ -141,10 +172,26 @@ Uniforme tra tutti gli N giocatori, estratto a ogni partita.
 ### 5.4 Casualità
 La logica di gioco riceve la sorgente casuale come parametro (iniettabile) per consentire test deterministici.
 
+### 5.5 Opzioni avanzate
+Tutte disattivate per default: la partita base resta identica a quella senza opzioni. Passi della creazione partita, nell'ordine:
+1. **Partita trappola**: se attiva, con probabilità 10% (costante `PROBABILITA_TRAPPOLA` = 0,10) K = 0: nessuno è impostore.
+2. Altrimenti K = numero impostori; con **Impostori a sorpresa** K è uniforme in 1..numero impostori (che diventa il massimo). Il massimo resta floor((N−1)/2).
+3. Gli impostori sono K indici distinti, scelti in modo uniforme.
+4. Primo giocatore: con **L'impostore non parla per primo** e K > 0, uniforme tra i civili; altrimenti uniforme tra tutti (5.3).
+5. Ordine di parola (5.6).
+6. **Giri di indizi** (1..3) e **Promemoria ultima possibilità** vengono copiati dalla configurazione nella partita; influenzano solo la visualizzazione (4.4, 4.5).
+
+Con K = 0 ogni giocatore riceve la parola dei civili, in entrambe le modalità. L'opzione "L'impostore vede la categoria" non è un'opzione avanzata contata (4.2.1) e non cambia regola.
+
+### 5.6 Ordine di parola
+Sequenza degli N indici dei giocatori nell'ordine in cui parlano: il primo è il giocatore che inizia. Senza **Ordine casuale**: da lui in poi seguendo la lista e ripartendo dall'inizio. Con **Ordine casuale**: il primo, poi una permutazione casuale degli altri. Ogni giocatore compare una volta. Con più giri l'ordine si ripete identico in ogni giro.
+
 ## 6. Persistenza
 
 Memorizzata in locale (es. DataStore/SharedPreferences) e ripristinata all'avvio: numero giocatori, nomi inseriti, numero impostori, modalità, opzione "mostra categoria", id delle categorie selezionate.
 
+- Opzioni avanzate (4.2.1): i cinque interruttori e "Giri di indizi" fanno parte della configurazione salvata. Campi mancanti (salvataggi precedenti) = default (spento, 1 giro); "Giri di indizi" fuori da 1..3 è corretto ai limiti.
+- Partita in corso: si salvano anche ordine di parola, giri di indizi e promemoria. Se l'ordine manca (salvataggi vecchi) si usa la rotazione da primo giocatore, con 1 giro e promemoria spento. Un ordine che non è una permutazione di 0..N−1 o non inizia con il primo giocatore rende la partita non valida. Impostori vuoti sono validi (partita trappola).
 - Al ripristino: un id di categoria non più presente nel file parole viene ignorato; se nessuna categoria valida resta, si selezionano tutte.
 - Valori fuori limite (es. impostori oltre il massimo) vengono corretti ai limiti.
 **Partita in corso.** La sessione di gioco sopravvive alla chiusura dell'app. A ogni cambio di stato si salva:
@@ -188,6 +235,7 @@ File `app/src/main/assets/parole.json`:
 - **CA-05** Un nome vuoto o di soli spazi diventa "Giocatore n" (n = posizione da 1); un nome con spazi ai bordi viene troncato dagli spazi; un nome oltre 20 caratteri è rifiutato.
 - **CA-06** Riducendo N, gli impostori vengono ridotti al nuovo massimo; aumentando N restano invariati.
 - **CA-07** L'assegnazione produce esattamente K impostori, tutti distinti, con indici in [0, N); gli altri N−K sono civili.
+  Nota: eccezione della partita trappola (5.5): con "Partita trappola" attiva, con probabilità 10% K = 0 (nessun impostore); con "Impostori a sorpresa" K è uniforme in 1..numeroImpostori. Con le opzioni spente CA-07 vale invariato. Vedi CA-70…CA-74.
 - **CA-08** Con sorgente casuale fissata (seed) l'assegnazione è riproducibile; con seed diversi si ottengono, su molte estrazioni, tutti i giocatori come impostori almeno una volta (nessun indice escluso a priori).
 - **CA-09** In modalità "Impostore senza parola" il contenuto del ruolo civile è la parola; quello dell'impostore è "Sei l'impostore" più la categoria se l'opzione è attiva, senza categoria se disattiva; non contiene mai la parola né l'affine.
 - **CA-10** In modalità "Parola affine" il contenuto civile è la parola e quello impostore è l'affine; i due oggetti di visualizzazione hanno la stessa struttura e le stesse etichette (differiscono solo nel testo della parola) e non contengono il flag di ruolo.
@@ -203,6 +251,7 @@ File `app/src/main/assets/parole.json`:
 - **CA-19** La serializzazione/deserializzazione della configurazione è reversibile (round-trip identico); id di categoria sconosciuti vengono scartati e, se non ne resta nessuno, si selezionano tutte; valori fuori limite vengono corretti ai limiti.
 - **CA-20** "Nuova partita" con le stesse impostazioni produce nuovi ruoli, nuova parola e nuovo giocatore iniziale mantenendo giocatori, nomi e impostazioni.
 - **CA-21** Il testo di svelamento usa la forma singolare con K=1 ("L'impostore era: …") e plurale con K>1 ("Gli impostori erano: …"), e include l'affine solo in modalità "Parola affine".
+  Nota: eccezione della partita trappola (opzione avanzata, 5.5): con "Partita trappola" attiva e K = 0 non vale la forma singolare/plurale ma il testo di CA-77/CA-86.
 - **CA-37** La serializzazione/deserializzazione dello stato partita (giocatori, indici impostori, categoria, parola, affine, modalità, mostraCategoria, primo giocatore, stato distribuzione) è reversibile (round-trip identico) per ciascuno stato: Passaggio k, Rivelazione k, Gioco.
 - **CA-38** La serializzazione/deserializzazione dell'insieme delle parole usate è reversibile (round-trip identico), compreso l'insieme vuoto.
 - **CA-39** Il ripristino normalizza Rivelazione k in Passaggio k (stesso k); Passaggio k e Gioco restano invariati.
@@ -210,6 +259,20 @@ File `app/src/main/assets/parole.json`:
 - **CA-41** Una partita salvata la cui categoria o parola (o affine, in modalità "Parola affine") non esiste più nel file parole è giudicata non valida; con dati coerenti col file è valida.
 - **CA-61** Le parole rimanenti di un pool sono quelle del pool non presenti tra le usate (X ≤ Y); l'azzeramento per pool rimuove dalle usate solo le parole delle categorie scelte, lasciando intatte le usate delle altre categorie; azzerare con nessuna parola usata non cambia nulla.
 - **CA-42** Le parole usate persistono tra un ripristino e l'altro: dopo salvataggio e ripristino, l'estrazione successiva esclude le parole già usate; l'esaurimento del pool le azzera come da 5.2.3. Le parole usate non più presenti nel file sono ignorate.
+
+Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` iniettato; "molte partite" = almeno 10.000 estrazioni con seed diversi.
+
+- **CA-70** Con tutte le opzioni spente (`impostoreNonPrimo`, `impostoriSorpresa`, `ordineCasuale`, `partitaTrappola`, `promemoriaUltimaPossibilita` = false, `giriIndizi` = 1) il comportamento è invariato: K = `numeroImpostori`, primo giocatore uniforme tra tutti, ordine = rotazione da primo, nessuna partita trappola, nessun promemoria; CA-07, CA-08, CA-15 e CA-21 valgono senza eccezioni. A parità di seed e di sequenza di chiamate al `Random`, l'esito coincide con quello della versione senza opzioni.
+- **CA-71** Frequenza della trappola: con `partitaTrappola` attivo, su molte partite la quota di partite con zero impostori è compresa tra 5% e 15% (probabilità nominale 10%). Con `partitaTrappola` spento le partite senza impostori sono 0.
+- **CA-72** Trappola deterministica: con `Random` il cui `nextDouble()` restituisce un valore < 0,10 la partita ha zero impostori; con un valore ≥ 0,10 ha K impostori secondo le altre regole. In una partita trappola `trappola` è vero e ogni giocatore riceve la parola dei civili in entrambe le modalità.
+- **CA-73** Impostore mai primo: con `impostoreNonPrimo` attivo e K > 0, su molte partite (con ogni N da 3 a 20) il primo giocatore non è mai un impostore, ed è uniforme tra i civili (ogni civile compare almeno una volta). Con K = 0 (trappola) il primo è uniforme tra tutti i giocatori. Il primo di `ordine` coincide con `primoGiocatore`.
+- **CA-74** K a sorpresa: con `impostoriSorpresa` attivo e `numeroImpostori` = M, K è sempre in 1..M (mai 0, mai > M, salvo trappola) e su molte partite compaiono tutti i valori 1..M con frequenza approssimativamente uniforme; con M = 1 K vale sempre 1. Il vincolo K ≤ floor((N−1)/2) resta rispettato.
+- **CA-75** Ordine di parola: `ordineDiParola()` restituisce una permutazione di 0..N−1 (size N, ogni indice una sola volta) il cui primo elemento è `primoGiocatore`. Con `ordineCasuale` spento è la rotazione: da `primoGiocatore` in poi, seguendo la lista e ripartendo dall'inizio. Con `ordineCasuale` attivo gli altri N−1 sono in ordine casuale e su molte partite non è sempre la rotazione.
+- **CA-76** `giriIndizi` è limitato a 1..3 (valori < 1 → 1, > 3 → 3) e, come `promemoriaUltimaPossibilita`, viene copiato dalla configurazione nella partita; non altera ruoli, parola, primo giocatore né ordine.
+- **CA-77** Testi: con K = 0 lo svelamento è "Nessun impostore: era una partita trappola!", seguito dalla parola (e dall'affine in modalità "Parola affine") e dalla categoria; il promemoria "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!" è prodotto solo se l'opzione è attiva e K > 0.
+- **CA-78** Salvataggi vecchi leggibili: una configurazione salvata senza i nuovi campi si legge con i default (tutte le opzioni spente, `giriIndizi` = 1); `giriIndizi` fuori da 1..3 è corretto ai limiti; una sessione salvata senza `ordine`, `giriIndizi` o `promemoria` si legge con la rotazione da `primoGiocatore`, 1 giro, promemoria spento. Il round-trip di configurazione e di sessione (CA-19, CA-37) resta identico anche con le nuove opzioni.
+- **CA-79** Una sessione salvata con `ordine` che non è una permutazione di 0..N−1, o che non inizia con `primoGiocatore`, è giudicata non valida (come CA-40). Una sessione con impostori vuoti è valida (partita trappola).
+- **CA-91** Segnalazioni: la lettura delle righe salvate prima della proposta di coppia (campi di proposta assenti) riesce con proposta nulla; la proposta è trimmata e limitata a 40 caratteri, la stringa vuota diventa assenza; `propostaValida` è vera solo se parola e affine sono entrambe presenti e diverse (senza distinzione maiuscole/minuscole); le righe malformate sono saltate in lettura.
 
 ### 8.2 Interfaccia (test strumentati/manuali)
 
@@ -250,6 +313,20 @@ File `app/src/main/assets/parole.json`:
 - **CA-63** Nella Configurazione compare "Parole ancora da giocare: X / Y" coerente con categorie e modalità scelte e si aggiorna al loro variare; "Azzera" chiede "Rimettere in gioco tutte le parole delle categorie scelte?" con "Annulla" / "Azzera"; "Annulla" non cambia X, "Azzera" porta X a Y per le categorie scelte lasciando intatte le usate delle altre (logica: CA-61).
 - **CA-64** In Distribuzione l'ultimo giocatore vede "Nascondi e inizia" al posto di "Nascondi e passa"; il pulsante è disabilitato nei primi 400 ms dopo la comparsa del ruolo e poi si attiva; la schermata di Passaggio mostra "Gli altri non guardino lo schermo".
 - **CA-65** Il feedback tattile della rivelazione è identico per civili e impostori, in entrambe le modalità (una sola vibrazione leggera); anche quello del passaggio è identico per tutti.
+
+Opzioni avanzate, ordine di parola, segnalazioni (4.2, 4.4, 4.5, 4.6):
+
+- **CA-80** Nella Configurazione compare la card "Opzioni avanzate", chiusa per default; chiusa mostra il riassunto "Regole classiche" se nessuna opzione contata è attiva, altrimenti l'elenco sintetico delle opzioni attive; aperta mostra i gruppi "Ruoli", "Turni", "Fine partita" con i controlli di 4.2.1.
+- **CA-81** Il badge mostra "N attive" con N = opzioni contate attive (4.2.1); con N = 0 il badge non compare. "L'impostore vede la categoria" è nel gruppo "Ruoli" ma non è contata nel badge.
+- **CA-82** Con "Impostori a sorpresa" attivo l'etichetta del selettore impostori è "Impostori (massimo)"; spenta torna "Numero impostori". Il limite massimo del selettore (CA-23) non cambia.
+- **CA-83** Il selettore "Giri di indizi" offre 1, 2, 3 (default 1); riaprendo l'app le opzioni avanzate hanno gli stessi valori impostati prima della chiusura (CA-26 esteso).
+- **CA-84** Con "Giri di indizi" > 1 la schermata di Gioco mostra l'ordine di parola ripetuto con le intestazioni "Giro 1", "Giro 2", …, "Giro n"; con 1 giro mostra un solo elenco senza intestazione "Giro".
+- **CA-85** La schermata di Gioco mostra l'ordine di parola nella sequenza in cui parlano i giocatori, il primo coincide con "Parla per primo: <nome>"; nessun ruolo è visibile.
+- **CA-86** In una partita trappola la schermata Rivela mostra "Nessun impostore: era una partita trappola!", poi "La parola era: <parola>" (e "La parola affine era: <affine>" in modalità "Parola affine") e "Categoria: <nome categoria>"; non compare "L'impostore era" né "Gli impostori erano".
+- **CA-87** Con "Promemoria ultima possibilità" attivo e almeno un impostore, la schermata Rivela mostra il riquadro con "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!"; il riquadro non compare se l'opzione è spenta né in una partita trappola.
+- **CA-88** In una partita trappola le schermate di rivelazione in Distribuzione e in "Rivedi la parola" mostrano a tutti il contenuto civile (4.3), identico per layout, etichette e colori; con la modalità "Impostore senza parola" nessun giocatore vede "Sei l'impostore".
+- **CA-89** Con tutte le opzioni avanzate spente le schermate sono identiche a prima dell'introduzione delle opzioni: nessun badge, riassunto "Regole classiche", nessuna intestazione "Giro", nessun riquadro del promemoria.
+- **CA-90** La schermata di segnalazione di una coppia offre i campi facoltativi di proposta (parola e affine, max 40 caratteri); "Salva" resta disattivato se non c'è alcun motivo, nota o coppia proposta valida; con un solo campo compilato o con le due parole uguali (senza distinzione maiuscole/minuscole) "Salva" è disattivato e compare un avviso.
 
 ## 9. Fuori perimetro (v1)
 

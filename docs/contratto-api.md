@@ -196,11 +196,11 @@ object Regole { const val PROBABILITA_TRAPPOLA = 0.10; const val MAX_GIRI = 3 }
 // game, Partita: nuovi campi
 data class Partita(
     ...esistenti...,                              // impostori può ora essere VUOTO (partita trappola)
-    val ordine: List<Int> = List(giocatori.size) { (primoGiocatore + it) % giocatori.size },
+    val ordine: List<Int>? = null,                // null = rotazione da primoGiocatore (calcolata); valorizzato solo con ordine casuale
     val giriIndizi: Int = 1,
     val promemoriaUltimaPossibilita: Boolean = false,
 ) {
-    fun ordineDiParola(): List<Int> = ordine
+    fun ordineDiParola(): List<Int> = ordine ?: rotazione da primoGiocatore
     val trappola: Boolean get() = impostori.isEmpty()
 }
 ```

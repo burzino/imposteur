@@ -41,6 +41,14 @@ private fun NavHostController.vaiAConfigurazione() {
     }
 }
 
+private fun NavHostController.vaiAHome(rottaCorrente: String) {
+    if (!inRotta(rottaCorrente)) return
+    navigate(Rotte.HOME) {
+        popUpTo(Rotte.HOME) { inclusive = true }
+        launchSingleTop = true
+    }
+}
+
 private fun NavHostController.inRotta(rotta: String) = currentDestination?.route == rotta
 
 @Composable
@@ -109,10 +117,14 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                 onCancellaSegnalazioni = { viewModel.cancellaSegnalazioni() },
                 onCambia = { viewModel.impostaAspetto(it) },
                 onIndietro = { if (navController.inRotta(Rotte.IMPOSTAZIONI)) navController.popBackStack() },
+                onHome = { navController.vaiAHome(Rotte.IMPOSTAZIONI) },
             )
         }
         composable(Rotte.REGOLE) {
-            SchermataRegole(onIndietro = { navController.popBackStack() })
+            SchermataRegole(
+                onIndietro = { navController.popBackStack() },
+                onHome = { navController.vaiAHome(Rotte.REGOLE) },
+            )
         }
         composable(Rotte.CONFIGURAZIONE) {
             SchermataConfigurazione(
@@ -121,6 +133,12 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                 onIndietro = {
                     viewModel.salvaOra()
                     navController.popBackStack(Rotte.HOME, inclusive = false)
+                },
+                onHome = {
+                    if (navController.inRotta(Rotte.CONFIGURAZIONE)) {
+                        viewModel.salvaOra()
+                        navController.vaiAHome(Rotte.CONFIGURAZIONE)
+                    }
                 },
                 onInizia = {
                     if (navController.inRotta(Rotte.CONFIGURAZIONE) && viewModel.iniziaPartita()) {
@@ -144,6 +162,12 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                     viewModel.terminaPartita()
                     navController.vaiAConfigurazione()
                 },
+                onHome = {
+                    if (navController.inRotta(Rotte.DISTRIBUZIONE)) {
+                        viewModel.sospendiPartita()
+                        navController.vaiAHome(Rotte.DISTRIBUZIONE)
+                    }
+                },
             )
         }
         composable(Rotte.GIOCO) {
@@ -165,6 +189,12 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                     viewModel.terminaPartita()
                     navController.vaiAConfigurazione()
                 },
+                onHome = {
+                    if (navController.inRotta(Rotte.GIOCO)) {
+                        viewModel.sospendiPartita()
+                        navController.vaiAHome(Rotte.GIOCO)
+                    }
+                },
             )
         }
         composable(Rotte.RIVEDI) {
@@ -178,6 +208,12 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                 onChiudi = {
                     viewModel.chiudiRevisione()
                     if (navController.inRotta(Rotte.RIVEDI)) navController.popBackStack()
+                },
+                onHome = {
+                    if (navController.inRotta(Rotte.RIVEDI)) {
+                        viewModel.sospendiPartita()
+                        navController.vaiAHome(Rotte.RIVEDI)
+                    }
                 },
             )
         }
@@ -200,6 +236,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                     viewModel.terminaPartita()
                     navController.vaiAConfigurazione()
                 },
+                onHome = { navController.vaiAHome(Rotte.RIVELA) },
             )
         }
     }

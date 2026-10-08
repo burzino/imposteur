@@ -12,6 +12,12 @@ data class Configurazione(
     val modalita: Modalita = Modalita.SENZA_PAROLA,
     val mostraCategoria: Boolean = true,
     val categorieSelezionate: Set<String> = emptySet(),
+    val impostoreNonPrimo: Boolean = false,
+    val impostoriSorpresa: Boolean = false,
+    val ordineCasuale: Boolean = false,
+    val partitaTrappola: Boolean = false,
+    val promemoriaUltimaPossibilita: Boolean = false,
+    val giriIndizi: Int = 1,
 )
 
 data class VoceParola(val categoriaId: String, val categoriaNome: String, val parola: String, val affine: String?)
@@ -36,5 +42,8 @@ object TestiGioco {
     fun impostoriSingolare(nome: String) = "L'impostore era: $nome"
     fun impostoriPlurale(nomi: List<String>) = "Gli impostori erano: ${nomi.joinToString(", ")}"
     fun laParolaEra(parola: String) = "La parola era: $parola"
+    const val NESSUN_IMPOSTORE = "Nessun impostore: era una partita trappola!"
+    const val PROMEMORIA_ULTIMA_POSSIBILITA =
+        "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!"
     fun laParolaAffineEra(affine: String) = "La parola affine era: $affine"
 }

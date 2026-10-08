@@ -57,6 +57,7 @@ fun SchermataDistribuzione(
     onInterrompiRivelazione: () -> Unit,
     onFineDistribuzione: () -> Unit,
     onInterrompiPartita: () -> Unit,
+    onHome: () -> Unit,
 ) {
     var chiediInterruzione by rememberSaveable { mutableStateOf(false) }
     BackHandler { chiediInterruzione = true }
@@ -89,10 +90,12 @@ fun SchermataDistribuzione(
     }
 
     if (partita != null) {
-        when (fase) {
-            is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice) { onSono(fase) }
-            is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice) { onNascondiEPassa(fase) }
-            StatoDistribuzione.Gioco -> Unit
+        ScaffoldConHome(titolo = R.string.distribuzione_titolo, onHome = onHome) {
+            when (fase) {
+                is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice) { onSono(fase) }
+                is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice) { onNascondiEPassa(fase) }
+                StatoDistribuzione.Gioco -> Unit
+            }
         }
     }
 
