@@ -528,3 +528,173 @@ export function creaArchivio(storage: ArchivioStorage): Archivio;
 ```
 
 Gli errori di storage (accessor che lancia, quota piena, modalità privata) sono assorbiti: le letture danno il valore di default, le scritture non lanciano (come i `catch` dei repository Kotlin). Il caricamento delle parole non fa parte di `Archivio`.
+
+## PWA: UI (`web/src/ui`, v2.1)
+
+Quattro sviluppatori in parallelo; ognuno tocca solo i file che possiede. Svelte 5 (rune), TypeScript, nessuna libreria UI. Le schermate importano solo da `ui/stato.svelte.ts`, `ui/rotte.ts`, `ui/testi.ts`, `ui/componenti/*`, `ui/browser.ts`, `game/`, `data/`. Un cambio a questo contratto si fa prima del codice.
+
+### 1. File e proprietari
+
+```
+web/src/App.svelte                       (A)  monta tema, rotta corrente, dialogo di interruzione
+web/src/main.ts                          (A)  importa tema.css, avvia stato, rotte, protezione ruolo
+web/src/ui/stato.svelte.ts  stato.test.ts (A)  Vitest senza DOM
+web/src/ui/rotte.ts  rotte.test.ts       (A)
+web/src/ui/testi.ts  testi.test.ts       (A)
+web/src/ui/browser.ts                    (A)
+web/src/ui/tema.css  tema.ts             (A)
+web/src/ui/componenti/*.svelte|*.ts      (A)  quelli del punto 5
+web/src/ui/schermate/Home.svelte                  (B)
+web/src/ui/schermate/Regole.svelte                (B)
+web/src/ui/schermate/Impostazioni.svelte          (B)
+web/src/ui/schermate/Configurazione.svelte        (C)
+web/src/ui/schermate/OpzioniAvanzate.svelte       (C)
+web/src/ui/schermate/Gioco.svelte                 (C)
+web/src/ui/schermate/Rivela.svelte                (C)
+web/src/ui/schermate/DialogoSegnalazione.svelte   (C)
+web/src/ui/schermate/Distribuzione.svelte         (D)
+web/src/ui/schermate/Rivedi.svelte                (D)
+web/src/ui/schermate/<Nome>*.svelte      sotto-componenti privati: li possiede chi possiede la schermata (prefisso = nome schermata)
+```
+Ogni schermata è un componente senza props: legge `stato` e chiama `vai`. `App.svelte` (A) sceglie il componente con `rottaCorrente.valore`. Un componente che serve a due schermate di sviluppatori diversi si chiede ad A. I test di schermata (se servono) stanno accanto al file e usano uno stato iniettato (punto 2).
+
+### 2. Stato (`ui/stato.svelte.ts`, porting di `ImpostoreViewModel`)
+
+```ts
+export interface Revisione { readonly indice: number; readonly rivelato: boolean }
+
+export interface Dipendenze {
+  archivio: Archivio;                       // data/archivio.ts
+  casuale: Casuale;                         // game/casuale.ts
+  caricaCategorie: () => Promise<RisultatoCaricamento>;   // default: fetch(`${import.meta.env.BASE_URL}parole.json`) + parseParole
+  ritardoSalvataggioMs?: number;            // default 500 (debounce della configurazione); 0 nei test
+}
+
+export class StatoApp {
+  constructor(dip: Dipendenze);
+  readonly pronto: Promise<void>;           // si risolve a caricamento finito (per i test)
+
+  // Campi leggibili ($state / $derived; non si assegnano dall'esterno)
+  readonly caricamento: boolean;            // true finché parole.json non è caricato
+  readonly erroreCaricamento: boolean;
+  readonly categorie: readonly Categoria[];
+  readonly config: Configurazione;
+  readonly partita: Partita | null;
+  readonly distribuzione: StatoDistribuzione;      // Distribuzione.iniziale() se non c'è partita
+  readonly ripristinabile: SessioneSalvata | null; // offerta da "Riprendi partita"
+  readonly paroleRimanenti: number;
+  readonly paroleTotali: number;
+  readonly revisione: Revisione | null;            // locale, mai salvata
+  readonly aspetto: Aspetto;
+  readonly segnalazioniSalvate: number;
+  readonly errori: readonly ErroreConfigurazione[];  // [] se categorie vuote, altrimenti Regole.valida
+  readonly puoIniziare: boolean;                     // !caricamento && !erroreCaricamento && errori.length === 0
+
+  // Aspetto e segnalazioni
+  impostaAspetto(a: Aspetto): void;                // salva e chiama applicaTema
+  salvaSegnalazione(s: Segnalazione): void;
+  cancellaSegnalazioni(): void;
+  leggiSegnalazioniJsonl(): string;                // contenuto del file, ogni riga terminata da "\n"
+
+  // Configurazione (ignorate se caricamento; salvataggio con debounce)
+  impostaNumeroGiocatori(n: number): void;
+  impostaNumeroImpostori(n: number): void;
+  impostaNome(indice: number, testo: string): void;
+  impostaModalita(m: Modalita): void;
+  impostaOpzione(trasforma: (c: Configurazione) => Configurazione): void;
+  impostaMostraCategoria(v: boolean): void;
+  impostaCategoria(id: string, selezionata: boolean): void;
+  selezionaTutte(tutte: boolean): void;
+  azzeraParole(): void;
+  salvaOra(): void;                                // flush immediato (Inizia, indietro, pagina nascosta)
+
+  // Partita
+  iniziaPartita(): boolean;
+  avanza(da: StatoDistribuzione): void;            // ignora se distribuzione !== da (confronto per tipo e indice)
+  interrompiRivelazione(): void;
+  scegliRevisione(indice: number): void;
+  rivelaRevisione(): void;
+  interrompiRevisione(): void;
+  tornaAElencoRevisione(): void;
+  chiudiRevisione(): void;
+  entraInRivela(): void;
+  terminaPartita(): void;
+  sospendiPartita(): void;
+  riprendiPartita(): boolean;                      // true se si va in Gioco
+  nascondiRuolo(): void;                           // pagina nascosta: interrompiRivelazione() + interrompiRevisione() + salvaOra()
+}
+
+export function creaStatoPredefinito(): StatoApp;  // archivio su localStorage, casualeDiSistema()
+export const stato: StatoApp;                      // singleton usato da App e schermate
+```
+Semantica identica al ViewModel Kotlin (stesse condizioni, stessi ritorni, `persisti()` a ogni cambio di sessione, `partitaAttiva`, `GestorePartite` creato al caricamento con `usate/ultima` della sessione). Differenze: nessuna coroutine (debounce con `setTimeout`), `aspetto.coloriDinamici` resta nel dato ma la UI lo ignora, `aspetto` si legge dall'archivio subito (sincrono). Gli oggetti di stato sono immutabili: le azioni sostituiscono, non mutano. In Rivedi, `visibilitychange` porta al passaggio (`interrompiRevisione`, W3); le schermate non ascoltano `visibilitychange` da sé. Per i test della UI, `stato` va costruito con `new StatoApp(...)` e passato via contesto Svelte `setContext("stato", s)`; le schermate lo leggono con `getStato()` esportato da `stato.svelte.ts` (default: il singleton).
+
+### 3. Rotte (`ui/rotte.ts`, porting di `ImpostoreNavHost`)
+
+```ts
+export type Rotta = "home" | "regole" | "impostazioni" | "configurazione" | "distribuzione" | "gioco" | "rivedi" | "rivela";
+export const rottaCorrente: { readonly valore: Rotta };       // $state, derivata dall'hash
+export const richiestaInterruzione: { aperta: boolean };      // $state: dialogo "Interrompere la partita?" (lo mostra App.svelte)
+export function vai(rotta: Rotta, opz?: { sostituisci?: boolean }): void;   // push in history, o replace
+export function vaiAHome(): void;                  // dopo, "indietro" non riporta alla schermata lasciata
+export function vaiAConfigurazione(): void;        // Home sotto, Configurazione sopra (popUpTo Home)
+export function indietro(): void;                  // freccia in app: equivale al tasto indietro del browser
+export function avviaRotte(s: StatoApp, env?: AmbienteRotte): () => void;   // hashchange/popstate; restituisce la rimozione. `env` finto per i test (location, history)
+```
+Hash `#/home` ecc.; vuoto o sconosciuto = `home`. Regole:
+- Avvio: dopo `s.pronto`, se la rotta è distribuzione/gioco/rivedi/rivela e `s.partita === null` -> `vai("home", {sostituisci:true})` (D1 Kotlin). Dopo un ricaricamento la partita non è attiva: si finisce in Home, dove "Riprendi partita" la offre.
+- `vai(r)` verso la rotta già corrente è un no-op (ignora i doppi tocchi).
+- Tasto indietro del browser (popstate) in `distribuzione` o `gioco` verso una voce non provocata da `vai`: l'app ripristina la voce e imposta `richiestaInterruzione.aperta = true`; mai si torna a un ruolo precedente. "Interrompi" -> `terminaPartita()` + `vaiAConfigurazione()`; "Continua a giocare" chiude il dialogo. Il pulsante indietro in app di Distribuzione e Gioco apre lo stesso dialogo (`richiestaInterruzione.aperta = true`), non ne duplica uno.
+- `rivedi`: indietro -> `chiudiRevisione()` poi history normale. `configurazione`: indietro -> `salvaOra()` poi Home. `rivela`, `regole`, `impostazioni`: history normale. `home`: indietro esce dal sito (nessuna azione, W9).
+- Azioni (equivalgono alle lambda del NavHost, le scrivono le schermate): Home "Nuova partita" -> `vai("configurazione")`; "Riprendi" -> `const g = riprendiPartita(); vai(g ? "gioco" : "distribuzione")` solo se `ripristinabile`; Configurazione "Inizia" -> `if (iniziaPartita()) vai("distribuzione")`; fine Distribuzione -> `vai("gioco", {sostituisci:true})`; Gioco "Rivela" -> `entraInRivela()`, `vai("rivela", {sostituisci:true})`; Gioco "Rivedi" -> `chiudiRevisione()`, `vai("rivedi")`; Home-in-barra in Distribuzione/Gioco/Rivedi -> `sospendiPartita()` + `vaiAHome()`; in Configurazione -> `salvaOra()` + `vaiAHome()`; in Regole/Impostazioni/Rivela -> `vaiAHome()`; Rivela "Nuova partita" -> `iniziaPartita() ? vai("distribuzione", {sostituisci:true}) : vaiAConfigurazione()`; Rivela "Cambia impostazioni" e "Interrompi" in Gioco -> `terminaPartita()` + `vaiAConfigurazione()`.
+
+### 4. Testi (`ui/testi.ts`)
+
+`export const t = { ... }` con TUTTE le chiavi di `strings.xml`, stesso testo (apostrofi senza backslash, `\n` reali).
+- Chiave: nome Android in camelCase (`config_numero_giocatori` -> `configNumeroGiocatori`, `app_name` -> `appName`, `torna_home` -> `tornaHome`); i numeri restano attaccati (`opz_x2` -> `opzX2`).
+- Stringa senza parametri: proprietà `string`. Con segnaposto (`%1$d`, `%2$s`): funzione con parametri posizionali nello stesso ordine (`configGiocatoreN: (n: number) => string`).
+- `<plurals>`: funzione `(n: number) => string` (`opzAttive(n)`), con `Intl.PluralRules("it")`; `<string-array>`: `readonly string[]`.
+- Testi nuovi del web, aggiunti da A: `esportaSegnalazioni` ("Esporta segnalazioni"), `condividiSegnalazioni` ("Condividi"), `segnalazioniSalvateN(n)` ("1 segnalazione salvata" / "n segnalazioni salvate"), `installaIos` ("Per installare l'app su iPhone: tocca Condividi, poi Aggiungi a Home.").
+- `testi.test.ts` (A) legge `app/src/main/res/values/strings.xml` e verifica che ogni `<string>`, `<plurals>` e `<string-array>` abbia la chiave corrispondente.
+- Un testo mancante si chiede ad A; nessuna stringa italiana letterale nelle schermate.
+
+### 5. Componenti comuni (`ui/componenti/`, A)
+
+Props con `$props()`, eventi come props-funzione `onXxx`, contenuto come `Snippet`.
+- `BarraApp.svelte`: `{ titolo: string; onHome?: () => void; onIndietro?: () => void }`. Freccia indietro (`t.indietro`), titolo, tasto Home (`t.tornaHome`), come `ScaffoldConHome`. Senza `onHome` niente tasto.
+- `Pagina.svelte`: `{ titolo: string; onHome?; onIndietro?; children: Snippet; piede?: Snippet }`. `BarraApp` + colonna centrata (max `--larghezza-max`), area scorrevole, `piede` fisso in basso.
+- `Pulsante.svelte`: `{ variante?: "pieno" | "tonale" | "contorno" | "testo"; disabilitato?: boolean; onClick: () => void; children: Snippet; ariaLabel?: string }`. Altezza minima `--altezza-tocco`.
+- `DialogoConferma.svelte`: `{ aperto: boolean; titolo: string; messaggio?: string; etichettaSi: string; etichettaNo: string; onSi: () => void; onNo: () => void }`. `<dialog>` modale; Esc e sfondo = `onNo`; focus iniziale su No; mai etichette Sì/No.
+- `CampoTesto.svelte`: `{ valore: string; onCambia: (v: string) => void; etichetta: string; segnaposto?: string; maxLunghezza?: number; errore?: string; multilinea?: boolean; righe?: number }`. Valore controllato, font >= 16 px (niente zoom su iOS).
+- `Interruttore.svelte`: `{ valore: boolean; onCambia: (v: boolean) => void; etichetta: string; descrizione?: string; disabilitato?: boolean }`.
+- `Selettore.svelte` (segmenti/radio): `{ opzioni: { valore: string; etichetta: string }[]; valore: string; onCambia: (v: string) => void; etichetta?: string }`.
+- `Contatore.svelte` (-/+): `{ valore: number; min: number; max: number; onCambia: (n: number) => void; etichetta: string }`.
+- `Fisarmonica.svelte`: `{ titolo: string; aperta: boolean; onCambia: (a: boolean) => void; children: Snippet }`.
+- `TestoAdattivo.svelte`: `{ testo: string; classe?: string; maxRighe?: number /* 2 */ }`: riduce del 10% a passo fino al 40% finché sta in larghezza e righe e non spezza parole.
+- `Avatar.svelte`: `{ nome: string; indice: number; stato?: "attesa" | "corrente" | "fatto"; dimensione?: number }`; colore da `--colore-avatar-{indice % 8}`.
+- `Toast.svelte` (montato da `App.svelte`) e `mostraToast(testo: string)` esportata da `componenti/toast.svelte.ts`.
+
+### 6. Tema (`ui/tema.css`, `ui/tema.ts`; porting di `Theme.kt`)
+
+`<html data-tema="sistema|chiaro|scuro|alto-contrasto">`. `tema.ts` esporta `applicaTema(t: Tema): void` (imposta `data-tema`, aggiorna `<meta name="theme-color">` con `--colore-sfondo` risolto) e `temaScuroAttivo(t: Tema): boolean`. `StatoApp` lo chiama all'avvio e in `impostaAspetto`; un `<script>` in `index.html` (A) lo imposta prima del primo paint leggendo l'archivio. Selettori: `:root, :root[data-tema="chiaro"]` (chiaro); `:root[data-tema="scuro"]`; `:root[data-tema="alto-contrasto"]`; per `sistema`, le variabili scure dentro `@media (prefers-color-scheme: dark) { :root[data-tema="sistema"] { ... } }`. `color-scheme` coerente.
+
+Variabili `--colore-...`: `primario`, `su-primario`, `contenitore-primario`, `su-contenitore-primario`, `secondario`, `su-secondario`, `contenitore-secondario`, `su-contenitore-secondario`, `terziario`, `su-terziario`, `sfondo`, `su-sfondo`, `superficie`, `su-superficie`, `superficie-variante`, `su-superficie-variante`, `contorno`, `contorno-variante`, `errore`, `su-errore`, `contenitore-errore`, `su-contenitore-errore`, `avatar-0` .. `avatar-7`.
+Valori: chiaro e scuro come `LightColors`/`DarkColors` di Theme.kt (primario #3F2B96 / #CBBEFF, contenitore #E6DEFF / #4A3AA8, secondario #625B71 / #CCC2DC, terziario #7D5260 / #EFB8C8; gli altri dalla palette Material 3 di base); alto contrasto come `AltoContrastoColors` (sfondo e superfici #000, testo #FFF, primario/secondario/terziario/contenitore primario #FFD600 con "su" nero, contorni #FFF, errore #FF8A80). `--scala-testo`: 1 (1.15 in alto contrasto), applicata a `html { font-size: calc(100% * var(--scala-testo)) }`; dimensioni in `rem`.
+Altre variabili: `--spazio-1..6` (4, 8, 12, 16, 24, 32 px), `--raggio-s|m|l`, `--larghezza-max: 480px`, `--altezza-tocco: 48px`. Colori dinamici assenti sul web: B non mostra l'opzione. Le schermate non usano colori letterali, solo variabili.
+
+### 7. Servizi del browser (`ui/browser.ts`, A)
+
+```ts
+export function richiediSchermoAcceso(): Promise<void>;   // navigator.wakeLock.request("screen"); no-op se manca o rifiuta
+export function rilasciaSchermoAcceso(): void;            // idempotente
+export function vibra(ms?: number): void;                 // default 30; navigator.vibrate se esiste, altrimenti nulla; mai eccezioni
+export function avviaProtezioneRuolo(s: StatoApp): () => void;   // visibilitychange hidden -> s.nascondiRuolo(); visible -> ri-richiede il wake lock se qualcuno lo aveva chiesto; pagehide -> s.salvaOra(). Restituisce la rimozione
+export function esportaSegnalazioni(jsonl: string, modo: "scarica" | "condividi"): Promise<"scaricato" | "condiviso" | "annullato">;
+export function condivisioneFileDisponibile(): boolean;   // navigator.canShare({ files: [file di prova] })
+export function eIosSafariNonInstallato(): boolean;       // iOS Safari e non standalone (display-mode / navigator.standalone)
+```
+- Wake lock: D chiama `richiediSchermoAcceso()` all'ingresso in Distribuzione e Rivedi e `rilascia...` all'uscita (onMount/onDestroy). Il contatore interno gestisce richieste annidate.
+- `vibra`: D la chiama alla comparsa del ruolo e al passaggio, sempre con la stessa durata (non deve distinguere i ruoli).
+- `esportaSegnalazioni`: `Blob([jsonl], { type: "application/x-ndjson" })`, file `segnalazioni.jsonl`; "scarica" con `<a download>` + `URL.createObjectURL` (revoca dopo); "condividi" con `navigator.share({ files })`, `AbortError` = "annullato". Non cancella le segnalazioni.
+- B mostra in Impostazioni "Esporta segnalazioni" (e "Condividi" se `condivisioneFileDisponibile()`) solo se `stato.segnalazioniSalvate > 0`, con il contatore e il pulsante di cancellazione già presente su Android. B mostra `t.installaIos` come ultima riga di "Come si gioca" (Regole) solo se `eIosSafariNonInstallato()`. C salva la segnalazione da Rivela con `stato.salvaSegnalazione`.
+- Ogni funzione è in `try/catch` e degrada senza `window`/`navigator` (test in Node).
