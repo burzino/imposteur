@@ -16,6 +16,7 @@ Regole:
 - Testi dell'interfaccia in `res/values/strings.xml`, in italiano.
 - In un `Box`, i pulsanti sovrapposti (icone in un angolo, FAB) vanno dichiarati DOPO il contenuto a tutto schermo: un figlio scorrevole o cliccabile dichiarato dopo copre i precedenti e ne intercetta i tocchi.
 - Non eseguire `gradlew build`/`test`/`assemble`: la build la esegue l'agente `esecutore-build`. Puoi usare grep e letture mirate.
+- Non scrivere né modificare file di test (`*.test.ts`, `src/test/`): li scrive solo il tester, anche in parallelo a te; sovrascriverli ne distrugge il lavoro.
 - Non modificare test esistenti per farli passare: se un test sembra sbagliato, segnalalo nel resoconto.
 
 PWA (`web/`): Svelte 5 (runes) + TypeScript strict + Vite + vite-plugin-pwa, test Vitest.

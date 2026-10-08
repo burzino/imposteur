@@ -7,6 +7,36 @@
     <link rel="icon" type="image/png" href="/icona-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Imposteur</title>
+    <style>
+      /* sfondo prima del caricamento di tema.css (evita il lampo) */
+      html { background: #fffbfe; }
+      html[data-tema="scuro"] { background: #1c1b1f; }
+      html[data-tema="alto-contrasto"] { background: #000; }
+      @media (prefers-color-scheme: dark) { html[data-tema="sistema"] { background: #1c1b1f; } }
+    </style>
+    <script>
+      // Tema scelto, applicato prima del primo paint (stessa chiave di data/archivio.ts).
+      (function () {
+        try {
+          var tema = "sistema";
+          var salvato = localStorage.getItem("impostore.aspetto");
+          if (salvato) {
+            var mappa = { CHIARO: "chiaro", SCURO: "scuro", ALTO_CONTRASTO: "alto-contrasto" };
+            tema = mappa[JSON.parse(salvato).tema] || "sistema";
+          }
+          var root = document.documentElement;
+          root.setAttribute("data-tema", tema);
+          var scuro =
+            tema === "scuro" ||
+            tema === "alto-contrasto" ||
+            (tema === "sistema" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var colore = tema === "alto-contrasto" ? "#000000" : scuro ? "#1c1b1f" : "#fffbfe";
+          document.querySelector('meta[name="theme-color"]').setAttribute("content", colore);
+        } catch (e) {
+          document.documentElement.setAttribute("data-tema", "sistema");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

@@ -672,7 +672,7 @@ Props con `$props()`, eventi come props-funzione `onXxx`, contenuto come `Snippe
 - `Fisarmonica.svelte`: `{ titolo: string; aperta: boolean; onCambia: (a: boolean) => void; children: Snippet }`.
 - `TestoAdattivo.svelte`: `{ testo: string; classe?: string; maxRighe?: number /* 2 */ }`: riduce del 10% a passo fino al 40% finché sta in larghezza e righe e non spezza parole.
 - `Avatar.svelte`: `{ nome: string; indice: number; stato?: "attesa" | "corrente" | "fatto"; dimensione?: number }`; colore da `--colore-avatar-{indice % 8}`.
-- `Toast.svelte` (montato da `App.svelte`) e `mostraToast(testo: string)` esportata da `componenti/toast.svelte.ts`.
+- `Toast.svelte` (montato da `App.svelte`) e `mostraToast(testo: string)` esportata da `componenti/notifiche.svelte.ts` (nome diverso da `Toast.svelte` non solo per le maiuscole: su Windows gli import si confondono).
 
 ### 6. Tema (`ui/tema.css`, `ui/tema.ts`; porting di `Theme.kt`)
 
