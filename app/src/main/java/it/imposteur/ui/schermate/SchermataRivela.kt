@@ -17,7 +17,12 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -227,11 +232,27 @@ private fun DialogoSegnalaCoppia(
         MotivoSegnalazione.POCO_CONOSCIUTA to R.string.segnala_motivo_poco_conosciuta,
         MotivoSegnalazione.CATEGORIA_SBAGLIATA to R.string.segnala_motivo_categoria,
     )
-    AlertDialog(
+    Dialog(
         onDismissRequest = onAnnulla,
-        title = { Text(stringResource(R.string.segnala_titolo)) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+    ) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            modifier = Modifier
+                .imePadding()
+                .padding(horizontal = 24.dp, vertical = 24.dp)
+                .widthIn(max = 560.dp)
+                .fillMaxWidth(),
+        ) {
+        Column(Modifier.padding(24.dp)) {
+            Text(
+                stringResource(R.string.segnala_titolo),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                 Text(
                     if (affine != null) stringResource(R.string.segnala_sottotitolo_coppia, parola, affine) else parola,
                     style = MaterialTheme.typography.titleMedium,
@@ -298,8 +319,11 @@ private fun DialogoSegnalaCoppia(
                     )
                 }
             }
-        },
-        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+            TextButton(onClick = onAnnulla) { Text(stringResource(R.string.annulla)) }
             TextButton(
                 enabled = (motivi.isNotEmpty() || nota.isNotBlank() || propostaValida) && !propostaMezza && !propostaUguale,
                 onClick = {
@@ -311,7 +335,8 @@ private fun DialogoSegnalaCoppia(
                     )
                 },
             ) { Text(stringResource(R.string.segnala_salva)) }
-        },
-        dismissButton = { TextButton(onClick = onAnnulla) { Text(stringResource(R.string.annulla)) } },
-    )
+            }
+        }
+        }
+    }
 }

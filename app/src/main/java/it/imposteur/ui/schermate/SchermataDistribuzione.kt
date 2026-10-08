@@ -157,9 +157,15 @@ internal fun Contenitore(azione: @Composable () -> Unit, content: @Composable ()
 @Composable
 internal fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
     val nome = partita.giocatori[indice]
+    // Anti doppio tocco: il pulsante si attiva solo dopo un ritardo da quando compare questo giocatore.
+    var abilitato by remember(indice) { mutableStateOf(false) }
+    LaunchedEffect(indice) {
+        delay(RITARDO_NASCONDI_MS)
+        abilitato = true
+    }
     Contenitore(
         azione = {
-            Button(onClick = onSono, modifier = Modifier.fillMaxWidth().height(64.dp)) {
+            Button(onClick = onSono, enabled = abilitato, modifier = Modifier.fillMaxWidth().height(64.dp)) {
                 Text(stringResource(R.string.distribuzione_sono, nome), style = MaterialTheme.typography.titleLarge)
             }
         },
@@ -182,8 +188,8 @@ internal fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
     }
 }
 
-/** Ritardo anti doppio tocco prima di abilitare "Nascondi e passa". */
-private const val RITARDO_NASCONDI_MS = 400L
+/** Ritardo anti doppio tocco prima di abilitare i pulsanti "Sono ..." e "Nascondi e passa". */
+private const val RITARDO_NASCONDI_MS = 600L
 
 @Composable
 internal fun Rivelazione(
