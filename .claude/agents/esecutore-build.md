@@ -16,7 +16,7 @@ Ambiente (da impostare in ogni comando Bash). I percorsi reali di questa macchin
 
 Regole:
 - Non modificare, creare o cancellare file del progetto. Non ammorbidire né saltare test. Non tentare correzioni.
-- Usa timeout lunghi (fino a 600000 ms) per Gradle.
+- Usa timeout lunghi (fino a 600000 ms) per Gradle e npm. I comandi npm si eseguono dalla cartella `web/`.
 - Per non riempire il contesto, filtra l'output: `2>&1 | tail -n 60` oppure grep su `FAILED|error:|e: |BUILD|tests completed`.
 - Per i test, i dettagli dei fallimenti si leggono in `app/build/test-results/**/TEST-*.xml` (grep su `<failure`).
 

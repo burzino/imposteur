@@ -29,7 +29,10 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - La vibrazione è identica per tutti, per non rivelare l'impostore.
 
 ## PWA (decisa il 2026-10-08, da avviare dopo la chiusura della v1 Android)
-- Strada A: app web separata in `web/` (TypeScript, Vite e plugin PWA) con lo stesso `parole.json` come unica fonte; le regole sono riportate dalle specifiche e verificate con test equivalenti.
+- Strada A: app web separata in `web/` con **Svelte 5 + TypeScript + Vite + vite-plugin-pwa** (scelta dell'utente, 2026-10-08), test con Vitest. Lo stesso `parole.json` (`app/src/main/assets/`) resta l'unica fonte e viene letto al momento della build. Le regole vengono dalle specifiche e sono verificate con test equivalenti che citano gli stessi CA-xx.
+- Perimetro (decisione dell'utente: "traduci tutta l'applicazione"): tutte le funzioni Android, quindi due modalità, opzioni avanzate, salvataggio della partita e delle parole usate, Rivedi, ordine di parola, contatore con Azzera, temi, segnalazioni (esportate come file), restyling della distribuzione e tasto Home. Testi in italiano identici a `strings.xml`.
+- Salvataggi in localStorage. Al posto di FLAG_SECURE e ON_STOP: `visibilitychange` (pagina nascosta) trasforma Rivelazione(k) in Passaggio(k).
+- Indirizzo: GitHub Pages (burzino.github.io/imposteur), poi `imposteur.burzi.eu` con un CNAME su Aruba verso `burzino.github.io.`.
 - Repository pubblico: https://github.com/burzino/imposteur (ramo `main`, remote `origin`). Hosting previsto: GitHub Pages, all'indirizzo burzino.github.io/imposteur.
 - Il token di `gh` non ha lo scope `workflow`: prima di pubblicare `.github/workflows/` serve `gh auth refresh -s workflow`, da far eseguire all'utente.
 - I percorsi locali stanno in `.claude/ambiente-locale.md` (in `.gitignore`); la storia è stata ripulita prima del primo push.
@@ -39,6 +42,14 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Aggiunti: opzioni avanzate (fisarmonica, 6 opzioni), tasto Home in alto, ordine di parola, griglia di Rivedi.
 - Collaudo su OnePlus 9 superato. Corretti il doppio tocco (ritardo di 600 ms) e il dialogo di segnalazione sopra la tastiera. Script di collaudo: `tools/collaudo/ui.py`.
 - Restyling della distribuzione (commit 9c15180): "Tieni premuto per scoprire" (pressione lunga), carta che si gira, fila di avatar, overlay "Tutti pronti!". 150/150 test. In attesa del parere dell'utente.
+
+## Prossima ondata: PWA (da avviare in una sessione nuova)
+1. analista-funzionale: aggiunge `docs/specifiche-web.md` con le differenze dalla versione Android (salvataggio, visibilitychange, esportazione delle segnalazioni, installazione, iOS). sviluppatore: aggiunge al contratto la parte TS di `game/` e `data/`.
+2. In parallelo: lo sviluppatore crea lo scheletro di `web/` (Vite + Svelte + TS + PWA) e porta `game/` e `data/` in TS puro; il tester porta i test JVM in Vitest.
+3. sviluppatore: le schermate Svelte (home, regole, configurazione con le opzioni avanzate, distribuzione con il restyling, gioco, rivedi, rivela con la segnalazione, impostazioni con i temi).
+4. esecutore-build: `npm ci && npm test && npm run build`. Poi il collaudo nel browser lo fa un agente, non la sessione principale.
+5. Workflow per GitHub Pages: prima l'utente esegue `gh auth refresh -s workflow`. Poi il dominio su Aruba.
+Node.js 24 e npm 11 sono installati sul PC.
 
 ## Punti aperti
 - Push dei commit da c498f04 in poi.

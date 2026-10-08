@@ -29,6 +29,10 @@ Invarianti che attraversano più file:
 - La sessione (partita in corso più parole usate) viene salvata a ogni cambio di stato. Al ripristino si scarta in silenzio se non è più coerente con `parole.json`.
 - In modalità "Parola affine" civili e impostore ricevono lo stesso tipo di contenuto (`ParolaSegreta`): l'interfaccia non deve distinguerli.
 
+## PWA (in costruzione)
+
+`web/` conterrà la versione web: Svelte 5 + TypeScript + Vite + vite-plugin-pwa, test con Vitest. La logica in `web/src/game/` è il porting in TS puro di `game/`. Le parole si leggono da `app/src/main/assets/parole.json`, senza copie. I comandi (`npm ci`, `npm test`, `npm run build`, da `web/`) li esegue `esecutore-build`. Il piano è in `STATO.md`.
+
 ## Documenti
 
 - `docs/specifiche.md`: specifiche e criteri di accettazione CA-xx; i nomi dei test citano il CA che verificano.

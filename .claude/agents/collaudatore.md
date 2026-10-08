@@ -18,6 +18,8 @@ Regole:
 - Non usare `adb shell input text` per compilare i campi (si mescola con il focus e la tastiera): verifica i campi di testo solo se il prompt lo chiede esplicitamente, e segnala che la verifica manuale spetta all utente.
 - In Git Bash i comandi `adb shell` con percorsi `/sdcard/...` vanno preceduti da `MSYS_NO_PATHCONV=1`, altrimenti il percorso viene convertito.
 - Se un tocco su un pulsante non ha effetto, controlla con `ui.py <seriale> tastiera` se la tastiera lo copre: è un difetto da riportare, non da aggirare.
+- Distribuzione: il ruolo si scopre con una pressione lunga (`ui.py <seriale> tienipremuto "Tieni premuto per scoprire"`); un tocco semplice non basta. Il nome del giocatore è un testo a sé, separato da "Passa il telefono a": cercali separatamente. Prima di chiudere, non lasciare mai un ruolo visibile.
+- Se lo schermo cambia senza che tu abbia toccato nulla, l'utente sta usando il telefono: fermati e riportalo.
 - Se ti restano pochi turni, fermati e consegna il resoconto parziale: un resoconto mancante vale meno di uno incompleto.
 - Esegui solo i passi del prompt. Per leggere lo schermo preferisci `adb shell uiautomator dump` + grep sui testi a screenshot; gli screenshot salvali in `%TEMP%\claude\imposteur-collaudo\`.
 - Non modificare file del progetto, non reinstallare l'SDK, non cancellare AVD.
