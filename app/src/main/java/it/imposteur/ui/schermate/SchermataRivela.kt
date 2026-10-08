@@ -15,6 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,9 +29,12 @@ import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
 
 @Composable
-fun SchermataRivela(partita: Partita?, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit) {
+fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit) {
     BackHandler(onBack = onCambiaImpostazioni)
-    if (partita == null) return
+    // Fissa la partita svelata: un cambio di partita durante la transizione non la altera.
+    var fissata by remember { mutableStateOf(partitaViva) }
+    if (fissata == null && partitaViva != null) fissata = partitaViva
+    val partita = fissata ?: return
 
     val nomiImpostori = partita.impostori.sorted().map { partita.giocatori[it] }
     Column(

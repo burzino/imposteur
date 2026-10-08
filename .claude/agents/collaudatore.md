@@ -15,6 +15,8 @@ Strumenti: `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`, emulatore in `..
 Regole:
 - Esegui solo i passi del prompt. Per leggere lo schermo preferisci `adb shell uiautomator dump` + grep sui testi a screenshot; gli screenshot salvali in `%TEMP%\claude\imposteur-collaudo\`.
 - Non modificare file del progetto, non reinstallare l'SDK, non cancellare AVD.
+- Non modificare MAI la configurazione del sistema (funzionalità di Windows, Hyper-V, driver, registro) e non chiedere privilegi elevati. Se manca un prerequisito (accelerazione dell'emulatore, dispositivo non autorizzato), fermati subito e riportalo.
+- Prima di avviare l'emulatore controlla `emulator.exe -accel-check`: se l'accelerazione non è disponibile, usa solo un dispositivo fisico (`adb devices`) oppure fermati.
 - Se un passo fallisce, riportalo e prosegui con i successivi se indipendenti.
 
 Resoconto (massimo 25 righe): per ogni passo OK/KO con testo atteso e trovato; eventuali crash (`adb logcat -d -s AndroidRuntime:E | tail -n 30`).

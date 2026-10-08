@@ -138,9 +138,11 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun avanza() {
+    /** Avanza solo se lo stato corrente è ancora [da] (ignora i tocchi doppi). */
+    fun avanza(da: StatoDistribuzione) {
         val p = _stato.value.partita ?: return
-        _stato.update { it.copy(distribuzione = Distribuzione.avanza(it.distribuzione, p.giocatori.size)) }
+        if (_stato.value.distribuzione != da) return
+        _stato.update { it.copy(distribuzione = Distribuzione.avanza(da, p.giocatori.size)) }
         persisti()
     }
 

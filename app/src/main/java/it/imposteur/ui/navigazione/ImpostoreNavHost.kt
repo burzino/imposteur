@@ -1,6 +1,12 @@
 package it.imposteur.ui.navigazione
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -31,20 +37,55 @@ private fun NavHostController.vaiAConfigurazione() {
     }
 }
 
+private fun NavHostController.inRotta(rotta: String) = currentDestination?.route == rotta
+
 @Composable
 fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostController = rememberNavController()) {
     val stato by viewModel.stato.collectAsStateWithLifecycle()
+
+    // D7: flush della configurazione quando l'app va in background.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, evento ->
+            if (evento == Lifecycle.Event.ON_STOP) viewModel.salvaOra()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    // D1: dopo process death la back stack può puntare a una partita che non esiste più.
+    val voce by navController.currentBackStackEntryAsState()
+    val rotta = voce?.destination?.route
+    LaunchedEffect(rotta, stato.caricamento, stato.partita == null) {
+        if (!stato.caricamento && stato.partita == null &&
+            (rotta == Rotte.DISTRIBUZIONE || rotta == Rotte.GIOCO || rotta == Rotte.RIVELA)
+        ) {
+            navController.navigate(Rotte.HOME) { popUpTo(0) }
+        }
+    }
 
     NavHost(navController = navController, startDestination = Rotte.HOME) {
         composable(Rotte.HOME) {
             SchermataHome(
                 stato = stato,
-                onNuovaPartita = { navController.navigate(Rotte.CONFIGURAZIONE) },
-                onRiprendi = {
-                    val inGioco = viewModel.riprendiPartita()
-                    navController.navigate(if (inGioco) Rotte.GIOCO else Rotte.DISTRIBUZIONE)
+                onNuovaPartita = {
+                    if (navController.inRotta(Rotte.HOME)) {
+                        navController.navigate(Rotte.CONFIGURAZIONE) { launchSingleTop = true }
+                    }
                 },
-                onRegole = { navController.navigate(Rotte.REGOLE) },
+                onRiprendi = {
+                    if (navController.inRotta(Rotte.HOME) && stato.ripristinabile != null) {
+                        val inGioco = viewModel.riprendiPartita()
+                        navController.navigate(if (inGioco) Rotte.GIOCO else Rotte.DISTRIBUZIONE) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                onRegole = {
+                    if (navController.inRotta(Rotte.HOME)) {
+                        navController.navigate(Rotte.REGOLE) { launchSingleTop = true }
+                    }
+                },
             )
         }
         composable(Rotte.REGOLE) {
@@ -59,7 +100,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                     navController.popBackStack(Rotte.HOME, inclusive = false)
                 },
                 onInizia = {
-                    if (viewModel.iniziaPartita()) {
+                    if (navController.inRotta(Rotte.CONFIGURAZIONE) && viewModel.iniziaPartita()) {
                         navController.navigate(Rotte.DISTRIBUZIONE) { launchSingleTop = true }
                     }
                 },
@@ -68,8 +109,8 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         composable(Rotte.DISTRIBUZIONE) {
             SchermataDistribuzione(
                 stato = stato,
-                onSono = { viewModel.avanza() },
-                onNascondiEPassa = { viewModel.avanza() },
+                onSono = { da -> viewModel.avanza(da) },
+                onNascondiEPassa = { da -> viewModel.avanza(da) },
                 onInterrompiRivelazione = { viewModel.interrompiRivelazione() },
                 onFineDistribuzione = {
                     navController.navigate(Rotte.GIOCO) {
@@ -99,14 +140,16 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         }
         composable(Rotte.RIVELA) {
             SchermataRivela(
-                partita = stato.partita,
+                partitaViva = stato.partita,
                 onNuovaPartita = {
-                    if (viewModel.iniziaPartita()) {
-                        navController.navigate(Rotte.DISTRIBUZIONE) {
-                            popUpTo(Rotte.RIVELA) { inclusive = true }
+                    if (navController.inRotta(Rotte.RIVELA)) {
+                        if (viewModel.iniziaPartita()) {
+                            navController.navigate(Rotte.DISTRIBUZIONE) {
+                                popUpTo(Rotte.RIVELA) { inclusive = true }
+                            }
+                        } else {
+                            navController.vaiAConfigurazione()
                         }
-                    } else {
-                        navController.vaiAConfigurazione()
                     }
                 },
                 onCambiaImpostazioni = {

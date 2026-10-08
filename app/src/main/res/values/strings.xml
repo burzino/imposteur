@@ -40,7 +40,7 @@
     <string name="config_deseleziona_tutte">Deseleziona tutte</string>
     <string name="config_nome_duplicato">Nome già usato</string>
     <string name="config_nessuna_categoria">Seleziona almeno una categoria</string>
-    <string name="config_pool_vuoto">Nessuna parola disponibile con queste impostazioni</string>
+    <string name="config_pool_vuoto">Le categorie scelte non contengono parole utilizzabili</string>
     <string name="config_inizia">Inizia</string>
     <string name="config_diminuisci">Diminuisci</string>
     <string name="config_aumenta">Aumenta</string>

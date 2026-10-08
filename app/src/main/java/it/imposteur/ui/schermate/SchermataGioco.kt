@@ -16,7 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,8 +28,8 @@ import it.imposteur.game.Partita
 
 @Composable
 fun SchermataGioco(partita: Partita?, onRivela: () -> Unit, onInterrompiPartita: () -> Unit) {
-    var chiediInterruzione by remember { mutableStateOf(false) }
-    var chiediRivela by remember { mutableStateOf(false) }
+    var chiediInterruzione by rememberSaveable { mutableStateOf(false) }
+    var chiediRivela by rememberSaveable { mutableStateOf(false) }
     BackHandler { chiediInterruzione = true }
 
     if (partita != null) {

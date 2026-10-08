@@ -2,12 +2,38 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Stato del progetto
+App Android "Impostore" per giocare al gioco dell'impostore con un solo telefono che passa di mano in mano. Kotlin, Jetpack Compose (Material 3), modulo unico `app`, package `it.imposteur`. Rispondi in italiano; testi dell'interfaccia e parole di gioco sono in italiano.
 
-Il repository è ancora vuoto: non ci sono codice, sistema di build o test. Obiettivo: un'app Android per giocare al **gioco dell'impostore**. I giocatori ricevono in privato una parola segreta, tranne l'impostore. Poi danno indizi a turno e votano chi pensano sia l'impostore.
+## Comandi
 
-Lo stack (proposto: Kotlin + Jetpack Compose), la modalità di gioco (un solo telefono che gira o multiplayer), le varianti e le funzioni extra non sono ancora decisi. Non inventare comandi di build o test: aggiorna questo file con quelli veri, e con l'architettura, quando viene creata la struttura del progetto.
+Il JDK di sistema è Java 8: usa sempre quello di Android Studio (JDK 25, quindi Gradle 9.1 o superiore).
 
-## Convenzioni
+```bash
+export JAVA_HOME="<ANDROID_STUDIO>/jbr"
+./gradlew :app:assembleDebug                 # APK in app/build/outputs/apk/debug/
+./gradlew :app:testDebugUnitTest             # test JVM (JUnit 4)
+./gradlew :app:testDebugUnitTest --tests "it.imposteur.game.RegoleTest"            # una classe
+./gradlew :app:testDebugUnitTest --tests "it.imposteur.game.RegoleTest.*CA-01*"    # un test
+```
 
-- L'utente scrive in italiano: rispondi in italiano. Anche i testi dell'interfaccia e le parole di gioco sono in italiano.
+Build e test non si lanciano nella sessione principale: li esegue l'agente `esecutore-build`. L'emulatore non parte su questo PC (manca l'accelerazione hardware): il collaudo si fa su un telefono fisico collegato via USB.
+
+## Architettura
+
+- `game/`: logica pura, senza import `android.*`. Contiene regole e validazione, `GestorePartite` (estrazione della parola senza ripetizioni, con l'insieme delle parole usate; casualità tramite `Random` iniettato), `Partita` / `ContenutoRuolo` (ciò che vede ogni giocatore) e la macchina a stati `Distribuzione` (Passaggio k → Rivelazione k → Passaggio k+1 | Gioco, mai all'indietro).
+- `data/`: parser di `assets/parole.json` e serializzazione JSON di configurazione e sessione, in Kotlin puro (kotlinx.serialization). Contiene anche i repository Android su un unico DataStore Preferences, con chiavi distinte per configurazione e sessione.
+- `ui/`: `ImpostoreViewModel`, l'unica fonte di stato; un NavHost con le rotte home, regole, configurazione, distribuzione, gioco, rivela; una schermata per file.
+
+Invarianti che attraversano più file:
+- Un ruolo non deve mai restare visibile: ON_STOP, la ripresa e il ripristino trasformano Rivelazione(k) in Passaggio(k). La Distribuzione usa FLAG_SECURE e il tasto indietro chiede conferma.
+- La sessione (partita in corso più parole usate) viene salvata a ogni cambio di stato. Al ripristino si scarta in silenzio se non è più coerente con `parole.json`.
+- In modalità "Parola affine" civili e impostore ricevono lo stesso tipo di contenuto (`ParolaSegreta`): l'interfaccia non deve distinguerli.
+
+## Documenti
+
+- `docs/specifiche.md`: specifiche e criteri di accettazione CA-xx; i nomi dei test citano il CA che verificano.
+- `docs/contratto-api.md`: firme condivise tra logica, test e UI. Va cambiato prima del codice.
+- `STATO.md`: stato del lavoro e punti aperti, per riprendere da una nuova sessione.
+- `app/src/main/assets/parole.json`: categorie con coppie parola/affine (formato in specifiche §7).
+
+Agenti di progetto in `.claude/agents/`: Sonnet: analista-funzionale, redattore-parole, sviluppatore, tester, revisore. Haiku: esecutore-build, collaudatore.

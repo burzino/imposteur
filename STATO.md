@@ -18,9 +18,12 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 ## Ondate
 1. [specifiche fatte: 36 CA, 8 decisioni da confermare in §10] Specifiche (`docs/specifiche.md`) e parole (`parole.json`).
 2. [fatto; prima build fallita per compileSdk 35, portato a 36, da ricompilare a fine ondata 3] Scheletro del progetto Gradle con wrapper, poi build della app vuota.
-3. [in corso, in parallelo: game+data, test, UI; contratto in docs/contratto-api.md] Logica di gioco (`game`) e caricamento delle parole (`data`), più test unitari.
-4. [in corso] Salvataggio/ripresa sessione (decisione utente 2026-10-06; anche parole usate persistenti): specifiche (analista), logica game/data (sviluppatore); poi test + UI ripresa. Contratto v1.1 in docs/contratto-api.md.
-5. Collaudo sul telefono dell utente via USB (avvisarlo quando la build è verde e la ripresa è nella UI).
+3. [fatto] Logica di gioco (`game`) e caricamento delle parole (`data`), più test unitari.
+4. [fatto; build verde, 96/96 test, commit b5d0a03] Salvataggio/ripresa sessione (decisione utente 2026-10-06; anche parole usate persistenti): specifiche (analista), logica game/data (sviluppatore); poi test + UI ripresa. Contratto v1.1 in docs/contratto-api.md.
+5. [fatto] Revisione statica della UI (docs/revisione-ui.md): corretti D1-D8 e aggiunto FLAG_SECURE in Distribuzione. Build verde, 96/96.
+6. [da fare, serve l utente] Collaudo su telefono fisico via USB. L emulatore non parte: manca l accelerazione hardware (Hyper-V/WHPX non attivi, servono i privilegi di amministratore). Verificare anche: doppio tocco, am kill (process death), Recents, back predittivo.
 
 ## Punti aperti
-- nessuno
+- Collaudo sul telefono fisico da fare con l utente (ondata 6).
+- Rivedere a mano la qualità delle coppie in parole.json (336 coppie, controllo a campione OK).
+- Specifiche §10: decisioni dell analista da confermare con l utente.

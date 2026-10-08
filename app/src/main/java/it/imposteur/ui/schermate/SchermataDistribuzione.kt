@@ -1,5 +1,9 @@
 package it.imposteur.ui.schermate
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,11 +22,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,13 +45,13 @@ import it.imposteur.ui.UiState
 @Composable
 fun SchermataDistribuzione(
     stato: UiState,
-    onSono: () -> Unit,
-    onNascondiEPassa: () -> Unit,
+    onSono: (StatoDistribuzione) -> Unit,
+    onNascondiEPassa: (StatoDistribuzione) -> Unit,
     onInterrompiRivelazione: () -> Unit,
     onFineDistribuzione: () -> Unit,
     onInterrompiPartita: () -> Unit,
 ) {
-    var chiediInterruzione by remember { mutableStateOf(false) }
+    var chiediInterruzione by rememberSaveable { mutableStateOf(false) }
     BackHandler { chiediInterruzione = true }
 
     // Schermo sempre acceso durante la distribuzione.
@@ -54,6 +59,14 @@ fun SchermataDistribuzione(
     DisposableEffect(view) {
         view.keepScreenOn = true
         onDispose { view.keepScreenOn = false }
+    }
+
+    // Niente screenshot né anteprima in Recents mentre un ruolo può essere visibile.
+    val context = LocalContext.current
+    DisposableEffect(context) {
+        val window = context.trovaActivity()?.window
+        window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
     }
 
     // Il ruolo non resta visibile se l'app va in background (include rotazione).
@@ -75,8 +88,8 @@ fun SchermataDistribuzione(
 
     if (partita != null) {
         when (fase) {
-            is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice, onSono)
-            is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice, onNascondiEPassa)
+            is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice) { onSono(fase) }
+            is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice) { onNascondiEPassa(fase) }
             StatoDistribuzione.Gioco -> Unit
         }
     }
@@ -91,6 +104,12 @@ fun SchermataDistribuzione(
             onNo = { chiediInterruzione = false },
         )
     }
+}
+
+private tailrec fun Context.trovaActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.trovaActivity()
+    else -> null
 }
 
 @Composable

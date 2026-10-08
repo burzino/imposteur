@@ -14,7 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,7 +30,7 @@ import it.imposteur.ui.UiState
 
 @Composable
 fun SchermataHome(stato: UiState, onNuovaPartita: () -> Unit, onRiprendi: () -> Unit, onRegole: () -> Unit) {
-    var chiediNuova by remember { mutableStateOf(false) }
+    var chiediNuova by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
