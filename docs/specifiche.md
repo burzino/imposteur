@@ -72,7 +72,7 @@ Contenuto dello stato 2:
 | Impostore | "Sei l'impostore" + (se opzione attiva) "Categoria: <nome categoria>" | "La tua parola è:" + parola affine |
 
 Regole:
-- Ogni ruolo si può rivelare una sola volta: dopo "Nascondi e passa" non è possibile tornare indietro né rivedere il ruolo di un giocatore già passato. Il tasto indietro di sistema nelle schermate di Distribuzione è disabilitato oppure chiede conferma "Interrompere la partita?" (Sì → cancella la partita salvata e va alla Configurazione, No → resta); non porta mai a un ruolo precedente.
+- Ogni ruolo si può rivelare una sola volta in Distribuzione (la schermata di Gioco offre poi "Rivedi la parola", vedi 4.4.1): dopo "Nascondi e passa" non è possibile tornare indietro né rivedere il ruolo di un giocatore già passato. Il tasto indietro di sistema nelle schermate di Distribuzione è disabilitato oppure chiede conferma "Interrompere la partita?" (Sì → cancella la partita salvata e va alla Configurazione, No → resta); non porta mai a un ruolo precedente.
 - Se l'app va in background o la schermata viene ricreata (rotazione, ripristino) durante lo stato 2, si torna allo stato 1 dello stesso giocatore (il ruolo non resta mai visibile senza interazione).
 - Lo stato corrente (Passaggio k / Rivelazione k) viene salvato a ogni cambio (vedi 6). Dopo la chiusura dell'app e "Riprendi partita", uno stato salvato Rivelazione k riparte come Passaggio k: il ruolo non è mai visibile all'avvio. Il giocatore k può quindi rivedere il proprio ruolo una sola volta ancora, solo dopo il tocco su "Sono <nome>".
 - Lo schermo resta acceso durante la Distribuzione.
@@ -84,7 +84,24 @@ Regole:
 - Testo di istruzione: "Discutete a voce, poi votate. Quando avete deciso, premete Rivela."
 - Pulsante "Rivela" → conferma "Rivelare i ruoli?" (Sì/No) → schermata Rivela.
 - Il ruolo non è mostrato in questa schermata.
+- Pulsante piccolo (secondario, meno evidente di "Rivela") "Rivedi la parola" → schermata Rivedi la parola (4.4.1).
 - Tasto indietro: chiede "Interrompere la partita?" (Sì → Configurazione).
+
+### 4.4.1 Rivedi la parola
+Funzione raggiungibile solo dalla schermata di Gioco, dopo la Distribuzione. Eccezione esplicita alla regola "una sola rivelazione" di 4.3 (che resta valida per la Distribuzione).
+
+Stati:
+1. **Elenco**: intestazione "Rivedi la parola", testo "Tocca il tuo nome" e l'elenco di tutti i giocatori (nomi effettivi) nell'ordine della partita, uno per riga, toccabili. Nessun ruolo visibile. Tasto indietro (di sistema e freccia in alto): torna alla schermata di Gioco, senza conferma.
+2. **Passaggio**: toccando un nome, testo "Passa il telefono a <nome>" e pulsante "Sono <nome>". Nessun ruolo visibile; nessun indicatore "Giocatore k di N". Tasto indietro: torna all'Elenco.
+3. **Rivelazione**: dopo il tocco su "Sono <nome>", stesso contenuto, layout, etichette e colori dello stato 2 della Distribuzione (tabella di 4.3, secondo ruolo e modalità del giocatore), con pulsante "Nascondi". Il tocco su "Nascondi" nasconde il ruolo e torna alla schermata di Gioco. Tasto indietro: come "Nascondi".
+
+Regole:
+- Si può rivedere più volte, per qualunque giocatore, senza limiti. Non cambia ruoli, parola, giocatore iniziale né le parole usate.
+- Se l'app va in background o la schermata viene ricreata (rotazione, ripristino) in un qualsiasi stato di Rivedi la parola, si torna alla schermata di Gioco; il ruolo non resta mai visibile senza interazione.
+- Schermata protetta (FLAG_SECURE) in tutte le schermate di Rivedi la parola: niente screenshot, registrazione schermo né anteprima in Recents con contenuto visibile.
+- Lo stato della revisione (Elenco / Passaggio / Rivelazione, giocatore scelto) non viene salvato nella sessione (vedi 6): dopo la chiusura dell'app "Riprendi partita" porta sempre alla schermata di Gioco.
+- Lo schermo resta acceso durante la Rivedi la parola.
+- Note (fair play): nulla impedisce a un giocatore di aprire il ruolo di un altro. Il rischio è accettato; il gioco si basa sulla correttezza dei partecipanti.
 
 ### 4.5 Rivela
 Contenuto:
@@ -130,6 +147,7 @@ Memorizzata in locale (es. DataStore/SharedPreferences) e ripristinata all'avvio
 
 Regole:
 - Ripristino: uno stato Rivelazione k diventa Passaggio k; il ruolo non è mai visibile all'avvio.
+- Lo stato di "Rivedi la parola" (4.4.1) non è salvato: la ripresa porta sempre alla schermata di Gioco.
 - La Home mostra "Riprendi partita" solo se esiste una partita salvata valida (vedi 4.1).
 - Cancellazione della partita salvata (non delle parole usate): all'ingresso in Rivela, confermando "Interrompere la partita?", avviando una nuova partita (sostituisce la salvata). Il solo "Nuova partita" in Home, finché non si preme "Inizia", non la cancella.
 - Validità: la partita salvata è scartata in silenzio (nessun messaggio, nessun "Riprendi partita") se i dati sono illeggibili o incoerenti (es. indici fuori limite, k fuori intervallo), o se categoria o parola (o affine, in modalità "Parola affine") non esistono più in `parole.json`. Anche con `parole.json` illeggibile non si offre "Riprendi partita".
@@ -175,6 +193,7 @@ File `app/src/main/assets/parole.json`:
 - **CA-16** Un pool iniziale vuoto (categorie senza parole utilizzabili nella modalità scelta) produce un errore esplicito, non un'eccezione non gestita.
 - **CA-17** Il parser accetta il formato di sezione 7, rifiuta `versione` ≠ 1, JSON malformato e `parola` vuota; tollera `affine` assente o vuoto.
 - **CA-18** Lo stato della distribuzione è una macchina a stati: dall'indice k in stato "Passaggio" si può passare solo a "Rivelazione" di k; da "Rivelazione" di k solo a "Passaggio" di k+1 (o a "Gioco" se k è l'ultimo); non esiste una transizione verso indici precedenti né una seconda rivelazione dello stesso k.
+  Nota: eccezione esplicita data dalla funzione "Rivedi la parola" (4.4.1, CA-51…CA-60): CA-18 resta valido per la sola Distribuzione; la revisione avviene dopo la Distribuzione, fuori da questa macchina a stati, e non ne modifica lo stato.
 - **CA-19** La serializzazione/deserializzazione della configurazione è reversibile (round-trip identico); id di categoria sconosciuti vengono scartati e, se non ne resta nessuno, si selezionano tutte; valori fuori limite vengono corretti ai limiti.
 - **CA-20** "Nuova partita" con le stesse impostazioni produce nuovi ruoli, nuova parola e nuovo giocatore iniziale mantenendo giocatori, nomi e impostazioni.
 - **CA-21** Il testo di svelamento usa la forma singolare con K=1 ("L'impostore era: …") e plurale con K>1 ("Gli impostori erano: …"), e include l'affine solo in modalità "Parola affine".
@@ -210,6 +229,16 @@ File `app/src/main/assets/parole.json`:
 - **CA-48** La partita salvata è cancellata (la Home non mostra "Riprendi partita") dopo: ingresso in Rivela, conferma "Interrompere la partita?" con Sì.
 - **CA-49** Con la partita salvata incoerente col file parole (categoria o parola rimossa) o dati illeggibili, la Home non mostra "Riprendi partita" e non compare alcun messaggio di errore.
 - **CA-50** Le parole usate sopravvivono alla chiusura dell'app: dopo riavvio, una nuova partita non estrae parole già usate finché il pool non è esaurito.
+- **CA-51** La schermata di Gioco mostra il pulsante "Rivedi la parola", visivamente secondario rispetto a "Rivela"; non compare in Distribuzione né in Rivela.
+- **CA-52** Il tocco su "Rivedi la parola" apre la schermata "Rivedi la parola" con tutti i giocatori, con i nomi effettivi e nell'ordine della partita; nessun ruolo è visibile.
+- **CA-53** Dall'Elenco, il tasto indietro (di sistema o freccia) torna alla schermata di Gioco senza conferma e con lo stesso "Inizia <nome>".
+- **CA-54** Toccando un nome compare "Passa il telefono a <nome>" con il pulsante "Sono <nome>", senza parola né testo di ruolo; il tasto indietro torna all'Elenco.
+- **CA-55** Dopo "Sono <nome>" la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
+- **CA-56** Si può rivedere la parola più volte, anche dello stesso giocatore o di giocatori diversi, senza limiti; ruoli, parola e giocatore iniziale restano invariati.
+- **CA-57** Mettere l'app in background o ruotare lo schermo in qualsiasi schermata di Rivedi la parola riporta alla schermata di Gioco, con nessun ruolo visibile.
+- **CA-58** Le schermate di Rivedi la parola hanno FLAG_SECURE: lo screenshot è bloccato e l'anteprima in Recents non mostra il contenuto.
+- **CA-59** Chiudendo l'app (processo terminato) durante Rivedi la parola, "Riprendi partita" porta alla schermata di Gioco con lo stesso "Inizia <nome>"; la partita salvata non contiene alcuno stato di revisione.
+- **CA-60** "Rivedi la parola" non modifica la macchina a stati della Distribuzione (CA-18 resta valido) né la partita salvata; CA-28 e CA-35 restano validi per la sola Distribuzione.
 
 ## 9. Fuori perimetro (v1)
 

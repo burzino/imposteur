@@ -42,6 +42,9 @@ data class UiState(
     val puoIniziare: Boolean get() = !caricamento && !erroreCaricamento && errori.isEmpty()
 }
 
+/** Stato di "Rivedi la parola": giocatore scelto e ruolo visibile o no. Locale, mai salvato. */
+data class Revisione(val indice: Int, val rivelato: Boolean = false)
+
 class ImpostoreViewModel(application: Application) : AndroidViewModel(application) {
     private val repoParole = RepositoryParole(application)
     private val repoConfig = RepositoryConfigurazione(application)
@@ -52,6 +55,9 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _stato = MutableStateFlow(UiState())
     val stato: StateFlow<UiState> = _stato.asStateFlow()
+
+    private val _revisione = MutableStateFlow<Revisione?>(null)
+    val revisione: StateFlow<Revisione?> = _revisione.asStateFlow()
 
     private var salvataggio: Job? = null
 
@@ -153,6 +159,33 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         if (_stato.value.distribuzione != prima) persisti()
     }
 
+    /** Sceglie il giocatore che rivede la parola (mostra "Passa il telefono a ..."). */
+    fun scegliRevisione(indice: Int) {
+        val p = _stato.value.partita ?: return
+        if (indice !in p.giocatori.indices || _revisione.value != null) return
+        _revisione.value = Revisione(indice)
+    }
+
+    /** "Sono <nome>": rivela il ruolo. Ignora i tocchi doppi. */
+    fun rivelaRevisione() {
+        _revisione.value = _revisione.value?.takeIf { !it.rivelato }?.copy(rivelato = true) ?: _revisione.value
+    }
+
+    /** ON_STOP: se un ruolo e' visibile torna al passaggio. */
+    fun interrompiRevisione() {
+        _revisione.update { r -> if (r != null && r.rivelato) r.copy(rivelato = false) else r }
+    }
+
+    /** Dal passaggio torna all'elenco. */
+    fun tornaAElencoRevisione() {
+        _revisione.value = null
+    }
+
+    /** Esce dalla funzione (nasconde tutto). */
+    fun chiudiRevisione() {
+        _revisione.value = null
+    }
+
     /** Ingresso in Rivela: cancella la partita salvata (le parole usate restano). */
     fun entraInRivela() {
         partitaAttiva = false
@@ -162,6 +195,7 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun terminaPartita() {
         partitaAttiva = false
+        _revisione.value = null
         _stato.update { it.copy(partita = null, distribuzione = Distribuzione.iniziale(), ripristinabile = null) }
         persisti()
     }

@@ -61,6 +61,11 @@
     <string name="gioco_istruzioni">Discutete a voce, poi votate. Quando avete deciso, premete Rivela.</string>
     <string name="gioco_rivela">Rivela</string>
     <string name="gioco_conferma_rivela">Rivelare i ruoli?</string>
+    <string name="gioco_rivedi">Rivedi la parola</string>
+
+    <!-- Rivedi la parola -->
+    <string name="rivedi_titolo">Rivedi la parola</string>
+    <string name="rivedi_nascondi">Nascondi</string>
 
     <!-- Rivela -->
     <string name="rivela_titolo">Svelamento</string>

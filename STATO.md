@@ -25,5 +25,6 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 
 ## Punti aperti
 - Collaudo sul telefono fisico da fare con l utente (ondata 6).
-- Rivedere a mano la qualità delle coppie in parole.json (336 coppie, controllo a campione OK).
-- Specifiche §10: decisioni dell analista da confermare con l utente.
+- Revisione qualità parole in corso (docs/revisione-parole.md). Poi secondo giro di collaudo: affine, doppio tocco, am kill, Recents.
+- Build release firmata: da fare, la chiave la crea l utente.
+- Specifiche §10: decisioni dell analista confermate dall utente (2026-10-08).

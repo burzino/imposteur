@@ -15,7 +15,7 @@
     },
     {
      "parola": "Pane",
-     "affine": "Grissini"
+     "affine": "Piadina"
     },
     {
      "parola": "Formaggio",
@@ -71,7 +71,7 @@
     },
     {
      "parola": "Torta",
-     "affine": "Crostata"
+     "affine": "Muffin"
     },
     {
      "parola": "Biscotto",
@@ -87,7 +87,7 @@
     },
     {
      "parola": "Hamburger",
-     "affine": "Panino"
+     "affine": "Hot Dog"
     },
     {
      "parola": "Lasagna",
@@ -95,7 +95,7 @@
     },
     {
      "parola": "Insalata",
-     "affine": "Spinaci"
+     "affine": "Cavolo"
     },
     {
      "parola": "Pesce",
@@ -103,7 +103,7 @@
     },
     {
      "parola": "Zuppa",
-     "affine": "Minestrone"
+     "affine": "Brodo"
     },
     {
      "parola": "Caffè",
@@ -157,11 +157,11 @@
     },
     {
      "parola": "Scimmia",
-     "affine": "Gorilla"
+     "affine": "Scoiattolo"
     },
     {
      "parola": "Orso",
-     "affine": "Panda"
+     "affine": "Bisonte"
     },
     {
      "parola": "Coniglio",
@@ -181,7 +181,7 @@
     },
     {
      "parola": "Pinguino",
-     "affine": "Gabbiano"
+     "affine": "Pellicano"
     },
     {
      "parola": "Delfino",
@@ -189,11 +189,11 @@
     },
     {
      "parola": "Balena",
-     "affine": "Foca"
+     "affine": "Orca"
     },
     {
      "parola": "Rana",
-     "affine": "Tartaruga"
+     "affine": "Rospo"
     },
     {
      "parola": "Serpente",
@@ -213,7 +213,7 @@
     },
     {
      "parola": "Formica",
-     "affine": "Scarabeo"
+     "affine": "Termite"
     },
     {
      "parola": "Volpe",
@@ -233,7 +233,7 @@
     },
     {
      "parola": "Coccodrillo",
-     "affine": "Alligatore"
+     "affine": "Iguana"
     }
    ]
   },
@@ -267,7 +267,7 @@
     },
     {
      "parola": "Ristorante",
-     "affine": "Pizzeria"
+     "affine": "Bar"
     },
     {
      "parola": "Parco",
@@ -283,7 +283,7 @@
     },
     {
      "parola": "Chiesa",
-     "affine": "Cimitero"
+     "affine": "Moschea"
     },
     {
      "parola": "Banca",
@@ -315,7 +315,7 @@
     },
     {
      "parola": "Fattoria",
-     "affine": "Stalla"
+     "affine": "Maneggio"
     },
     {
      "parola": "Zoo",
@@ -327,7 +327,7 @@
     },
     {
      "parola": "Autostrada",
-     "affine": "Sentiero"
+     "affine": "Tangenziale"
     },
     {
      "parola": "Panificio",
@@ -339,7 +339,7 @@
     },
     {
      "parola": "Prigione",
-     "affine": "Tribunale"
+     "affine": "Caserma"
     },
     {
      "parola": "Faro",
@@ -567,7 +567,7 @@
     },
     {
      "parola": "Astronauta",
-     "affine": "Scienziato"
+     "affine": "Astronomo"
     },
     {
      "parola": "Soldato",
@@ -586,8 +586,8 @@
      "affine": "Operaio"
     },
     {
-     "parola": "Fornaio",
-     "affine": "Gelataio"
+     "parola": "Gelataio",
+     "affine": "Pizzaiolo"
     }
    ]
   },
@@ -612,8 +612,8 @@
      "affine": "Tuffi"
     },
     {
-     "parola": "Atletica",
-     "affine": "Maratona"
+     "parola": "Badminton",
+     "affine": "Squash"
     },
     {
      "parola": "Ciclismo",
@@ -637,7 +637,7 @@
     },
     {
      "parola": "Golf",
-     "affine": "Baseball"
+     "affine": "Minigolf"
     },
     {
      "parola": "Equitazione",
@@ -645,7 +645,7 @@
     },
     {
      "parola": "Surf",
-     "affine": "Vela"
+     "affine": "Kitesurf"
     },
     {
      "parola": "Canottaggio",
@@ -681,7 +681,7 @@
     },
     {
      "parola": "Skateboard",
-     "affine": "Monopattino"
+     "affine": "BMX"
     },
     {
      "parola": "Yoga",
@@ -697,7 +697,7 @@
     },
     {
      "parola": "Rafting",
-     "affine": "Immersioni"
+     "affine": "Kayak"
     },
     {
      "parola": "Formula Uno",
@@ -731,7 +731,7 @@
     },
     {
      "parola": "Nave",
-     "affine": "Traghetto"
+     "affine": "Yacht"
     },
     {
      "parola": "Barca",
@@ -755,7 +755,7 @@
     },
     {
      "parola": "Ambulanza",
-     "affine": "Camionetta"
+     "affine": "Autopompa"
     },
     {
      "parola": "Funivia",
@@ -767,7 +767,7 @@
     },
     {
      "parola": "Sottomarino",
-     "affine": "Battello"
+     "affine": "Portaerei"
     },
     {
      "parola": "Veliero",
@@ -798,7 +798,7 @@
      "affine": "Gru"
     },
     {
-     "parola": "Escavatore",
+     "parola": "Autobotte",
      "affine": "Betoniera"
     },
     {
@@ -818,8 +818,8 @@
      "affine": "Scala Mobile"
     },
     {
-     "parola": "Cabinovia",
-     "affine": "Skilift"
+     "parola": "Carro Armato",
+     "affine": "Jeep"
     },
     {
      "parola": "Autocaravan",
@@ -845,11 +845,11 @@
     },
     {
      "parola": "Foresta",
-     "affine": "Bosco"
+     "affine": "Giungla"
     },
     {
      "parola": "Prato",
-     "affine": "Pascolo"
+     "affine": "Campo"
     },
     {
      "parola": "Dune",
@@ -861,11 +861,11 @@
     },
     {
      "parola": "Scoglio",
-     "affine": "Atollo"
+     "affine": "Iceberg"
     },
     {
      "parola": "Grotta",
-     "affine": "Canyon"
+     "affine": "Burrone"
     },
     {
      "parola": "Nuvola",
@@ -909,15 +909,15 @@
     },
     {
      "parola": "Alluvione",
-     "affine": "Siccità"
+     "affine": "Frana"
     },
     {
      "parola": "Albero",
      "affine": "Cespuglio"
     },
     {
-     "parola": "Fiore",
-     "affine": "Erba"
+     "parola": "Fungo",
+     "affine": "Muschio"
     },
     {
      "parola": "Rosa",
@@ -937,7 +937,7 @@
     },
     {
      "parola": "Sasso",
-     "affine": "Roccia"
+     "affine": "Conchiglia"
     },
     {
      "parola": "Sabbia",
@@ -955,7 +955,7 @@
     },
     {
      "parola": "Pantaloni",
-     "affine": "Jeans"
+     "affine": "Bermuda"
     },
     {
      "parola": "Gonna",
@@ -975,11 +975,11 @@
     },
     {
      "parola": "Calzini",
-     "affine": "Calze"
+     "affine": "Collant"
     },
     {
      "parola": "Scarpe",
-     "affine": "Stivali"
+     "affine": "Pantofole"
     },
     {
      "parola": "Sandali",
@@ -991,7 +991,7 @@
     },
     {
      "parola": "Cappello",
-     "affine": "Berretto"
+     "affine": "Cuffia"
     },
     {
      "parola": "Sciarpa",
@@ -1015,15 +1015,15 @@
     },
     {
      "parola": "Costume",
-     "affine": "Bikini"
+     "affine": "Pareo"
     },
     {
      "parola": "Tuta",
-     "affine": "Salopette"
+     "affine": "Completo"
     },
     {
      "parola": "Impermeabile",
-     "affine": "K-way"
+     "affine": "Poncho"
     },
     {
      "parola": "Occhiali",
@@ -1046,12 +1046,12 @@
      "affine": "Borsa"
     },
     {
-     "parola": "Portafoglio",
-     "affine": "Borsellino"
+     "parola": "Giubbotto",
+     "affine": "Piumino"
     },
     {
      "parola": "Grembiule",
-     "affine": "Divisa"
+     "affine": "Camice"
     },
     {
      "parola": "Mutande",
@@ -1117,7 +1117,7 @@
     },
     {
      "parola": "Xilofono",
-     "affine": "Glockenspiel"
+     "affine": "Marimba"
     },
     {
      "parola": "Tamburello",
@@ -1145,23 +1145,23 @@
     },
     {
      "parola": "Tuba",
-     "affine": "Eufonio"
+     "affine": "Trombone"
     },
     {
      "parola": "Timpani",
      "affine": "Bongo"
     },
     {
-     "parola": "Castagnette",
-     "affine": "Nacchere"
+     "parola": "Sitar",
+     "affine": "Banjo"
     },
     {
      "parola": "Rullante",
      "affine": "Grancassa"
     },
     {
-     "parola": "Pianola",
-     "affine": "Clavicembalo"
+     "parola": "Viola",
+     "affine": "Violino"
     },
     {
      "parola": "Kazoo",
@@ -1176,8 +1176,8 @@
      "affine": "Metronomo"
     },
     {
-     "parola": "Microfono",
-     "affine": "Altoparlante"
+     "parola": "Mandolino",
+     "affine": "Liuto"
     }
    ]
   },
@@ -1191,7 +1191,7 @@
     },
     {
      "parola": "Pasqua",
-     "affine": "Ferragosto"
+     "affine": "Natale"
     },
     {
      "parola": "Carnevale",
@@ -1230,8 +1230,8 @@
      "affine": "Falò"
     },
     {
-     "parola": "Epifania",
-     "affine": "Befana"
+     "parola": "San Valentino",
+     "affine": "Festa della Mamma"
     },
     {
      "parola": "Vacanza",
@@ -1251,7 +1251,7 @@
     },
     {
      "parola": "Torneo",
-     "affine": "Gara"
+     "affine": "Campionato"
     },
     {
      "parola": "Elezioni",
@@ -1263,11 +1263,11 @@
     },
     {
      "parola": "Mostra",
-     "affine": "Esposizione"
+     "affine": "Convegno"
     },
     {
      "parola": "Spettacolo",
-     "affine": "Recital"
+     "affine": "Musical"
     },
     {
      "parola": "Cerimonia",
@@ -1275,18 +1275,18 @@
     },
     {
      "parola": "Riunione",
-     "affine": "Assemblea"
+     "affine": "Conferenza"
     },
     {
      "parola": "Vendemmia",
-     "affine": "Raccolta"
+     "affine": "Mietitura"
     },
     {
      "parola": "Palio",
      "affine": "Giostra"
     },
     {
-     "parola": "Serata",
+     "parola": "Cenone",
      "affine": "Veglione"
     },
     {
@@ -1295,7 +1295,7 @@
     },
     {
      "parola": "Ballo",
-     "affine": "Discoteca"
+     "affine": "Karaoke"
     }
    ]
   },
@@ -1313,7 +1313,7 @@
     },
     {
      "parola": "Occhio",
-     "affine": "Sopracciglio"
+     "affine": "Palpebra"
     },
     {
      "parola": "Naso",
@@ -1321,7 +1321,7 @@
     },
     {
      "parola": "Orecchio",
-     "affine": "Guancia"
+     "affine": "Occhio"
     },
     {
      "parola": "Dente",
@@ -1361,7 +1361,7 @@
     },
     {
      "parola": "Gamba",
-     "affine": "Coscia"
+     "affine": "Polpaccio"
     },
     {
      "parola": "Ginocchio",
@@ -1389,7 +1389,7 @@
     },
     {
      "parola": "Pelle",
-     "affine": "Cicatrice"
+     "affine": "Pelo"
     },
     {
      "parola": "Sangue",
@@ -1413,7 +1413,7 @@
     },
     {
      "parola": "Cranio",
-     "affine": "Mandibola"
+     "affine": "Scheletro"
     }
    ]
   }

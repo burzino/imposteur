@@ -20,6 +20,7 @@ import it.imposteur.ui.schermate.SchermataGioco
 import it.imposteur.ui.schermate.SchermataHome
 import it.imposteur.ui.schermate.SchermataRegole
 import it.imposteur.ui.schermate.SchermataRivela
+import it.imposteur.ui.schermate.SchermataRivedi
 
 object Rotte {
     const val HOME = "home"
@@ -28,6 +29,7 @@ object Rotte {
     const val DISTRIBUZIONE = "distribuzione"
     const val GIOCO = "gioco"
     const val RIVELA = "rivela"
+    const val RIVEDI = "rivedi"
 }
 
 private fun NavHostController.vaiAConfigurazione() {
@@ -42,6 +44,7 @@ private fun NavHostController.inRotta(rotta: String) = currentDestination?.route
 @Composable
 fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostController = rememberNavController()) {
     val stato by viewModel.stato.collectAsStateWithLifecycle()
+    val revisione by viewModel.revisione.collectAsStateWithLifecycle()
 
     // D7: flush della configurazione quando l'app va in background.
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -58,7 +61,8 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
     val rotta = voce?.destination?.route
     LaunchedEffect(rotta, stato.caricamento, stato.partita == null) {
         if (!stato.caricamento && stato.partita == null &&
-            (rotta == Rotte.DISTRIBUZIONE || rotta == Rotte.GIOCO || rotta == Rotte.RIVELA)
+            (rotta == Rotte.DISTRIBUZIONE || rotta == Rotte.GIOCO ||
+                rotta == Rotte.RIVELA || rotta == Rotte.RIVEDI)
         ) {
             navController.navigate(Rotte.HOME) { popUpTo(0) }
         }
@@ -132,9 +136,29 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                         popUpTo(Rotte.GIOCO) { inclusive = true }
                     }
                 },
+                onRivedi = {
+                    if (navController.inRotta(Rotte.GIOCO)) {
+                        viewModel.chiudiRevisione()
+                        navController.navigate(Rotte.RIVEDI) { launchSingleTop = true }
+                    }
+                },
                 onInterrompiPartita = {
                     viewModel.terminaPartita()
                     navController.vaiAConfigurazione()
+                },
+            )
+        }
+        composable(Rotte.RIVEDI) {
+            SchermataRivedi(
+                partita = stato.partita,
+                revisione = revisione,
+                onScegli = { viewModel.scegliRevisione(it) },
+                onSono = { viewModel.rivelaRevisione() },
+                onInterrompi = { viewModel.interrompiRevisione() },
+                onTornaAElenco = { viewModel.tornaAElencoRevisione() },
+                onChiudi = {
+                    viewModel.chiudiRevisione()
+                    if (navController.inRotta(Rotte.RIVEDI)) navController.popBackStack()
                 },
             )
         }

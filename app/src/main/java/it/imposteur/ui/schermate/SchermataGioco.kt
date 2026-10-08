@@ -10,7 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +34,12 @@ import it.imposteur.R
 import it.imposteur.game.Partita
 
 @Composable
-fun SchermataGioco(partita: Partita?, onRivela: () -> Unit, onInterrompiPartita: () -> Unit) {
+fun SchermataGioco(
+    partita: Partita?,
+    onRivela: () -> Unit,
+    onRivedi: () -> Unit,
+    onInterrompiPartita: () -> Unit,
+) {
     var chiediInterruzione by rememberSaveable { mutableStateOf(false) }
     var chiediRivela by rememberSaveable { mutableStateOf(false) }
     BackHandler { chiediInterruzione = true }
@@ -60,6 +72,11 @@ fun SchermataGioco(partita: Partita?, onRivela: () -> Unit, onInterrompiPartita:
             )
             Button(onClick = { chiediRivela = true }, modifier = Modifier.fillMaxWidth().height(64.dp)) {
                 Text(stringResource(R.string.gioco_rivela), style = MaterialTheme.typography.titleLarge)
+            }
+            TextButton(onClick = onRivedi) {
+                Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.gioco_rivedi))
             }
         }
     }

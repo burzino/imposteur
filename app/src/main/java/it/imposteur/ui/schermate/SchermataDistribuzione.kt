@@ -62,12 +62,7 @@ fun SchermataDistribuzione(
     }
 
     // Niente screenshot né anteprima in Recents mentre un ruolo può essere visibile.
-    val context = LocalContext.current
-    DisposableEffect(context) {
-        val window = context.trovaActivity()?.window
-        window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
-    }
+    SchermoProtetto()
 
     // Il ruolo non resta visibile se l'app va in background (include rotazione).
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -106,6 +101,17 @@ fun SchermataDistribuzione(
     }
 }
 
+/** Attiva FLAG_SECURE finché il composable è in composizione. */
+@Composable
+internal fun SchermoProtetto() {
+    val context = LocalContext.current
+    DisposableEffect(context) {
+        val window = context.trovaActivity()?.window
+        window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
+    }
+}
+
 private tailrec fun Context.trovaActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.trovaActivity()
@@ -113,7 +119,7 @@ private tailrec fun Context.trovaActivity(): Activity? = when (this) {
 }
 
 @Composable
-private fun Contenitore(content: @Composable () -> Unit) {
+internal fun Contenitore(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -126,7 +132,7 @@ private fun Contenitore(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
+internal fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
     val nome = partita.giocatori[indice]
     Contenitore {
         Text(
@@ -146,7 +152,12 @@ private fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
 }
 
 @Composable
-private fun Rivelazione(partita: Partita, indice: Int, onNascondiEPassa: () -> Unit) {
+internal fun Rivelazione(
+    partita: Partita,
+    indice: Int,
+    testoPulsante: Int = R.string.distribuzione_nascondi,
+    onNascondiEPassa: () -> Unit,
+) {
     val contenuto = partita.contenutoPer(indice)
     Contenitore {
         Text(
@@ -190,7 +201,7 @@ private fun Rivelazione(partita: Partita, indice: Int, onNascondiEPassa: () -> U
             }
         }
         Button(onClick = onNascondiEPassa, modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text(stringResource(R.string.distribuzione_nascondi), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(testoPulsante), style = MaterialTheme.typography.titleLarge)
         }
     }
 }
