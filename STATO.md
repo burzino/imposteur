@@ -38,6 +38,12 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - I percorsi locali stanno in `.claude/ambiente-locale.md` (in `.gitignore`); la storia è stata ripulita prima del primo push.
 - Le segnalazioni nella PWA si esportano come file, perché adb non è disponibile.
 
+## Decisioni PWA (2026-10-08, sessione di avvio)
+- Utente: Screen Wake Lock in Distribuzione e Rivedi; nota di installazione iOS in "Come si gioca" (solo iOS Safari non installato); "Esporta segnalazioni" nelle impostazioni, visibile solo se ce ne sono.
+- Sessione principale: rotte in hash (#/home…); colori dinamici assenti sul web; rotazione non azzera il ruolo (CA-W17); ritardo "Nascondi e passa" 600 ms come nel codice.
+- Specifiche: §4.4.1, CA-54/55, CA-46 e la riga "Ripristino" di §4.3 citano ancora "Sono <nome>" e il tocco: da allineare alla pressione lunga.
+- Mancano le icone PNG `web/public/icona-192.png` e `icona-512.png`.
+
 ## Ultimi passi (2026-10-08)
 - Aggiunti: opzioni avanzate (fisarmonica, 6 opzioni), tasto Home in alto, ordine di parola, griglia di Rivedi.
 - Collaudo su OnePlus 9 superato. Corretti il doppio tocco (ritardo di 600 ms) e il dialogo di segnalazione sopra la tastiera. Script di collaudo: `tools/collaudo/ui.py`.
@@ -52,6 +58,7 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 Node.js 24 e npm 11 sono installati sul PC.
 
 ## Punti aperti
+- Vulnerabilità (solo sviluppo) in vitest 3: @vitest/mocker e tinypool; correzione con vitest 5.
 - Push dei commit da c498f04 in poi.
 - L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.
 - Specifiche da aggiornare per il restyling (pressione lunga, overlay).

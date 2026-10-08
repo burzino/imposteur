@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- Stessa icona di app/src/main/res/drawable/ic_launcher_*.xml; a tutto campo, usabile anche come maskable -->
+  <defs>
+    <radialGradient id="sfondo" cx="54" cy="54" r="76" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E1029"/><stop offset="1" stop-color="#060309"/>
+    </radialGradient>
+    <radialGradient id="ombra" cx="54" cy="88" r="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="maschera" x1="0" y1="37" x2="0" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B3447"/><stop offset="1" stop-color="#17141D"/>
+    </linearGradient>
+    <radialGradient id="aloneViola" cx="40" cy="52.5" r="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#B39DFF" stop-opacity="0.55"/><stop offset="1" stop-color="#B39DFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aloneGiallo" cx="68" cy="52.5" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB300" stop-opacity="0.5"/><stop offset="1" stop-color="#FFB300" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#sfondo)"/>
+  <ellipse cx="54" cy="88" rx="50" ry="15" fill="url(#ombra)"/>
+  <path d="M54,40.5 C46,40.5 38,43 31,44.5 C27,43.5 24,41 22,38 C21,47 27,60 38,66 C44,67.5 49,61.5 54,61.5 C59,61.5 64,67.5 70,66 C81,60 87,47 86,38 C84,41 81,43.5 77,44.5 C70,43 62,40.5 54,40.5 Z" fill="url(#maschera)" stroke="#9C86C9" stroke-opacity="0.7" stroke-width="1" stroke-linejoin="round"/>
+  <path fill="#050307" d="M30.4 48.3C35.2 42.9 44.8 45.9 49.6 55.5C43.6 60.9 34 58.5 30.4 48.3Z"/>
+  <path fill="#050307" d="M77.6 48.3C72.8 42.9 63.2 45.9 58.4 55.5C64.4 60.9 74 58.5 77.6 48.3Z"/>
+  <circle cx="40" cy="52.5" r="10" fill="url(#aloneViola)"/>
+  <circle cx="40" cy="52.5" r="2.64" fill="#D8CCFF"/>
+  <circle cx="68" cy="52.5" r="14" fill="url(#aloneGiallo)"/>
+  <path fill="#FFD600" d="M64.16 51.9C64.16 48.9 65.96 47.46 68 47.46C70.16 47.46 71.84 48.9 71.84 50.94C71.84 53.34 69.8 53.82 69.2 55.26L69.2 55.86L66.32 55.86L66.32 55.02C66.32 52.86 68.72 52.5 68.72 51.18C68.72 50.46 68.48 50.1 68 50.1C67.4 50.1 67.04 50.58 67.04 51.9Z"/>
+  <circle cx="67.76" cy="58.26" r="1.44" fill="#FFD600"/>
+</svg>

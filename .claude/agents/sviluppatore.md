@@ -22,6 +22,7 @@ PWA (`web/`): Svelte 5 (runes) + TypeScript strict + Vite + vite-plugin-pwa, tes
 - `web/src/game/` e `web/src/data/` sono TS puro (niente DOM, niente Svelte): porting fedele di `game/` e `data/` Kotlin, con le firme della sezione TS di `docs/contratto-api.md`. Casualità tramite un generatore iniettato.
 - `parole.json` si importa da `app/src/main/assets/` al momento della build, senza copie.
 - Testi identici a `app/src/main/res/values/strings.xml`.
+- `tsconfig` di `web/` con `allowJs` e `checkJs`: un componente senza `<script lang="ts">` è JS e senza `allowJs` svelte-check dà "Could not find a declaration file for module ...svelte". Ogni componente nuovo usa comunque `<script lang="ts">`.
 - Non eseguire `npm ci`/`npm test`/`npm run build`: li esegue `esecutore-build`. Non lanciare server di sviluppo.
 
 Resoconto finale: massimo 20 righe (file creati/modificati, scelte non ovvie, punti aperti). Niente diff nel resoconto.

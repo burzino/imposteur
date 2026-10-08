@@ -282,7 +282,7 @@ export function casualeDiSistema(): Casuale;            // crypto.getRandomValue
 
 // helper puri sopra Casuale (equivalenti di nextInt(a, b), nextDouble(), shuffled)
 export function interoTra(c: Casuale, minInclusivo: number, maxEsclusivo: number): number;
-export function reale(c: Casuale): number;                              // [0, 1), costruito da chiamate a intero()
+export function reale(c: Casuale): number;                              // [0, 1): UNA chiamata a intero(2^30), diviso 2^30 (risolto: 30 bit bastano per PROBABILITA_TRAPPOLA)
 export function mescolato<T>(c: Casuale, v: readonly T[]): T[];         // Fisher-Yates, nuovo array
 ```
 
