@@ -85,9 +85,11 @@ Card a fisarmonica "Opzioni avanzate", chiusa per default (lo stato aperto/chius
 ### 4.3 Distribuzione ruoli
 Per ogni giocatore, nell'ordine della lista, si alternano tre stati:
 
-1. **Passaggio**: testo "Passa il telefono a <nome>", avviso "Gli altri non guardino lo schermo" e pulsante "Sono <nome>". Nessun ruolo visibile. Indicatore "Giocatore k di N".
-2. **Rivelazione**: dopo il tocco sul pulsante, il contenuto del ruolo (vedi tabella) e il pulsante "Nascondi e passa" ("Nascondi e inizia" per l'ultimo giocatore). Il pulsante si attiva 400 ms dopo la comparsa del ruolo (prima è disabilitato).
-3. Il tocco su "Nascondi e passa" nasconde il ruolo e passa allo stato 1 del giocatore successivo. Il tocco su "Nascondi e inizia" (ultimo giocatore) apre la schermata di Gioco.
+1. **Passaggio**: testo "Passa il telefono a" seguito dal nome del giocatore in grande (equivale a "Passa il telefono a <nome>"), avviso "Gli altri non guardino lo schermo", indicatore "Giocatore k di N", cerchio con l'iniziale del nome e, in basso, il pulsante a pressione lunga "Tieni premuto per scoprire" con sotto la didascalia "Sono <nome> — tieni premuto". Nessun ruolo visibile.
+   - Fila di avatar (in alto, decorativa: l'informazione è nel testo "Giocatore k di N"): un cerchio con l'iniziale per ogni giocatore, in ordine; già visti = pieni con spunta, corrente = evidenziato con anello, successivi = attenuati. Fino a 8 giocatori stanno tutti sulla riga; oltre 8 la riga scorre e resta centrata sul corrente.
+   - Pressione lunga: tenendo premuto il pulsante una barra si riempie in 600 ms; a barra piena il ruolo viene rivelato (stato 2). Rilasciando prima, la barra torna a zero e non succede nulla. Un semplice tocco non rivela. Il pulsante è disabilitato (attenuato, ignora la pressione) nei primi 600 ms dopo la comparsa del giocatore (anti doppio tocco). Per l'accessibilità l'azione "Scopri il ruolo" attiva la rivelazione senza pressione lunga.
+2. **Rivelazione**: la carta si gira (rotazione 3D) mostrando il contenuto del ruolo (vedi tabella) e il pulsante "Nascondi e passa" ("Nascondi e inizia" per l'ultimo giocatore). Il pulsante si attiva 600 ms dopo la comparsa del ruolo (prima è disabilitato). L'animazione è identica per tutti i ruoli.
+3. Il tocco su "Nascondi e passa" nasconde il ruolo e passa allo stato 1 del giocatore successivo. Il tocco su "Nascondi e inizia" (ultimo giocatore) mostra l'overlay "Tutti pronti!": schermata a tutto schermo con il testo "Tutti pronti!" e sotto "Che il bluff abbia inizio"; dopo 1200 ms (o al tocco, che lo salta) si apre la schermata di Gioco. La partita è già nello stato Gioco quando compare l'overlay (salvataggio, ripristino e tasto indietro seguono le regole del Gioco).
 
 Contenuto dello stato 2:
 
@@ -281,7 +283,7 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-24** L'interruttore "L'impostore vede la categoria" è visibile solo con modalità "Impostore senza parola".
 - **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Inizia" è disabilitato e sopra compare in rosso lo stesso errore; con un nome duplicato compare "Nome già usato" e "Inizia" è disabilitato; per un errore senza testo dedicato sopra "Inizia" compare in rosso "Controlla la configurazione".
 - **CA-26** Chiudendo e riaprendo l'app, la Configurazione mostra gli stessi valori impostati prima della chiusura.
-- **CA-27** La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; il ruolo compare solo dopo il tocco su "Sono <nome>".
+- **CA-27** La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; il ruolo compare solo dopo la pressione lunga (600 ms) su "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"); un tocco breve o un rilascio anticipato non rivelano nulla e la barra torna a zero.
 - **CA-28** Dopo "Nascondi e passa" il ruolo non è più visibile e non esiste alcun controllo né gesto (incluso il tasto indietro) per rivedere il ruolo di un giocatore precedente.
 - **CA-29** Mettere l'app in background o ruotare lo schermo mentre un ruolo è visibile riporta alla schermata "Passa il telefono a <nome>" dello stesso giocatore.
 - **CA-30** In modalità "Parola affine" le schermate di rivelazione di un civile e di un impostore sono indistinguibili in layout, etichette e colori (differiscono solo per la parola).
@@ -311,7 +313,10 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-60** "Rivedi la parola" non modifica la macchina a stati della Distribuzione (CA-18 resta valido) né la partita salvata; CA-28 e CA-35 restano validi per la sola Distribuzione.
 - **CA-62** Ogni campo nome ha un pulsante "x" che lo svuota (il nome torna "Giocatore n"); la tastiera dei campi nome mostra il tasto Avanti, che passa al campo successivo.
 - **CA-63** Nella Configurazione compare "Parole ancora da giocare: X / Y" coerente con categorie e modalità scelte e si aggiorna al loro variare; "Azzera" chiede "Rimettere in gioco tutte le parole delle categorie scelte?" con "Annulla" / "Azzera"; "Annulla" non cambia X, "Azzera" porta X a Y per le categorie scelte lasciando intatte le usate delle altre (logica: CA-61).
-- **CA-64** In Distribuzione l'ultimo giocatore vede "Nascondi e inizia" al posto di "Nascondi e passa"; il pulsante è disabilitato nei primi 400 ms dopo la comparsa del ruolo e poi si attiva; la schermata di Passaggio mostra "Gli altri non guardino lo schermo".
+- **CA-64** In Distribuzione l'ultimo giocatore vede "Nascondi e inizia" al posto di "Nascondi e passa"; il pulsante è disabilitato nei primi 600 ms dopo la comparsa del ruolo e poi si attiva; la schermata di Passaggio mostra "Gli altri non guardino lo schermo" e, nei primi 600 ms dal suo ingresso, il pulsante "Tieni premuto per scoprire" ignora la pressione.
+- **CA-66** La schermata di Passaggio mostra la fila di avatar (uno per giocatore, nell'ordine della lista): i giocatori già passati con spunta, il corrente evidenziato, i successivi attenuati; con più di 8 giocatori la fila scorre restando centrata sul corrente. La fila non contiene ruoli né altre informazioni oltre all'iniziale del nome.
+- **CA-67** Dopo la pressione lunga la rivelazione avviene con la carta che si gira; l'animazione è identica per tutti i giocatori e ruoli (CA-30, CA-65 restano validi).
+- **CA-68** Dopo "Nascondi e inizia" compare l'overlay "Tutti pronti!" con "Che il bluff abbia inizio"; si chiude dopo 1200 ms o al tocco e porta alla schermata di Gioco (CA-31); chiudendo l'app durante l'overlay, "Riprendi partita" porta alla schermata di Gioco.
 - **CA-65** Il feedback tattile della rivelazione è identico per civili e impostori, in entrambe le modalità (una sola vibrazione leggera); anche quello del passaggio è identico per tutti.
 
 Opzioni avanzate, ordine di parola, segnalazioni (4.2, 4.4, 4.5, 4.6):

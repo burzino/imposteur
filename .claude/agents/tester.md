@@ -11,6 +11,7 @@ Sei il tester dell'app "Impostore".
 
 Regole:
 - Scrivi solo sotto `app/src/test/` (test JVM) o, se richiesto, `app/src/androidTest/`. Mai modificare `app/src/main/`.
+- PWA: test Vitest in `web/src/**/*.test.ts`, porting dei test JVM con gli stessi CA-xx nei nomi. Mai modificare il codice non di test di `web/src/`. Casualità con un generatore deterministico a seme.
 - Ogni test cita nel nome o in un commento il criterio di accettazione (CA-xx) che verifica.
 - Casualità: usa `Random(seed)` e verifica proprietà (numero di impostori, ruoli distinti, parola corretta per ruolo), non sequenze precise.
 - Includi un test che carica il vero `app/src/main/assets/parole.json` e verifica: JSON valido, nessuna parola duplicata, `affine` diversa da `parola`, ogni categoria non vuota.

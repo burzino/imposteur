@@ -260,3 +260,271 @@ v1.4: `FormatoSegnalazioni.leggi` deve leggere anche le righe salvate prima dell
 ## `it.imposteur.ui` (UI: la scrive solo l'agente dedicato)
 
 `ImpostoreViewModel` (AndroidViewModel) espone `StateFlow<UiState>` e possiede un unico `GestorePartite(Random.Default)`. Navigazione Compose con le rotte: home, regole, configurazione, distribuzione, gioco, rivela.
+
+## PWA: `web/src/game` e `web/src/data` (TypeScript, v2.0)
+
+Porting 1:1 di `game/` e `data/` Kotlin. Le firme Kotlin e le specifiche restano la fonte di verità: dove qui non è detto altro, il comportamento è identico (stessi algoritmi, stesso ordine di chiamata a `Casuale`, stessi testi). Regole comuni:
+
+- TS puro, `strict`, nessun DOM né Svelte in `game/` e `data/` (solo `archivio.ts` riceve lo storage per iniezione).
+- Mappatura: data class → `interface` con campi `readonly`; sealed → unione discriminata con campo `tipo`; enum → unione di stringhe letterali (stessi nomi del Kotlin, es. `"SENZA_PAROLA"`); `Set<T>` → `ReadonlySet<T>`; `List<T>` → `readonly T[]`; `T?` → `T | null` (mai `undefined` nei modelli). Le `copy` Kotlin diventano oggetti nuovi (`{ ...c, campo }`): nessuna mutazione dei modelli.
+- Niente eccezioni di validazione: dove Kotlin restituisce un risultato, TS restituisce un risultato.
+- Il JSON salvato ha gli stessi nomi di campo e le stesse regole di normalizzazione del Kotlin (§6 delle specifiche), così un salvataggio Android e uno web sono interscambiabili.
+
+### `web/src/game/casuale.ts`
+
+```ts
+export interface Casuale {
+  /** Intero uniforme con 0 <= x < limite. limite >= 1 (intero). */
+  intero(limite: number): number;
+}
+export function casualeConSeme(seme: number): Casuale;  // deterministica (mulberry32), per i test
+export function casualeDiSistema(): Casuale;            // crypto.getRandomValues, senza bias (rejection sampling)
+
+// helper puri sopra Casuale (equivalenti di nextInt(a, b), nextDouble(), shuffled)
+export function interoTra(c: Casuale, minInclusivo: number, maxEsclusivo: number): number;
+export function reale(c: Casuale): number;                              // [0, 1), costruito da chiamate a intero()
+export function mescolato<T>(c: Casuale, v: readonly T[]): T[];         // Fisher-Yates, nuovo array
+```
+
+`GestorePartite` usa `reale(c) < PROBABILITA_TRAPPOLA` dove Kotlin usa `nextDouble()`. Gli esiti non sono identici bit a bit a quelli Kotlin (generatori diversi): i test web verificano le proprietà, non sequenze.
+
+### `web/src/game/modelli.ts`
+
+```ts
+export type Modalita = "SENZA_PAROLA" | "PAROLA_AFFINE";
+
+export interface Parola { readonly parola: string; readonly affine: string | null }
+export interface Categoria { readonly id: string; readonly nome: string; readonly parole: readonly Parola[] }
+
+export interface Configurazione {
+  readonly numeroGiocatori: number;
+  readonly nomi: readonly string[];
+  readonly numeroImpostori: number;
+  readonly modalita: Modalita;
+  readonly mostraCategoria: boolean;
+  readonly categorieSelezionate: ReadonlySet<string>;
+  readonly impostoreNonPrimo: boolean;
+  readonly impostoriSorpresa: boolean;
+  readonly ordineCasuale: boolean;
+  readonly partitaTrappola: boolean;
+  readonly promemoriaUltimaPossibilita: boolean;
+  readonly giriIndizi: number;
+}
+/** Default del Kotlin: 4 giocatori, nomi [], 1 impostore, SENZA_PAROLA, mostraCategoria true, categorie vuote, opzioni false, giriIndizi 1. */
+export function configurazioneDefault(sovrascritture?: Partial<Configurazione>): Configurazione;
+
+export interface VoceParola {
+  readonly categoriaId: string; readonly categoriaNome: string;
+  readonly parola: string; readonly affine: string | null;
+}
+
+export type ErroreConfigurazione =
+  | { readonly tipo: "TroppoPochiGiocatori" }
+  | { readonly tipo: "TroppiGiocatori" }
+  | { readonly tipo: "TroppoPochiImpostori" }
+  | { readonly tipo: "TroppiImpostori" }
+  | { readonly tipo: "NessunaCategoria" }
+  | { readonly tipo: "PoolVuoto" }
+  | { readonly tipo: "NomeDuplicato"; readonly indici: readonly number[] }   // 0-based
+  | { readonly tipo: "NomeTroppoLungo"; readonly indice: number };
+
+export const TestiGioco: {
+  readonly SEI_IMPOSTORE: string; readonly LA_PAROLA_E: string; readonly LA_TUA_PAROLA_E: string;
+  readonly NESSUN_IMPOSTORE: string; readonly PROMEMORIA_ULTIMA_POSSIBILITA: string;
+  categoria(nome: string): string;
+  impostoriSingolare(nome: string): string;
+  impostoriPlurale(nomi: readonly string[]): string;
+  laParolaEra(parola: string): string;
+  laParolaAffineEra(affine: string): string;
+};   // stringhe identiche al Kotlin
+```
+
+### `web/src/game/regole.ts`
+
+```ts
+export const Regole: {
+  readonly MIN_GIOCATORI: 3;
+  readonly MAX_GIOCATORI: 20;
+  readonly MAX_LUNGHEZZA_NOME: 20;
+  readonly PROBABILITA_TRAPPOLA: 0.10;
+  readonly MAX_GIRI: 3;
+  maxImpostori(numeroGiocatori: number): number;                                  // max(0, floor((N-1)/2))
+  nomiEffettivi(config: Configurazione): string[];                                // trim + "Giocatore n", lunghezza N
+  valida(config: Configurazione, categorie: readonly Categoria[]): ErroreConfigurazione[];  // vuota = valida, stesso ordine del Kotlin
+  conNumeroGiocatori(config: Configurazione, n: number): Configurazione;         // CA-06
+  pool(categorie: readonly Categoria[], selezionate: ReadonlySet<string>, modalita: Modalita): VoceParola[];  // CA-11
+};
+```
+
+Le costanti sono anche esportate singolarmente (`MIN_GIOCATORI`, ...). I confronti "senza maiuscole" del Kotlin (`lowercase()`, `equals(ignoreCase)`) diventano `toLowerCase()`; la lunghezza dei nomi si misura in unità UTF-16, come `String.length` in Kotlin.
+
+### `web/src/game/partita.ts`
+
+```ts
+export type ContenutoRuolo =
+  | { readonly tipo: "ParolaSegreta"; readonly testo: string }
+  | { readonly tipo: "Impostore"; readonly categoria: string | null };
+
+export interface Partita {
+  readonly giocatori: readonly string[];
+  readonly impostori: ReadonlySet<number>;      // vuoto = partita trappola
+  readonly voce: VoceParola;
+  readonly modalita: Modalita;
+  readonly mostraCategoria: boolean;
+  readonly primoGiocatore: number;
+  readonly ordine: readonly number[] | null;    // null = rotazione da primoGiocatore
+  readonly giriIndizi: number;
+  readonly promemoriaUltimaPossibilita: boolean;
+}
+export function eTrappola(p: Partita): boolean;                       // impostori.size === 0
+export function contenutoPer(p: Partita, indice: number): ContenutoRuolo;   // CA-09, CA-10
+export function ordineDiParola(p: Partita): number[];
+export function testoSvelamento(p: Partita): string;                  // CA-21
+
+export interface ChiaveParola { readonly categoriaId: string; readonly parola: string }  // parola = trim + minuscole
+export function chiaveDi(v: VoceParola): ChiaveParola;
+export function chiaveStringa(k: ChiaveParola): string;               // JSON.stringify([categoriaId, parola])
+
+export interface SessioneSalvata {
+  readonly partita: Partita | null;
+  readonly stato: StatoDistribuzione | null;   // null se partita null
+  readonly usate: readonly ChiaveParola[];     // senza duplicati (vedi nota)
+  readonly ultima: ChiaveParola | null;
+}
+
+export type RisultatoNuovaPartita =
+  | { readonly tipo: "Ok"; readonly partita: Partita }
+  | { readonly tipo: "Errore"; readonly errori: readonly ErroreConfigurazione[] };
+
+export class GestorePartite {
+  constructor(casuale: Casuale, usateIniziali?: Iterable<ChiaveParola>, ultimaIniziale?: ChiaveParola | null);
+  get usate(): readonly ChiaveParola[];         // copia
+  get ultima(): ChiaveParola | null;
+  rimanenti(pool: readonly VoceParola[]): number;
+  azzeraUsate(pool: readonly VoceParola[]): void;
+  nuovaPartita(config: Configurazione, categorie: readonly Categoria[]): RisultatoNuovaPartita;  // stesso algoritmo e ordine di chiamate a Casuale di v1.6
+}
+
+export type StatoDistribuzione =
+  | { readonly tipo: "Passaggio"; readonly indice: number }
+  | { readonly tipo: "Rivelazione"; readonly indice: number }
+  | { readonly tipo: "Gioco" };
+
+export const Distribuzione: {
+  iniziale(): StatoDistribuzione;
+  avanza(stato: StatoDistribuzione, numeroGiocatori: number): StatoDistribuzione;
+  interrompiRivelazione(stato: StatoDistribuzione): StatoDistribuzione;
+};
+```
+
+Uguaglianza delle chiavi: in JS un `Set` di oggetti confronta per riferimento, quindi `usate` è un array senza duplicati (unicità garantita con `chiaveStringa`, usata anche per i `Set<string>` interni del `GestorePartite`). I test confrontano con `chiaveStringa` o con `toEqual` su array ordinati.
+
+### `web/src/data/parserParole.ts`
+
+```ts
+export type RisultatoCaricamento =
+  | { readonly tipo: "Ok"; readonly categorie: readonly Categoria[] }
+  | { readonly tipo: "Errore"; readonly messaggio: string };
+
+export function parseParole(json: string): RisultatoCaricamento;   // CA-17; ignora chiavi sconosciute; versione deve essere 1; stesse regole e messaggi di ParserParole.kt
+```
+
+Il file è `app/src/main/assets/parole.json` (nessuna copia); il caricamento (fetch/import) sta fuori da `data/`, nel livello UI.
+
+### `web/src/data/serializzazioneConfigurazione.ts`
+
+```ts
+export function configurazioneAStringa(config: Configurazione): string;
+/** null/vuota/malformata -> default con tutte le categorie selezionate; normalizza ai limiti come il Kotlin. */
+export function configurazioneDaStringa(s: string | null, categorie: readonly Categoria[]): Configurazione;
+```
+
+Formato JSON (campi identici al Kotlin, default se mancanti): `numeroGiocatori`, `nomi` (array), `numeroImpostori`, `modalita` (stringa enum), `mostraCategoria`, `categorieSelezionate` (array di id), `impostoreNonPrimo`, `impostoriSorpresa`, `ordineCasuale`, `partitaTrappola`, `promemoriaUltimaPossibilita`, `giriIndizi`. Un campo di tipo errato rende malformato l'intero JSON (come in Kotlin) e dà la configurazione di default.
+
+### `web/src/data/serializzazioneSessione.ts`
+
+```ts
+export function sessioneAStringa(s: SessioneSalvata): string;
+/** null/malformata -> { partita: null, stato: null, usate: [], ultima: null }. Stesse regole di scarto e di filtro del Kotlin (v1.1, v1.6); Rivelazione(k) -> Passaggio(k). */
+export function sessioneDaStringa(s: string | null, categorie: readonly Categoria[]): SessioneSalvata;
+```
+
+Formato JSON: `{ "partita": {...}|null, "stato": {...}|null, "usate": [{"categoriaId","parola"}], "ultima": {"categoriaId","parola"}|null }`.
+- `partita`: `giocatori`, `impostori` (array ordinato), `categoriaId`, `parola`, `affine` (stringa o null, sempre presente), `modalita`, `mostraCategoria`, `primoGiocatore`, `ordine` (array o null), `giriIndizi`, `promemoria` (= `promemoriaUltimaPossibilita`).
+- `stato`: `{ "tipo": "PASSAGGIO" | "RIVELAZIONE" | "GIOCO", "indice": number }` (per GIOCO `indice` vale 0). La conversione verso `StatoDistribuzione` (PascalCase in memoria, maiuscolo nel JSON) sta solo in questo modulo.
+
+### `web/src/data/segnalazioni.ts`
+
+```ts
+export type MotivoSegnalazione = "TROPPO_SIMILI" | "TROPPO_DIVERSE" | "POCO_CONOSCIUTA" | "CATEGORIA_SBAGLIATA";
+
+export interface Segnalazione {
+  readonly tipo: "coppia" | "app";
+  readonly istante: string;                 // ISO-8601 locale
+  readonly categoriaId: string | null;
+  readonly parola: string | null;
+  readonly affine: string | null;
+  readonly modalita: Modalita | null;
+  readonly motivi: readonly MotivoSegnalazione[];
+  readonly nota: string;
+  readonly propostaParola: string | null;
+  readonly propostaAffine: string | null;
+}
+export function segnalazione(base: Pick<Segnalazione, "tipo" | "istante"> & Partial<Segnalazione>): Segnalazione;  // default null / [] / ""
+
+export const FormatoSegnalazioni: {
+  normalizza(s: Segnalazione): Segnalazione;        // trim e limiti: nota 500, proposte 40, "" -> null
+  propostaValida(s: Segnalazione): boolean;
+  riga(s: Segnalazione): string;                    // una riga JSON senza a capo; i null sono scritti come null, come in Kotlin
+  leggi(testo: string): Segnalazione[];             // JSONL; righe malformate saltate; campi assenti -> default
+};
+```
+
+Sul web non c'è un file: `archivio.ts` conserva il testo JSONL e l'esportazione (download/condivisione) sta nella UI.
+
+### `web/src/data/aspetto.ts`
+
+```ts
+export type Tema = "SISTEMA" | "CHIARO" | "SCURO" | "ALTO_CONTRASTO";
+export interface Aspetto { readonly tema: Tema; readonly coloriDinamici: boolean }
+export const aspettoDefault: Aspetto;                                // { tema: "SISTEMA", coloriDinamici: true }
+export function aspettoAStringa(a: Aspetto): string;                 // {"tema":"...","coloriDinamici":bool}
+export function aspettoDaStringa(s: string | null): Aspetto;         // null/malformata/valori sconosciuti -> default per campo
+```
+
+Su web `coloriDinamici` è conservato ma la UI può ignorarlo (nessun Material You).
+
+### `web/src/data/archivio.ts` (sostituisce `Repository*.kt`)
+
+```ts
+/** Sottoinsieme di Storage: in produzione `window.localStorage`, nei test una Map in memoria. */
+export interface ArchivioStorage {
+  getItem(chiave: string): string | null;
+  setItem(chiave: string, valore: string): void;
+  removeItem(chiave: string): void;
+}
+export function storageInMemoria(): ArchivioStorage;   // per i test
+
+export const CHIAVI_ARCHIVIO: {
+  readonly configurazione: "impostore.configurazione";
+  readonly sessione: "impostore.sessione";
+  readonly aspetto: "impostore.aspetto";
+  readonly segnalazioni: "impostore.segnalazioni";     // testo JSONL
+};
+
+export interface Archivio {
+  leggiConfigurazione(categorie: readonly Categoria[]): Configurazione;
+  salvaConfigurazione(config: Configurazione): void;
+  leggiSessione(categorie: readonly Categoria[]): SessioneSalvata;
+  salvaSessione(s: SessioneSalvata): void;
+  leggiAspetto(): Aspetto;
+  salvaAspetto(a: Aspetto): void;
+  aggiungiSegnalazione(s: Segnalazione): void;       // append di riga + "\n"
+  leggiSegnalazioni(): Segnalazione[];
+  contaSegnalazioni(): number;
+  cancellaSegnalazioni(): void;
+}
+export function creaArchivio(storage: ArchivioStorage): Archivio;
+```
+
+Gli errori di storage (accessor che lancia, quota piena, modalità privata) sono assorbiti: le letture danno il valore di default, le scritture non lanciano (come i `catch` dei repository Kotlin). Il caricamento delle parole non fa parte di `Archivio`.
