@@ -25,6 +25,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import it.imposteur.data.FormatoSegnalazioni
 import it.imposteur.data.MotivoSegnalazione
 import it.imposteur.data.Segnalazione
 import kotlinx.coroutines.launch
@@ -135,7 +139,7 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
             affine = partita.voce.affine.takeIf { partita.modalita == Modalita.PAROLA_AFFINE },
             categoria = partita.voce.categoriaNome,
             onAnnulla = { segnalando = false },
-            onSalva = { motivi, nota ->
+            onSalva = { motivi, nota, propParola, propAffine ->
                 segnalando = false
                 onSegnala(
                     Segnalazione(
@@ -147,6 +151,8 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
                         modalita = partita.modalita.name,
                         motivi = motivi,
                         nota = nota,
+                        propostaParola = propParola,
+                        propostaAffine = propAffine,
                     ),
                 )
                 scope.launch { snackbar.showSnackbar(messaggioSalvata) }
@@ -156,6 +162,7 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
 }
 
 private const val MAX_COMMENTO = 500
+private const val MAX_PROPOSTA = 40
 
 @Composable
 private fun DialogoSegnalaCoppia(
@@ -163,10 +170,18 @@ private fun DialogoSegnalaCoppia(
     affine: String?,
     categoria: String,
     onAnnulla: () -> Unit,
-    onSalva: (List<MotivoSegnalazione>, String) -> Unit,
+    onSalva: (List<MotivoSegnalazione>, String, String?, String?) -> Unit,
 ) {
     var motivi by rememberSaveable { mutableStateOf(emptyList<String>()) }
     var nota by rememberSaveable { mutableStateOf("") }
+    var propParola by rememberSaveable { mutableStateOf("") }
+    var propAffine by rememberSaveable { mutableStateOf("") }
+    val proposta = FormatoSegnalazioni.normalizza(
+        Segnalazione(tipo = "coppia", istante = "", propostaParola = propParola, propostaAffine = propAffine),
+    )
+    val propostaValida = FormatoSegnalazioni.propostaValida(proposta)
+    val propostaMezza = (proposta.propostaParola == null) != (proposta.propostaAffine == null)
+    val propostaUguale = proposta.propostaParola != null && proposta.propostaAffine != null && !propostaValida
     val etichette = listOf(
         MotivoSegnalazione.TROPPO_SIMILI to R.string.segnala_motivo_simili,
         MotivoSegnalazione.TROPPO_DIVERSE to R.string.segnala_motivo_diverse,
@@ -215,13 +230,46 @@ private fun DialogoSegnalaCoppia(
                     minLines = 3,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.segnala_proponi), style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = propParola,
+                    onValueChange = { propParola = it.take(MAX_PROPOSTA) },
+                    label = { Text(stringResource(R.string.segnala_proponi_parola)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = propAffine,
+                    onValueChange = { propAffine = it.take(MAX_PROPOSTA) },
+                    label = { Text(stringResource(R.string.segnala_proponi_affine)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (propostaMezza || propostaUguale) {
+                    Text(
+                        stringResource(if (propostaMezza) R.string.segnala_proponi_manca else R.string.segnala_proponi_uguali),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(
-                enabled = motivi.isNotEmpty() || nota.isNotBlank(),
+                enabled = (motivi.isNotEmpty() || nota.isNotBlank() || propostaValida) && !propostaMezza && !propostaUguale,
                 onClick = {
-                    onSalva(MotivoSegnalazione.entries.filter { it.name in motivi }, nota.trim())
+                    onSalva(
+                        MotivoSegnalazione.entries.filter { it.name in motivi },
+                        nota.trim(),
+                        proposta.propostaParola,
+                        proposta.propostaAffine,
+                    )
                 },
             ) { Text(stringResource(R.string.segnala_salva)) }
         },

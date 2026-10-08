@@ -95,7 +95,12 @@
     <string name="segnala_motivo_diverse">Parole troppo diverse</string>
     <string name="segnala_motivo_poco_conosciuta">Parola poco conosciuta</string>
     <string name="segnala_motivo_categoria">Categoria sbagliata</string>
-    <string name="segnala_commento">Commento o proposta (facoltativo)</string>
+    <string name="segnala_commento">Commento (facoltativo)</string>
+    <string name="segnala_proponi">Proponi una coppia (facoltativo)</string>
+    <string name="segnala_proponi_parola">Parola</string>
+    <string name="segnala_proponi_affine">Parola affine</string>
+    <string name="segnala_proponi_manca">Compila entrambe le parole</string>
+    <string name="segnala_proponi_uguali">Le due parole devono essere diverse</string>
     <string name="segnala_contatore">%1$d / %2$d</string>
     <string name="segnala_salva">Salva</string>
     <string name="segnala_salvata">Segnalazione salvata, grazie!</string>

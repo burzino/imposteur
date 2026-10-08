@@ -167,6 +167,15 @@ La UI calcola il pool con `Regole.pool(categorie, config.categorieSelezionate, c
 
 Caso limite: a pool esaurito `rimanenti` vale 0. La partita successiva azzera da sola le usate del pool (regola §5.2.3), quindi la UI mostra 0 senza errori.
 
+## Ordine di parola (v1.5)
+
+```kotlin
+// game, in Partita
+/** Indici dei giocatori nell'ordine in cui parlano: da primoGiocatore in poi, seguendo la lista e ripartendo dall'inizio.
+ *  Size == giocatori.size, contiene ogni indice una volta, il primo elemento è primoGiocatore. */
+fun ordineDiParola(): List<Int>
+```
+
 ## Segnalazioni (v1.3)
 
 ```kotlin
@@ -181,6 +190,8 @@ data class Segnalazione(
     val modalita: String? = null,         // Modalita.name
     val motivi: List<MotivoSegnalazione> = emptyList(),
     val nota: String = "",                // trim, max 500 caratteri
+    val propostaParola: String? = null,   // v1.4: coppia proposta, trim, max 40 caratteri, "" -> null
+    val propostaAffine: String? = null,   // v1.4: idem; valida solo se entrambe presenti e diverse (senza distinzione maiuscole/minuscole)
 )
 object FormatoSegnalazioni {
     fun riga(s: Segnalazione): String                 // una riga JSON, senza a capo
@@ -196,7 +207,9 @@ class RepositorySegnalazioni(context: Context) {
 }
 ```
 
-Una segnalazione di tipo "coppia" senza motivi né nota non si salva: il pulsante Salva resta disattivato.
+Una segnalazione di tipo "coppia" senza motivi, nota o coppia proposta valida non si salva: il pulsante Salva resta disattivato. Una coppia proposta con un solo campo compilato, o con due parole uguali, blocca il salvataggio e mostra un avviso.
+
+v1.4: `FormatoSegnalazioni.leggi` deve leggere anche le righe salvate prima della v1.4 (campi di proposta assenti, quindi null). `FormatoSegnalazioni.normalizza(s)` applica trim e limiti a nota e proposte; `riga()` la usa. Aggiungi anche `fun propostaValida(s: Segnalazione): Boolean`.
 
 ## `it.imposteur.ui` (UI: la scrive solo l'agente dedicato)
 

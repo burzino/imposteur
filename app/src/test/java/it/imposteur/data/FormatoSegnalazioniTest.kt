@@ -113,4 +113,73 @@ class FormatoSegnalazioniTest {
     fun `SEG-12 nota di soli spazi diventa vuota`() {
         assertEquals("", unica(coppia.copy(nota = "     ")).nota)
     }
+
+    // ---- v1.4: coppia proposta ----
+
+    @Test
+    fun `SEG-13 round-trip con propostaParola e propostaAffine`() {
+        val s = coppia.copy(propostaParola = "leone", propostaAffine = "puma")
+        val r = unica(s)
+        assertEquals(s, r)
+        assertEquals("leone", r.propostaParola)
+        assertEquals("puma", r.propostaAffine)
+    }
+
+    @Test
+    fun `SEG-14 riga salvata prima della v1_4 si legge con proposte null`() {
+        val vecchia = """{"tipo":"coppia","istante":"2026-10-08T21:14:03","categoriaId":"animali","parola":"gatto","affine":"tigre","modalita":"CLASSICA","motivi":["TROPPO_SIMILI"],"nota":"vecchia"}"""
+        val l = FormatoSegnalazioni.leggi(vecchia)
+        assertEquals(1, l.size)
+        assertNull(l[0].propostaParola)
+        assertNull(l[0].propostaAffine)
+        assertEquals("gatto", l[0].parola)
+        assertEquals("vecchia", l[0].nota)
+    }
+
+    @Test
+    fun `SEG-15 normalizza applica trim alle proposte`() {
+        val n = FormatoSegnalazioni.normalizza(coppia.copy(propostaParola = "  leone ", propostaAffine = "\tpuma  "))
+        assertEquals("leone", n.propostaParola)
+        assertEquals("puma", n.propostaAffine)
+    }
+
+    @Test
+    fun `SEG-16 normalizza trasforma vuoto e soli spazi in null`() {
+        val n = FormatoSegnalazioni.normalizza(coppia.copy(propostaParola = "", propostaAffine = "    "))
+        assertNull(n.propostaParola)
+        assertNull(n.propostaAffine)
+    }
+
+    @Test
+    fun `SEG-17 normalizza tronca le proposte a 40 caratteri`() {
+        val n = FormatoSegnalazioni.normalizza(
+            coppia.copy(propostaParola = "a".repeat(60), propostaAffine = "b".repeat(40))
+        )
+        assertEquals("a".repeat(40), n.propostaParola)
+        assertEquals("b".repeat(40), n.propostaAffine)
+    }
+
+    @Test
+    fun `SEG-18 riga normalizza anche le proposte`() {
+        val r = unica(coppia.copy(propostaParola = "  x".padEnd(80, 'x'), propostaAffine = " "))
+        assertEquals(40, r.propostaParola!!.length)
+        assertNull(r.propostaAffine)
+    }
+
+    @Test
+    fun `SEG-19 propostaValida false con un solo campo`() {
+        assertFalse(FormatoSegnalazioni.propostaValida(coppia.copy(propostaParola = "leone")))
+        assertFalse(FormatoSegnalazioni.propostaValida(coppia.copy(propostaAffine = "puma")))
+        assertFalse(FormatoSegnalazioni.propostaValida(coppia))
+    }
+
+    @Test
+    fun `SEG-20 propostaValida false con parole uguali a meno di maiuscole e spazi`() {
+        assertFalse(FormatoSegnalazioni.propostaValida(coppia.copy(propostaParola = "Pane", propostaAffine = " pane ")))
+    }
+
+    @Test
+    fun `SEG-21 propostaValida true con due parole diverse`() {
+        assertTrue(FormatoSegnalazioni.propostaValida(coppia.copy(propostaParola = "Pane", propostaAffine = "Pasta")))
+    }
 }
