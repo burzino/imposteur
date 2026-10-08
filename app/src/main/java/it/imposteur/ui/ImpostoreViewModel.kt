@@ -18,6 +18,7 @@ import it.imposteur.game.Regole
 import it.imposteur.game.RisultatoNuovaPartita
 import it.imposteur.game.SessioneSalvata
 import it.imposteur.game.StatoDistribuzione
+import it.imposteur.game.VoceParola
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,9 @@ data class UiState(
     val distribuzione: StatoDistribuzione = Distribuzione.iniziale(),
     /** Partita salvata valida (con stato), offerta da "Riprendi partita". */
     val ripristinabile: SessioneSalvata? = null,
+    /** Parole delle categorie scelte non ancora usate / totali (contatore di Configurazione). */
+    val paroleRimanenti: Int = 0,
+    val paroleTotali: Int = 0,
 ) {
     val errori: List<ErroreConfigurazione>
         get() = if (categorie.isEmpty()) emptyList() else Regole.valida(config, categorie)
@@ -72,6 +76,7 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
                     _stato.update {
                         it.copy(caricamento = false, categorie = r.categorie, config = config, ripristinabile = ripristinabile)
                     }
+                    aggiornaContatore()
                 }
                 is RisultatoCaricamento.Errore ->
                     _stato.update { it.copy(caricamento = false, erroreCaricamento = true) }
@@ -82,11 +87,32 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
     private fun modificaConfig(f: (Configurazione) -> Configurazione) {
         if (_stato.value.caricamento) return
         _stato.update { it.copy(config = f(it.config)) }
+        aggiornaContatore()
         salvataggio?.cancel()
         salvataggio = viewModelScope.launch {
             delay(500)
             repoConfig.salva(_stato.value.config)
         }
+    }
+
+    private fun poolCorrente(): List<VoceParola> {
+        val s = _stato.value
+        return Regole.pool(s.categorie, s.config.categorieSelezionate, s.config.modalita)
+    }
+
+    /** Ricalcola "parole ancora da giocare" (categorie, modalita' o usate cambiate). */
+    private fun aggiornaContatore() {
+        val pool = poolCorrente()
+        val rimanenti = gestore.rimanenti(pool)
+        _stato.update { it.copy(paroleRimanenti = rimanenti, paroleTotali = pool.size) }
+    }
+
+    /** Rimette in gioco le parole delle categorie scelte e salva la sessione. */
+    fun azzeraParole() {
+        if (_stato.value.caricamento) return
+        gestore.azzeraUsate(poolCorrente())
+        aggiornaContatore()
+        persisti()
     }
 
     /** Salva subito la configurazione corrente (Inizia, tasto indietro). */
@@ -137,6 +163,7 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
                 _stato.update {
                     it.copy(partita = r.partita, distribuzione = Distribuzione.iniziale(), ripristinabile = null)
                 }
+                aggiornaContatore()
                 persisti()
                 true
             }

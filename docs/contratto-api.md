@@ -153,6 +153,20 @@ class RepositorySessione(private val context: android.content.Context) {
 }
 ```
 
+## Contatore delle parole da giocare (v1.2)
+
+```kotlin
+// game, in GestorePartite
+/** Numero di voci di `pool` la cui chiave non è in `usate`. */
+fun rimanenti(pool: List<VoceParola>): Int
+/** Toglie da `usate` le chiavi di `pool`; se `ultima` appartiene a `pool` la mette a null. Le altre usate restano. */
+fun azzeraUsate(pool: List<VoceParola>)
+```
+
+La UI calcola il pool con `Regole.pool(categorie, config.categorieSelezionate, config.modalita)` e mostra "Parole ancora da giocare: <rimanenti> / <pool.size>". Dopo `azzeraUsate` la sessione va salvata.
+
+Caso limite: a pool esaurito `rimanenti` vale 0. La partita successiva azzera da sola le usate del pool (regola §5.2.3), quindi la UI mostra 0 senza errori.
+
 ## `it.imposteur.ui` (UI: la scrive solo l'agente dedicato)
 
 `ImpostoreViewModel` (AndroidViewModel) espone `StateFlow<UiState>` e possiede un unico `GestorePartite(Random.Default)`. Navigazione Compose con le rotte: home, regole, configurazione, distribuzione, gioco, rivela.

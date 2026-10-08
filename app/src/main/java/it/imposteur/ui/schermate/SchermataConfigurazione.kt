@@ -2,6 +2,17 @@ package it.imposteur.ui.schermate
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,6 +69,8 @@ fun SchermataConfigurazione(
     val errori = stato.errori
     val indiciDuplicati = errori.filterIsInstance<ErroreConfigurazione.NomeDuplicato>().flatMap { it.indici }.toSet()
     val maxImpostori = Regole.maxImpostori(config.numeroGiocatori)
+    val focus = LocalFocusManager.current
+    var chiediAzzera by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -72,15 +85,21 @@ fun SchermataConfigurazione(
         },
         bottomBar = {
             Surface(tonalElevation = 3.dp) {
-                Button(
-                    onClick = onInizia,
-                    enabled = stato.puoIniziare,
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(56.dp),
-                ) { Text(stringResource(R.string.config_inizia), style = MaterialTheme.typography.titleMedium) }
+                Column(modifier = Modifier.navigationBarsPadding().padding(16.dp)) {
+                    if (!stato.puoIniziare && errori.isNotEmpty()) {
+                        Text(
+                            stringResource(testoErrore(errori.first())),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                    }
+                    Button(
+                        onClick = onInizia,
+                        enabled = stato.puoIniziare,
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                    ) { Text(stringResource(R.string.config_inizia), style = MaterialTheme.typography.titleMedium) }
+                }
             }
         },
     ) { padding ->
@@ -107,6 +126,25 @@ fun SchermataConfigurazione(
                     value = config.nomi.getOrElse(i) { "" },
                     onValueChange = { viewModel.impostaNome(i, it) },
                     label = { Text(stringResource(R.string.config_giocatore_n, i + 1)) },
+                    placeholder = { Text(stringResource(R.string.config_giocatore_n, i + 1)) },
+                    trailingIcon = if (config.nomi.getOrElse(i) { "" }.isNotEmpty()) {
+                        {
+                            IconButton(onClick = { viewModel.impostaNome(i, "") }) {
+                                Icon(
+                                    Icons.Filled.Clear,
+                                    contentDescription = stringResource(R.string.config_cancella_nome),
+                                )
+                            }
+                        }
+                    } else null,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = if (i == config.numeroGiocatori - 1) ImeAction.Done else ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focus.moveFocus(FocusDirection.Down) },
+                        onDone = { focus.clearFocus() },
+                    ),
                     singleLine = true,
                     isError = duplicato,
                     supportingText = if (duplicato) {
@@ -168,6 +206,16 @@ fun SchermataConfigurazione(
                     Text(stringResource(R.string.config_deseleziona_tutte))
                 }
             }
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    stringResource(R.string.config_parole_rimanenti, stato.paroleRimanenti, stato.paroleTotali),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { chiediAzzera = true }, enabled = stato.paroleTotali > 0) {
+                    Text(stringResource(R.string.config_azzera))
+                }
+            }
             for (categoria in stato.categorie) {
                 val selezionata = categoria.id in config.categorieSelezionate
                 Row(
@@ -196,6 +244,27 @@ fun SchermataConfigurazione(
             }
         }
     }
+
+    if (chiediAzzera) {
+        DialogoConferma(
+            titolo = stringResource(R.string.config_azzera_conferma),
+            messaggio = null,
+            etichettaSi = stringResource(R.string.config_azzera),
+            etichettaNo = stringResource(R.string.annulla),
+            onSi = {
+                chiediAzzera = false
+                viewModel.azzeraParole()
+            },
+            onNo = { chiediAzzera = false },
+        )
+    }
+}
+
+private fun testoErrore(errore: ErroreConfigurazione): Int = when (errore) {
+    ErroreConfigurazione.NessunaCategoria -> R.string.config_nessuna_categoria
+    ErroreConfigurazione.PoolVuoto -> R.string.config_pool_vuoto
+    is ErroreConfigurazione.NomeDuplicato -> R.string.config_nome_duplicato
+    else -> R.string.config_non_valida
 }
 
 @Composable

@@ -3,9 +3,10 @@
     <string name="app_name">Impostore</string>
 
     <!-- Comuni -->
-    <string name="si">Sì</string>
-    <string name="no">No</string>
     <string name="interrompere_partita">Interrompere la partita?</string>
+    <string name="interrompere_messaggio">La partita andrà persa.</string>
+    <string name="interrompere_conferma">Interrompi</string>
+    <string name="interrompere_continua">Continua a giocare</string>
     <string name="indietro">Indietro</string>
     <string name="annulla">Annulla</string>
 
@@ -34,7 +35,7 @@
     <string name="config_modalita">Modalità</string>
     <string name="modalita_senza_parola">Impostore senza parola</string>
     <string name="modalita_affine">Parola affine</string>
-    <string name="config_mostra_categoria">Mostra categoria all\'impostore</string>
+    <string name="config_mostra_categoria">L\'impostore vede la categoria</string>
     <string name="config_categorie">Categorie</string>
     <string name="config_seleziona_tutte">Seleziona tutte</string>
     <string name="config_deseleziona_tutte">Deseleziona tutte</string>
@@ -42,6 +43,11 @@
     <string name="config_nessuna_categoria">Seleziona almeno una categoria</string>
     <string name="config_pool_vuoto">Le categorie scelte non contengono parole utilizzabili</string>
     <string name="config_inizia">Inizia</string>
+    <string name="config_non_valida">Controlla la configurazione</string>
+    <string name="config_cancella_nome">Cancella nome</string>
+    <string name="config_parole_rimanenti">Parole ancora da giocare: %1$d / %2$d</string>
+    <string name="config_azzera">Azzera</string>
+    <string name="config_azzera_conferma">Rimettere in gioco tutte le parole delle categorie scelte?</string>
     <string name="config_diminuisci">Diminuisci</string>
     <string name="config_aumenta">Aumenta</string>
 
@@ -50,6 +56,8 @@
     <string name="distribuzione_passa">Passa il telefono a %1$s</string>
     <string name="distribuzione_sono">Sono %1$s</string>
     <string name="distribuzione_nascondi">Nascondi e passa</string>
+    <string name="distribuzione_nascondi_ultimo">Nascondi e inizia</string>
+    <string name="distribuzione_non_guardare">Gli altri non guardino lo schermo</string>
     <string name="ruolo_la_parola_e">La parola è:</string>
     <string name="ruolo_la_tua_parola_e">La tua parola è:</string>
     <string name="ruolo_sei_impostore">Sei l\'impostore</string>
@@ -57,10 +65,13 @@
 
     <!-- Gioco -->
     <string name="gioco_titolo">Si gioca!</string>
-    <string name="gioco_inizia">Inizia %1$s</string>
+    <string name="gioco_inizia">Parla per primo: %1$s</string>
     <string name="gioco_istruzioni">Discutete a voce, poi votate. Quando avete deciso, premete Rivela.</string>
     <string name="gioco_rivela">Rivela</string>
     <string name="gioco_conferma_rivela">Rivelare i ruoli?</string>
+    <string name="gioco_conferma_messaggio">Verrà mostrato chi era l\'impostore.</string>
+    <string name="gioco_conferma_si">Rivela</string>
+    <string name="gioco_conferma_no">Non ancora</string>
     <string name="gioco_rivedi">Rivedi la parola</string>
 
     <!-- Rivedi la parola -->
@@ -68,11 +79,12 @@
     <string name="rivedi_nascondi">Nascondi</string>
 
     <!-- Rivela -->
-    <string name="rivela_titolo">Svelamento</string>
+    <string name="rivela_titolo">Il risultato</string>
     <string name="rivela_impostore">L\'impostore era: %1$s</string>
     <string name="rivela_impostori">Gli impostori erano: %1$s</string>
     <string name="rivela_parola">La parola era: %1$s</string>
     <string name="rivela_affine">La parola affine era: %1$s</string>
     <string name="rivela_categoria">Categoria: %1$s</string>
-    <string name="rivela_cambia_impostazioni">Cambia impostazioni</string>
+    <string name="rivela_cambia_impostazioni">Modifica giocatori e opzioni</string>
+    <string name="rivela_rigioca">Rigioca (stessi giocatori)</string>
 </resources>

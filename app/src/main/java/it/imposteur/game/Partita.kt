@@ -62,6 +62,16 @@ class GestorePartite(
 
     private fun chiave(v: VoceParola) = ChiaveParola(v.categoriaId, v.parola.trim().lowercase())
 
+    /** Numero di voci di `pool` la cui chiave non e' in `usate`. */
+    fun rimanenti(pool: List<VoceParola>): Int = pool.count { chiave(it) !in usateInterne }
+
+    /** Toglie dalle usate le chiavi di `pool`; se `ultima` appartiene a `pool` la mette a null. */
+    fun azzeraUsate(pool: List<VoceParola>) {
+        val chiavi = pool.map { chiave(it) }.toSet()
+        usateInterne.removeAll(chiavi)
+        if (ultimaInterna in chiavi) ultimaInterna = null
+    }
+
     fun nuovaPartita(config: Configurazione, categorie: List<Categoria>): RisultatoNuovaPartita {
         val errori = Regole.valida(config, categorie)
         if (errori.isNotEmpty()) return RisultatoNuovaPartita.Errore(errori)

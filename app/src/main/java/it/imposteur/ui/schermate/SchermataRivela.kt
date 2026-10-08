@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
@@ -41,8 +42,14 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
             .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -56,7 +63,7 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
         } else {
             stringResource(R.string.rivela_impostori, nomiImpostori.joinToString(", "))
         }
-        Text(testoImpostori, style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+        TestoAdattivo(testoImpostori, MaterialTheme.typography.headlineMedium, maxRighe = 3)
         Text(
             stringResource(R.string.rivela_parola, partita.voce.parola),
             style = MaterialTheme.typography.titleLarge,
@@ -74,11 +81,17 @@ fun SchermataRivela(partitaViva: Partita?, onNuovaPartita: () -> Unit, onCambiaI
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
         )
+    }
+    Column(
+        modifier = Modifier.navigationBarsPadding().padding(top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
         Button(onClick = onNuovaPartita, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Text(stringResource(R.string.nuova_partita), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.rivela_rigioca), style = MaterialTheme.typography.titleMedium)
         }
         OutlinedButton(onClick = onCambiaImpostazioni, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text(stringResource(R.string.rivela_cambia_impostazioni), style = MaterialTheme.typography.titleMedium)
         }
+    }
     }
 }

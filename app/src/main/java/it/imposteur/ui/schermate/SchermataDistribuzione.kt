@@ -6,8 +6,11 @@ import android.content.ContextWrapper
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,12 +25,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.delay
 import it.imposteur.R
 import it.imposteur.game.ContenutoRuolo
 import it.imposteur.game.Modalita
@@ -91,7 +98,10 @@ fun SchermataDistribuzione(
 
     if (chiediInterruzione) {
         DialogoConferma(
-            testo = stringResource(R.string.interrompere_partita),
+            titolo = stringResource(R.string.interrompere_partita),
+            messaggio = stringResource(R.string.interrompere_messaggio),
+            etichettaSi = stringResource(R.string.interrompere_conferma),
+            etichettaNo = stringResource(R.string.interrompere_continua),
             onSi = {
                 chiediInterruzione = false
                 onInterrompiPartita()
@@ -118,48 +128,103 @@ private tailrec fun Context.trovaActivity(): Activity? = when (this) {
     else -> null
 }
 
+/** Struttura fissa: contenuto al centro, pulsante ancorato in basso (zona del pollice). */
 @Composable
-internal fun Contenitore(content: @Composable () -> Unit) {
+internal fun Contenitore(azione: @Composable () -> Unit, content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
             .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ) { content() }
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) { content() }
+        Spacer(Modifier.height(16.dp))
+        Box(modifier = Modifier.navigationBarsPadding()) { azione() }
+    }
 }
 
 @Composable
 internal fun Passaggio(partita: Partita, indice: Int, onSono: () -> Unit) {
     val nome = partita.giocatori[indice]
-    Contenitore {
+    Contenitore(
+        azione = {
+            Button(onClick = onSono, modifier = Modifier.fillMaxWidth().height(64.dp)) {
+                Text(stringResource(R.string.distribuzione_sono, nome), style = MaterialTheme.typography.titleLarge)
+            }
+        },
+    ) {
         Text(
             stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        TestoAdattivo(
+            testo = stringResource(R.string.distribuzione_passa, nome),
+            stile = MaterialTheme.typography.displaySmall,
+        )
         Text(
-            stringResource(R.string.distribuzione_passa, nome),
-            style = MaterialTheme.typography.displaySmall,
+            stringResource(R.string.distribuzione_non_guardare),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Button(onClick = onSono, modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text(stringResource(R.string.distribuzione_sono, nome), style = MaterialTheme.typography.titleLarge)
-        }
     }
 }
+
+/** Ritardo anti doppio tocco prima di abilitare "Nascondi e passa". */
+private const val RITARDO_NASCONDI_MS = 400L
 
 @Composable
 internal fun Rivelazione(
     partita: Partita,
     indice: Int,
-    testoPulsante: Int = R.string.distribuzione_nascondi,
+    testoPulsante: Int? = null,
     onNascondiEPassa: () -> Unit,
 ) {
     val contenuto = partita.contenutoPer(indice)
-    Contenitore {
+    val ultimo = indice == partita.giocatori.size - 1
+    val etichettaPulsante = testoPulsante
+        ?: if (ultimo) R.string.distribuzione_nascondi_ultimo else R.string.distribuzione_nascondi
+    val haptic = LocalHapticFeedback.current
+    val impostore = contenuto is ContenutoRuolo.Impostore
+
+    // Segnale alla comparsa del ruolo: due impulsi per l'impostore, uno per gli altri.
+    LaunchedEffect(indice) {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        if (impostore) {
+            delay(150)
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+    // Il pulsante si abilita dopo un breve ritardo, per evitare il doppio tocco.
+    var abilitato by remember(indice) { mutableStateOf(false) }
+    LaunchedEffect(indice) {
+        delay(RITARDO_NASCONDI_MS)
+        abilitato = true
+    }
+
+    Contenitore(
+        azione = {
+            Button(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onNascondiEPassa()
+                },
+                enabled = abilitato,
+                modifier = Modifier.fillMaxWidth().height(64.dp),
+            ) {
+                Text(stringResource(etichettaPulsante), style = MaterialTheme.typography.titleLarge)
+            }
+        },
+    ) {
         Text(
             stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
             style = MaterialTheme.typography.titleMedium,
@@ -177,19 +242,17 @@ internal fun Rivelazione(
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                 )
-                Text(
-                    contenuto.testo,
-                    style = MaterialTheme.typography.displayLarge,
+                TestoAdattivo(
+                    testo = contenuto.testo,
+                    stile = MaterialTheme.typography.displayLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
                 )
             }
             is ContenutoRuolo.Impostore -> {
-                Text(
-                    stringResource(R.string.ruolo_sei_impostore),
-                    style = MaterialTheme.typography.displayMedium,
+                TestoAdattivo(
+                    testo = stringResource(R.string.ruolo_sei_impostore),
+                    stile = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
                 )
                 contenuto.categoria?.let {
                     Text(
@@ -199,9 +262,6 @@ internal fun Rivelazione(
                     )
                 }
             }
-        }
-        Button(onClick = onNascondiEPassa, modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text(stringResource(testoPulsante), style = MaterialTheme.typography.titleLarge)
         }
     }
 }
