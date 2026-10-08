@@ -58,7 +58,6 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 Node.js 24 e npm 11 sono installati sul PC.
 
 ## Punti aperti
-- Vulnerabilità (solo sviluppo) in vitest 3: @vitest/mocker e tinypool; correzione con vitest 5.
 - Push dei commit da c498f04 in poi.
 - L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.
 - Specifiche da aggiornare per il restyling (pressione lunga, overlay).

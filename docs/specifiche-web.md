@@ -19,10 +19,11 @@ Questo documento elenca SOLO le differenze rispetto a `docs/specifiche.md` (nel 
 ## W3. Protezione del ruolo (sostituisce FLAG_SECURE e ON_STOP in 4.3, 4.4.1)
 
 - FLAG_SECURE e "schermo sempre acceso" non esistono sul web. Screenshot e registrazione non sono bloccabili: rischio accettato (fair play, come in 4.4.1).
-- Schermo acceso: dove disponibile si usa la Screen Wake Lock API durante Distribuzione e Rivedi; se manca, si ignora in silenzio.
+- Schermo acceso: dove disponibile si usa la Screen Wake Lock API durante Distribuzione e Rivedi (decisione presa: approvato); se manca, si ignora in silenzio.
 - Evento `visibilitychange` con pagina nascosta (cambio scheda, blocco schermo, app in background): Rivelazione(k) diventa Passaggio(k); in Rivedi si torna alla schermata di Gioco.
 - Ricaricamento della pagina (F5, ripristino della scheda) e riapertura: come il ripristino Android, Rivelazione(k) riparte come Passaggio(k).
-- Il rotare lo schermo NON ricrea lo stato: nessun effetto (differenza da CA-29, CA-57).
+- Il rotare lo schermo NON ricrea lo stato: nessun effetto, il ruolo resta visibile (differenza da CA-29, CA-57; decisione presa: accettata).
+- Ritardo di "Nascondi e passa" / "Nascondi e inizia": 600 ms dalla comparsa del ruolo, come in 4.3 (decisione presa: confermato).
 - Tasto/gesto indietro del browser (history/popstate) durante la Distribuzione: non porta mai a un ruolo precedente; mostra il dialogo "Interrompere la partita?" ("La partita andrà persa.", "Interrompi" / "Continua a giocare"). In Gioco: stesso dialogo. Le altre schermate usano la history normale (la freccia indietro in app equivale al tasto indietro Android).
 - Pressione lunga (4.3): vale per mouse, tocco e penna (pointer events); il rilascio, l'uscita del puntatore dal pulsante o `pointercancel` la annullano. Il menu contestuale del browser e la selezione del testo sono disattivati sul pulsante. Tastiera: il pulsante è raggiungibile con Tab; Invio/Spazio attivano la rivelazione senza pressione lunga (equivalente dell'azione di accessibilità).
 
@@ -36,26 +37,26 @@ Questo documento elenca SOLO le differenze rispetto a `docs/specifiche.md` (nel 
 - Icone: 192, 512 e maskable 512 PNG, più `apple-touch-icon` 180.
 - Service worker (vite-plugin-pwa): precache di tutti gli asset, `parole.json` compreso; dopo il primo caricamento l'app funziona senza rete. Gli aggiornamenti si applicano al caricamento successivo alla pubblicazione (nessun dialogo); una partita in corso non viene mai interrotta dall'aggiornamento.
 - Android/Chrome: invito all'installazione tramite il meccanismo del browser; l'app non mostra pulsanti propri di installazione.
-- iOS Safari: nessun invito automatico. Nella schermata "Come si gioca" una nota finale "Per installare l'app su iPhone: tocca Condividi, poi Aggiungi a Home." compare solo se il browser è iOS Safari non installato (da confermare, vedi aperti). Limiti noti: `navigator.vibrate` assente (W4); i dati di un sito non aggiunto a Home possono essere cancellati da Safari dopo giorni di inutilizzo.
+- iOS Safari: nessun invito automatico. Nella schermata "Come si gioca" una nota finale "Per installare l'app su iPhone: tocca Condividi, poi Aggiungi a Home." compare solo se il browser è iOS Safari non installato (decisione presa: nota approvata). Limiti noti: `navigator.vibrate` assente (W4); i dati di un sito non aggiunto a Home possono essere cancellati da Safari dopo giorni di inutilizzo.
 - Cancellare i dati del sito cancella partita, configurazione e parole usate.
 
 ## W6. Hosting e base path
 
 - Sito statico su GitHub Pages: base `/imposteur/`; poi dominio `imposteur.burzi.eu` con base `/`.
-- Il base path è un parametro di build (es. variabile d'ambiente), usato per asset, manifest, service worker, `start_url` e routing; nessun percorso assoluto fisso nel codice. Il routing non deve richiedere configurazione del server (rotte in hash o fallback `404.html`): un ricaricamento in qualsiasi schermata non dà errore 404.
+- Il base path è un parametro di build (es. variabile d'ambiente), usato per asset, manifest, service worker, `start_url` e routing; nessun percorso assoluto fisso nel codice. Il routing non deve richiedere configurazione del server: rotte in hash (decisione presa), senza fallback `404.html`; un ricaricamento in qualsiasi schermata non dà errore 404.
 - Il `parole.json` si carica con URL relativo al base path.
 
 ## W7. Aspetto e temi
 
 - Temi: "Sistema", "Chiaro", "Scuro", "Alto contrasto" (stesse etichette Android), salvati in W2. "Sistema" segue `prefers-color-scheme`.
-- I colori dinamici (Material You) non esistono sul web: l'opzione è assente. Proposta: nessuna sostituzione; la palette fissa dell'app (stessa degli altri temi) è l'unica. Da confermare.
+- I colori dinamici (Material You) non esistono sul web: l'opzione è assente. Decisione presa: nessuna sostituzione; la palette fissa dell'app (stessa degli altri temi) è l'unica.
 - Stessi testi, layout adattato a viewport verticale da telefono; su schermi larghi il contenuto resta in una colonna centrata (max 480 px).
 
 ## W8. Segnalazioni (sostituisce il file locale di 4.6)
 
 - Le segnalazioni (stessi motivi, note, proposte e limiti di 4.6) si accumulano in `localStorage` (W2), una riga JSON per segnalazione, stesso formato di `segnalazioni.jsonl`.
-- Esportazione: pulsante che scarica il file `segnalazioni.jsonl` (Blob + download). Se `navigator.share` con file è disponibile, affianca la condivisione; altrimenti solo il download. Senza segnalazioni il pulsante è disattivato. Esportare non cancella le segnalazioni.
-- Etichette e posizione del pulsante di esportazione: da definire nel contratto API (testi nuovi da aggiungere a `strings.xml`-equivalente).
+- Esportazione: pulsante "Esporta segnalazioni" nelle impostazioni (decisione presa), visibile solo se esiste almeno una segnalazione; scarica il file `segnalazioni.jsonl` (Blob + download). Se `navigator.share` con file è disponibile, affianca la condivisione; altrimenti solo il download. Esportare non cancella le segnalazioni.
+- Gli altri testi nuovi dell'esportazione: da definire nel contratto API (da aggiungere a `strings.xml`-equivalente).
 
 ## W9. Altre differenze
 
@@ -81,7 +82,7 @@ Vitest = test automatici sulla logica; Browser = collaudo manuale/automatizzato 
 - **CA-W12** (Browser) Il manifest è valido (Lighthouse "installabile"), con icone 192/512/maskable; l'app installata si apre in `standalone` al base path corretto.
 - **CA-W13** (Vitest + Browser) Con base `/imposteur/` e con base `/` la build carica asset, `parole.json`, manifest e service worker; ricaricare qualsiasi schermata non dà 404.
 - **CA-W14** (Browser) Il tema scelto ("Sistema", "Chiaro", "Scuro", "Alto contrasto") persiste dopo il ricaricamento; l'opzione colori dinamici non compare.
-- **CA-W15** (Browser) Dopo una segnalazione, "Esporta" scarica `segnalazioni.jsonl` con una riga JSON valida per segnalazione, nel formato di 4.6; con `navigator.share` disponibile compare anche la condivisione; senza segnalazioni il pulsante è disattivato.
+- **CA-W15** (Browser) Dopo una segnalazione, "Esporta segnalazioni" (nelle impostazioni) scarica `segnalazioni.jsonl` con una riga JSON valida per segnalazione, nel formato di 4.6; con `navigator.share` disponibile compare anche la condivisione; senza segnalazioni il pulsante non è visibile.
 - **CA-W16** (Browser) Con `localStorage` bloccato (navigazione privata) l'app si avvia e si gioca una partita; nessun errore a schermo.
 - **CA-W17** (Browser) Il rotare lo schermo durante un ruolo visibile lascia il ruolo visibile senza perdere lo stato (differenza accettata da CA-29).
 - **CA-W18** (Browser) Tutti i testi dell'interfaccia coincidono con `strings.xml` (CA-36), compresi i testi del restyling (CA-66…CA-68).
@@ -93,7 +94,12 @@ Notifiche push, sincronizzazione tra dispositivi, account, backend, Wake Lock ga
 
 ## W12. Punti da confermare
 
-1. Colori dinamici: opzione assente (nessuna sostituzione).
-2. Nota di installazione iOS in "Come si gioca" (testo W5).
-3. Uso della Wake Lock API dove disponibile (W3).
-4. Routing: rotte in hash o fallback `404.html` (scelta tecnica, contratto API).
+Nessun punto aperto. Decisioni prese (riportate nelle sezioni indicate):
+
+1. Colori dinamici assenti, nessuna sostituzione (W7).
+2. Nota iOS in "Come si gioca" approvata (W5).
+3. Wake Lock approvato in Distribuzione e Rivedi (W3).
+4. Rotte in hash (W6).
+5. Rotazione che non azzera il ruolo: accettata (W3, CA-W17).
+6. "Esporta segnalazioni" nelle impostazioni, visibile solo se ci sono segnalazioni (W8, CA-W15).
+7. Ritardo di "Nascondi e passa" di 600 ms confermato (W3).

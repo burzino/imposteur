@@ -101,7 +101,7 @@ Contenuto dello stato 2:
 Regole:
 - Ogni ruolo si può rivelare una sola volta in Distribuzione (la schermata di Gioco offre poi "Rivedi la parola", vedi 4.4.1): dopo "Nascondi e passa" non è possibile tornare indietro né rivedere il ruolo di un giocatore già passato. Il tasto indietro di sistema nelle schermate di Distribuzione è disabilitato oppure chiede conferma "Interrompere la partita?" con messaggio "La partita andrà persa." e pulsanti "Interrompi" (cancella la partita salvata e va alla Configurazione) / "Continua a giocare" (resta); non porta mai a un ruolo precedente.
 - Se l'app va in background o la schermata viene ricreata (rotazione, ripristino) durante lo stato 2, si torna allo stato 1 dello stesso giocatore (il ruolo non resta mai visibile senza interazione).
-- Lo stato corrente (Passaggio k / Rivelazione k) viene salvato a ogni cambio (vedi 6). Dopo la chiusura dell'app e "Riprendi partita", uno stato salvato Rivelazione k riparte come Passaggio k: il ruolo non è mai visibile all'avvio. Il giocatore k può quindi rivedere il proprio ruolo una sola volta ancora, solo dopo il tocco su "Sono <nome>".
+- Lo stato corrente (Passaggio k / Rivelazione k) viene salvato a ogni cambio (vedi 6). Dopo la chiusura dell'app e "Riprendi partita", uno stato salvato Rivelazione k riparte come Passaggio k: il ruolo non è mai visibile all'avvio. Il giocatore k può quindi rivedere il proprio ruolo una sola volta ancora, solo dopo la pressione lunga su "Tieni premuto per scoprire".
 - Lo schermo resta acceso durante la Distribuzione.
 - La schermata di Passaggio non mostra mai informazioni sul ruolo.
 - In modalità "Parola affine" lo stato 2 di civili e impostori è identico per layout, etichette e colori.
@@ -121,8 +121,8 @@ Funzione raggiungibile solo dalla schermata di Gioco, dopo la Distribuzione. Ecc
 
 Stati:
 1. **Elenco**: intestazione "Rivedi la parola", testo "Tocca il tuo nome" e l'elenco di tutti i giocatori (nomi effettivi) nell'ordine della partita, uno per riga, toccabili. Nessun ruolo visibile. Tasto indietro (di sistema e freccia in alto): torna alla schermata di Gioco, senza conferma.
-2. **Passaggio**: toccando un nome, testo "Passa il telefono a <nome>" e pulsante "Sono <nome>". Nessun ruolo visibile; nessun indicatore "Giocatore k di N". Tasto indietro: torna all'Elenco.
-3. **Rivelazione**: dopo il tocco su "Sono <nome>", stesso contenuto, layout, etichette e colori dello stato 2 della Distribuzione (tabella di 4.3, secondo ruolo e modalità del giocatore), con pulsante "Nascondi". Il tocco su "Nascondi" nasconde il ruolo e torna alla schermata di Gioco. Tasto indietro: come "Nascondi".
+2. **Passaggio**: toccando un nome, stesso Passaggio della Distribuzione (stato 1 di 4.3): testo "Passa il telefono a" + nome in grande, avviso "Gli altri non guardino lo schermo", cerchio con l'iniziale e pulsante a pressione lunga "Tieni premuto per scoprire" con didascalia "Sono <nome> — tieni premuto" (barra che si riempie in 600 ms, pulsante disabilitato nei primi 600 ms, azione di accessibilità "Scopri il ruolo", come in 4.3). Differenze: nessuna fila di avatar e nessun indicatore "Giocatore k di N". Nessun ruolo visibile. Tasto indietro: torna all'Elenco.
+3. **Rivelazione**: dopo la pressione lunga (barra piena), stesso contenuto, layout, etichette e colori dello stato 2 della Distribuzione (tabella di 4.3, secondo ruolo e modalità del giocatore), con pulsante "Nascondi". Il tocco su "Nascondi" nasconde il ruolo e torna alla schermata di Gioco. Tasto indietro: come "Nascondi".
 
 Regole:
 - Si può rivedere più volte, per qualunque giocatore, senza limiti. Non cambia ruoli, parola, giocatore iniziale né le parole usate.
@@ -296,7 +296,7 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-43** Senza partita salvata la Home non mostra "Riprendi partita" e "Nuova partita" apre direttamente la Configurazione. Con una partita salvata valida "Riprendi partita" compare sopra "Nuova partita".
 - **CA-44** Con una partita salvata, "Nuova partita" mostra "Esiste una partita in corso. Iniziarne una nuova?"; "Annulla" resta in Home con la partita intatta; "Nuova partita" apre la Configurazione e, dopo "Inizia", la partita salvata è sostituita dalla nuova.
 - **CA-45** Chiudendo l'app (processo terminato) in Passaggio k, "Riprendi partita" mostra "Passa il telefono a <nome k>" con gli stessi ruoli, parola e giocatore iniziale di prima.
-- **CA-46** Chiudendo l'app mentre il ruolo del giocatore k è visibile, "Riprendi partita" mostra "Passa il telefono a <nome k>" e nessun ruolo; il ruolo compare solo dopo il tocco su "Sono <nome k>".
+- **CA-46** Chiudendo l'app mentre il ruolo del giocatore k è visibile, "Riprendi partita" mostra "Passa il telefono a <nome k>" e nessun ruolo; il ruolo compare solo dopo la pressione lunga su "Tieni premuto per scoprire".
 - **CA-47** Chiudendo l'app nella schermata di Gioco, "Riprendi partita" riporta alla schermata di Gioco con lo stesso "Parla per primo: <nome>".
 - **CA-48** La partita salvata è cancellata (la Home non mostra "Riprendi partita") dopo: ingresso in Rivela, conferma "Interrompere la partita?" con "Interrompi".
 - **CA-49** Con la partita salvata incoerente col file parole (categoria o parola rimossa) o dati illeggibili, la Home non mostra "Riprendi partita" e non compare alcun messaggio di errore.
@@ -304,8 +304,8 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-51** La schermata di Gioco mostra il pulsante "Rivedi la parola", visivamente secondario rispetto a "Rivela"; non compare in Distribuzione né in Rivela.
 - **CA-52** Il tocco su "Rivedi la parola" apre la schermata "Rivedi la parola" con tutti i giocatori, con i nomi effettivi e nell'ordine della partita; nessun ruolo è visibile.
 - **CA-53** Dall'Elenco, il tasto indietro (di sistema o freccia) torna alla schermata di Gioco senza conferma e con lo stesso "Parla per primo: <nome>".
-- **CA-54** Toccando un nome compare "Passa il telefono a <nome>" con il pulsante "Sono <nome>", senza parola né testo di ruolo; il tasto indietro torna all'Elenco.
-- **CA-55** Dopo "Sono <nome>" la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
+- **CA-54** Toccando un nome compare "Passa il telefono a <nome>" con il pulsante a pressione lunga "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"), senza fila di avatar, senza indicatore "Giocatore k di N", senza parola né testo di ruolo; un tocco breve non rivela; il tasto indietro torna all'Elenco.
+- **CA-55** Dopo la pressione lunga (600 ms) la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
 - **CA-56** Si può rivedere la parola più volte, anche dello stesso giocatore o di giocatori diversi, senza limiti; ruoli, parola e giocatore iniziale restano invariati.
 - **CA-57** Mettere l'app in background o ruotare lo schermo in qualsiasi schermata di Rivedi la parola riporta alla schermata di Gioco, con nessun ruolo visibile.
 - **CA-58** Le schermate di Rivedi la parola hanno FLAG_SECURE: lo screenshot è bloccato e l'anteprima in Recents non mostra il contenuto.
@@ -342,4 +342,4 @@ Voto nell'app, punteggi, classifiche, parole personalizzate (aggiunta/modifica d
 - Limite impostori floor((N−1)/2) (civili sempre in maggioranza): confermare o proporre un limite diverso.
 - "Nome già usato" blocca l'avvio: alternativa, accettare i duplicati.
 - Decisione 3 (modificata): la partita interrotta da chiusura app viene ripresa (vedi 6); non è più un punto aperto.
-- In Rivelazione k salvata, dopo la chiusura il giocatore k può rivedere il proprio ruolo (una volta) dopo "Sono <nome>": confermare che è accettabile.
+- In Rivelazione k salvata, dopo la chiusura il giocatore k può rivedere il proprio ruolo (una volta) dopo la pressione lunga: confermare che è accettabile.
