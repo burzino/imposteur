@@ -30,7 +30,9 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 
 ## PWA (decisa il 2026-10-08, da avviare dopo la chiusura della v1 Android)
 - Strada A: app web separata in `web/` (TypeScript, Vite e plugin PWA) con lo stesso `parole.json` come unica fonte; le regole sono riportate dalle specifiche e verificate con test equivalenti.
-- L'utente ha un account GitHub. `gh` CLI non è installata. Da decidere: repository pubblico o privato e hosting (GitHub Pages richiede un repository pubblico sul piano gratuito; Cloudflare Pages funziona anche con un repository privato).
+- Repository pubblico: https://github.com/burzino/imposteur (ramo `main`, remote `origin`). Hosting previsto: GitHub Pages, all'indirizzo burzino.github.io/imposteur.
+- Il token di `gh` non ha lo scope `workflow`: prima di pubblicare `.github/workflows/` serve `gh auth refresh -s workflow`, da far eseguire all'utente.
+- I percorsi locali stanno in `.claude/ambiente-locale.md` (in `.gitignore`); la storia è stata ripulita prima del primo push.
 - Le segnalazioni nella PWA si esportano come file, perché adb non è disponibile.
 
 ## Punti aperti
