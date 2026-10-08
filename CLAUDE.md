@@ -9,7 +9,7 @@ App Android "Impostore" per giocare al gioco dell'impostore con un solo telefono
 Il JDK di sistema è Java 8: usa sempre quello di Android Studio (JDK 25, quindi Gradle 9.1 o superiore).
 
 ```bash
-export JAVA_HOME="<ANDROID_STUDIO>/jbr"
+export JAVA_HOME="<ANDROID_STUDIO>/jbr"   # percorso reale in .claude/ambiente-locale.md (non versionato)
 ./gradlew :app:assembleDebug                 # APK in app/build/outputs/apk/debug/
 ./gradlew :app:testDebugUnitTest             # test JVM (JUnit 4)
 ./gradlew :app:testDebugUnitTest --tests "it.imposteur.game.RegoleTest"            # una classe

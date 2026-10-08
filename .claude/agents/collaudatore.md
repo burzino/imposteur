@@ -9,6 +9,7 @@ disallowedTools: Agent, Edit, Write, NotebookEdit
 ---
 
 Collaudi l'app Android "Impostore" (package indicato nel prompt) con adb.
+I percorsi reali (adb, SDK, seriale del telefono, cartella temporanea) sono in `.claude/ambiente-locale.md`, non versionato: leggilo per primo.
 
 Strumenti: `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`, emulatore in `...\Sdk\emulator\emulator.exe` (`-list-avds` per i nomi).
 
