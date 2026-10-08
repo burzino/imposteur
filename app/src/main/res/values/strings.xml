@@ -89,7 +89,12 @@
     <!-- Distribuzione -->
     <string name="distribuzione_indicatore">Giocatore %1$d di %2$d</string>
     <string name="distribuzione_passa">Passa il telefono a %1$s</string>
-    <string name="distribuzione_sono">Sono %1$s</string>
+    <string name="distribuzione_passa_a">Passa il telefono a</string>
+    <string name="distribuzione_tieni_premuto">Tieni premuto per scoprire</string>
+    <string name="distribuzione_sono_premuto">Sono %1$s — tieni premuto</string>
+    <string name="distribuzione_scopri_cd">Scopri il ruolo</string>
+    <string name="distribuzione_tutti_pronti">Tutti pronti!</string>
+    <string name="distribuzione_bluff">Che il bluff abbia inizio</string>
     <string name="distribuzione_nascondi">Nascondi e passa</string>
     <string name="distribuzione_nascondi_ultimo">Nascondi e inizia</string>
     <string name="distribuzione_non_guardare">Gli altri non guardino lo schermo</string>
