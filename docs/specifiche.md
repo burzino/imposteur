@@ -30,7 +30,7 @@ Discussione e voto avvengono a voce, fuori dall'app. Vedi sezione 9 per il fuori
 
 ## 4. Flusso delle schermate
 
-Home → Configurazione → Distribuzione ruoli → Gioco → Rivela → (Nuova partita → Distribuzione ruoli | Cambia impostazioni → Configurazione).
+Home → Configurazione → Distribuzione ruoli → Gioco → Rivela → (Rigioca (stessi giocatori) → Distribuzione ruoli | Modifica giocatori e opzioni → Configurazione).
 
 ### 4.1 Home
 - Contenuto: titolo "Impostore", pulsanti "Riprendi partita" (solo se esiste una partita salvata valida, vedi 6; posto sopra "Nuova partita"), "Nuova partita" e "Come si gioca".
@@ -47,22 +47,26 @@ Tutti i campi sono precompilati con l'ultima configurazione salvata (o con i def
 | Nomi | un campo testo per giocatore, etichetta "Giocatore n" | facoltativo; spazi iniziali/finali rimossi; max 20 caratteri; nome vuoto → "Giocatore n"; nomi duplicati (senza distinzione maiuscole/minuscole) non ammessi | vuoto (mostra "Giocatore 1…N") |
 | Numero impostori | stepper | minimo 1; massimo = floor((giocatori − 1) / 2), cioè i civili sono sempre più degli impostori (3-4 giocatori → 1, 5-6 → 2, 7-8 → 3, …, 20 → 9) | 1 |
 | Modalità | scelta singola: "Impostore senza parola" / "Parola affine" | obbligatoria | "Impostore senza parola" |
-| Mostra categoria all'impostore | interruttore | visibile e attivo solo se la modalità è "Impostore senza parola"; nascosto (non applicato) in "Parola affine" | attivo |
+| L'impostore vede la categoria | interruttore | visibile e attivo solo se la modalità è "Impostore senza parola"; nascosto (non applicato) in "Parola affine" | attivo |
 | Categorie | lista con caselle di selezione, più "Seleziona tutte" / "Deseleziona tutte" | almeno una selezionata | tutte selezionate |
+| Parole ancora da giocare | testo "Parole ancora da giocare: X / Y" e pulsante "Azzera" | vedi sotto | calcolato |
 
 Regole di validazione:
 - Se il numero giocatori scende, il numero impostori e i nomi in eccesso si adattano: impostori = min(impostori, nuovo massimo). I nomi dei giocatori oltre N restano memorizzati ma non usati.
 - Se un nome duplicato è presente, il campo mostra l'errore "Nome già usato" e "Inizia" è disabilitato. Il nome di default "Giocatore n" è considerato per il confronto.
 - Se nessuna categoria è selezionata: messaggio "Seleziona almeno una categoria" e "Inizia" disabilitato.
 - In modalità "Parola affine" una parola senza affine non può essere estratta (vedi 7).
+- Ogni campo nome ha un pulsante "x" che cancella il testo del nome (il campo torna vuoto, quindi vale "Giocatore n"). Sulla tastiera dei campi nome è presente il tasto Avanti, che porta al campo nome successivo.
+- Quando "Inizia" è disabilitato, sopra il pulsante compare in rosso il primo errore di validazione (in ordine di schermata) con il suo testo dedicato ("Nome già usato", "Seleziona almeno una categoria", "Le categorie scelte non contengono parole utilizzabili"); se l'errore non ha un testo dedicato compare "Controlla la configurazione".
+- "Parole ancora da giocare: X / Y": Y = dimensione del pool iniziale (5.2 passo 1) per le categorie e la modalità attualmente scelte; X = parole di quel pool non presenti tra le usate. Si aggiorna al variare di categorie e modalità. Il pulsante "Azzera" è abilitato solo se X < Y e chiede conferma "Rimettere in gioco tutte le parole delle categorie scelte?" con pulsanti "Annulla" / "Azzera". Confermando, dalle usate si tolgono solo le parole delle categorie scelte (le usate di altre categorie restano); "Annulla" non cambia nulla.
 - "Inizia" salva la configurazione e apre la Distribuzione ruoli. Tasto indietro: torna alla Home (la configurazione corrente viene salvata).
 
 ### 4.3 Distribuzione ruoli
 Per ogni giocatore, nell'ordine della lista, si alternano tre stati:
 
-1. **Passaggio**: testo "Passa il telefono a <nome>" e pulsante "Sono <nome>". Nessun ruolo visibile. Indicatore "Giocatore k di N".
-2. **Rivelazione**: dopo il tocco sul pulsante, il contenuto del ruolo (vedi tabella) e il pulsante "Nascondi e passa".
-3. Il tocco su "Nascondi e passa" nasconde il ruolo e passa allo stato 1 del giocatore successivo. Dopo l'ultimo giocatore apre la schermata di Gioco.
+1. **Passaggio**: testo "Passa il telefono a <nome>", avviso "Gli altri non guardino lo schermo" e pulsante "Sono <nome>". Nessun ruolo visibile. Indicatore "Giocatore k di N".
+2. **Rivelazione**: dopo il tocco sul pulsante, il contenuto del ruolo (vedi tabella) e il pulsante "Nascondi e passa" ("Nascondi e inizia" per l'ultimo giocatore). Il pulsante si attiva 400 ms dopo la comparsa del ruolo (prima è disabilitato).
+3. Il tocco su "Nascondi e passa" nasconde il ruolo e passa allo stato 1 del giocatore successivo. Il tocco su "Nascondi e inizia" (ultimo giocatore) apre la schermata di Gioco.
 
 Contenuto dello stato 2:
 
@@ -72,20 +76,21 @@ Contenuto dello stato 2:
 | Impostore | "Sei l'impostore" + (se opzione attiva) "Categoria: <nome categoria>" | "La tua parola è:" + parola affine |
 
 Regole:
-- Ogni ruolo si può rivelare una sola volta in Distribuzione (la schermata di Gioco offre poi "Rivedi la parola", vedi 4.4.1): dopo "Nascondi e passa" non è possibile tornare indietro né rivedere il ruolo di un giocatore già passato. Il tasto indietro di sistema nelle schermate di Distribuzione è disabilitato oppure chiede conferma "Interrompere la partita?" (Sì → cancella la partita salvata e va alla Configurazione, No → resta); non porta mai a un ruolo precedente.
+- Ogni ruolo si può rivelare una sola volta in Distribuzione (la schermata di Gioco offre poi "Rivedi la parola", vedi 4.4.1): dopo "Nascondi e passa" non è possibile tornare indietro né rivedere il ruolo di un giocatore già passato. Il tasto indietro di sistema nelle schermate di Distribuzione è disabilitato oppure chiede conferma "Interrompere la partita?" con messaggio "La partita andrà persa." e pulsanti "Interrompi" (cancella la partita salvata e va alla Configurazione) / "Continua a giocare" (resta); non porta mai a un ruolo precedente.
 - Se l'app va in background o la schermata viene ricreata (rotazione, ripristino) durante lo stato 2, si torna allo stato 1 dello stesso giocatore (il ruolo non resta mai visibile senza interazione).
 - Lo stato corrente (Passaggio k / Rivelazione k) viene salvato a ogni cambio (vedi 6). Dopo la chiusura dell'app e "Riprendi partita", uno stato salvato Rivelazione k riparte come Passaggio k: il ruolo non è mai visibile all'avvio. Il giocatore k può quindi rivedere il proprio ruolo una sola volta ancora, solo dopo il tocco su "Sono <nome>".
 - Lo schermo resta acceso durante la Distribuzione.
 - La schermata di Passaggio non mostra mai informazioni sul ruolo.
 - In modalità "Parola affine" lo stato 2 di civili e impostori è identico per layout, etichette e colori.
+- Vibrazione (feedback tattile): alla comparsa del ruolo (stato 2) una sola vibrazione leggera, IDENTICA per tutti i giocatori (civili e impostori) in entrambe le modalità: una vibrazione diversa (es. doppia) si sentirebbe e rivelerebbe l'impostore a chi sta vicino (indistinguibilità, CA-10, CA-30). Una vibrazione leggera anche al passaggio al giocatore successivo (ingresso nello stato 1), uguale per tutti.
 
 ### 4.4 Schermata di gioco
-- Testo "Si gioca!" e "Inizia <nome>" dove <nome> è il giocatore che inizia, scelto a caso uniformemente tra tutti i giocatori (indipendentemente dal ruolo).
+- Testo "Si gioca!" e "Parla per primo: <nome>" dove <nome> è il giocatore che inizia, scelto a caso uniformemente tra tutti i giocatori (indipendentemente dal ruolo).
 - Testo di istruzione: "Discutete a voce, poi votate. Quando avete deciso, premete Rivela."
-- Pulsante "Rivela" → conferma "Rivelare i ruoli?" (Sì/No) → schermata Rivela.
+- Pulsante "Rivela" (in basso) → conferma "Rivelare i ruoli?" con messaggio "Verrà mostrato chi era l'impostore." e pulsanti "Rivela" / "Non ancora" → schermata Rivela ("Non ancora" chiude il dialogo e resta in Gioco).
 - Il ruolo non è mostrato in questa schermata.
 - Pulsante piccolo (secondario, meno evidente di "Rivela") "Rivedi la parola" → schermata Rivedi la parola (4.4.1).
-- Tasto indietro: chiede "Interrompere la partita?" (Sì → Configurazione).
+- Tasto indietro: chiede "Interrompere la partita?" con messaggio "La partita andrà persa." e pulsanti "Interrompi" (→ Configurazione) / "Continua a giocare" (resta in Gioco).
 
 ### 4.4.1 Rivedi la parola
 Funzione raggiungibile solo dalla schermata di Gioco, dopo la Distribuzione. Eccezione esplicita alla regola "una sola rivelazione" di 4.3 (che resta valida per la Distribuzione).
@@ -105,13 +110,13 @@ Regole:
 
 ### 4.5 Rivela
 Contenuto:
-- Intestazione "Svelamento".
+- Intestazione "Il risultato".
 - "L'impostore era: <nome>" (singolare) oppure "Gli impostori erano: <nome1>, <nome2>, …" (plurale), nell'ordine della lista giocatori.
 - "La parola era: <parola>".
 - Solo in modalità "Parola affine": "La parola affine era: <affine>".
 - Categoria: "Categoria: <nome categoria>".
-- Pulsanti: "Nuova partita" (stessi giocatori e impostazioni: nuova parola, nuovi impostori, nuovo giocatore iniziale → Distribuzione ruoli) e "Cambia impostazioni" (→ Configurazione, precompilata).
-- Tasto indietro: come "Cambia impostazioni".
+- Pulsanti: "Rigioca (stessi giocatori)" (stessi giocatori e impostazioni: nuova parola, nuovi impostori, nuovo giocatore iniziale → Distribuzione ruoli) e "Modifica giocatori e opzioni" (→ Configurazione, precompilata).
+- Tasto indietro: come "Modifica giocatori e opzioni".
 - Entrando in Rivela la partita salvata viene cancellata (la Home non mostra più "Riprendi partita" fino a una nuova partita).
 
 ## 5. Regole di gioco
@@ -126,7 +131,8 @@ Contenuto:
 2. Si escludono le parole già usate nella sessione (insieme "usate").
 3. Se il pool risultante è vuoto, l'insieme "usate" viene azzerato (per il solo pool corrente) e si estrae di nuovo dal pool completo; la nuova parola non coincide con quella dell'ultima partita, se il pool ha almeno 2 parole.
 4. Si estrae una parola a caso (uniforme) e la si aggiunge a "usate".
-5. L'insieme "usate" è persistente (vedi 6): sopravvive alla chiusura dell'app e si azzera solo per esaurimento del pool (passo 3). Non si azzera cambiando impostazioni o categorie.
+5. L'insieme "usate" è persistente (vedi 6): sopravvive alla chiusura dell'app e si azzera solo per esaurimento del pool (passo 3) o con "Azzera" in Configurazione (4.2), che toglie dalle usate solo le parole delle categorie scelte. Non si azzera cambiando impostazioni o categorie.
+7. Parole rimanenti per un pool (categorie e modalità scelte) = parole del pool non presenti tra le usate; l'azzeramento per pool rimuove dalle usate solo le parole delle categorie scelte (indipendentemente dalla modalità).
 6. Se il pool iniziale (passo 1) è vuoto, "Inizia" è disabilitato con messaggio "Le categorie scelte non contengono parole utilizzabili".
 
 ### 5.3 Giocatore che inizia
@@ -202,43 +208,48 @@ File `app/src/main/assets/parole.json`:
 - **CA-39** Il ripristino normalizza Rivelazione k in Passaggio k (stesso k); Passaggio k e Gioco restano invariati.
 - **CA-40** Una partita salvata con dati illeggibili o incoerenti (JSON malformato, campo mancante, indici impostori fuori [0, N) o duplicati, k fuori [0, N), stato sconosciuto) è giudicata non valida senza eccezioni non gestite.
 - **CA-41** Una partita salvata la cui categoria o parola (o affine, in modalità "Parola affine") non esiste più nel file parole è giudicata non valida; con dati coerenti col file è valida.
+- **CA-61** Le parole rimanenti di un pool sono quelle del pool non presenti tra le usate (X ≤ Y); l'azzeramento per pool rimuove dalle usate solo le parole delle categorie scelte, lasciando intatte le usate delle altre categorie; azzerare con nessuna parola usata non cambia nulla.
 - **CA-42** Le parole usate persistono tra un ripristino e l'altro: dopo salvataggio e ripristino, l'estrazione successiva esclude le parole già usate; l'esaurimento del pool le azzera come da 5.2.3. Le parole usate non più presenti nel file sono ignorate.
 
 ### 8.2 Interfaccia (test strumentati/manuali)
 
 - **CA-22** Al primo avvio la Configurazione mostra: 4 giocatori, 1 impostore, modalità "Impostore senza parola", opzione categoria attiva, tutte le categorie selezionate, nomi "Giocatore 1…4".
 - **CA-23** I pulsanti "−"/"+" del numero giocatori si fermano a 3 e 20; quelli degli impostori si fermano a 1 e al massimo consentito; il massimo si aggiorna al variare dei giocatori.
-- **CA-24** L'interruttore "Mostra categoria all'impostore" è visibile solo con modalità "Impostore senza parola".
-- **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Inizia" è disabilitato; con un nome duplicato compare "Nome già usato" e "Inizia" è disabilitato.
+- **CA-24** L'interruttore "L'impostore vede la categoria" è visibile solo con modalità "Impostore senza parola".
+- **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Inizia" è disabilitato e sopra compare in rosso lo stesso errore; con un nome duplicato compare "Nome già usato" e "Inizia" è disabilitato; per un errore senza testo dedicato sopra "Inizia" compare in rosso "Controlla la configurazione".
 - **CA-26** Chiudendo e riaprendo l'app, la Configurazione mostra gli stessi valori impostati prima della chiusura.
 - **CA-27** La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; il ruolo compare solo dopo il tocco su "Sono <nome>".
 - **CA-28** Dopo "Nascondi e passa" il ruolo non è più visibile e non esiste alcun controllo né gesto (incluso il tasto indietro) per rivedere il ruolo di un giocatore precedente.
 - **CA-29** Mettere l'app in background o ruotare lo schermo mentre un ruolo è visibile riporta alla schermata "Passa il telefono a <nome>" dello stesso giocatore.
 - **CA-30** In modalità "Parola affine" le schermate di rivelazione di un civile e di un impostore sono indistinguibili in layout, etichette e colori (differiscono solo per la parola).
-- **CA-31** Dopo l'ultimo giocatore compare la schermata di Gioco con "Inizia <nome>"; il ruolo di nessuno è mostrato; "Rivela" chiede conferma prima di procedere.
+- **CA-31** Dopo l'ultimo giocatore compare la schermata di Gioco con "Parla per primo: <nome>"; il ruolo di nessuno è mostrato; "Rivela" chiede conferma ("Rivelare i ruoli?", "Verrà mostrato chi era l'impostore.", "Rivela" / "Non ancora") prima di procedere.
 - **CA-32** La schermata Rivela mostra impostore/i, parola, categoria e (solo in modalità affine) la parola affine, con i testi di sezione 4.5.
-- **CA-33** "Nuova partita" nella schermata Rivela porta a "Passa il telefono a <primo giocatore>" con la stessa lista di giocatori; "Cambia impostazioni" porta alla Configurazione precompilata.
+- **CA-33** "Rigioca (stessi giocatori)" nella schermata Rivela porta a "Passa il telefono a <primo giocatore>" con la stessa lista di giocatori; "Modifica giocatori e opzioni" porta alla Configurazione precompilata.
 - **CA-34** Con `parole.json` illeggibile la Home mostra "Impossibile caricare le parole" e "Nuova partita" è disabilitato.
-- **CA-35** Il tasto indietro in Distribuzione e Gioco chiede "Interrompere la partita?" e non porta mai a un ruolo precedente.
+- **CA-35** Il tasto indietro in Distribuzione e Gioco chiede "Interrompere la partita?" ("La partita andrà persa.", "Interrompi" / "Continua a giocare") e non porta mai a un ruolo precedente.
 - **CA-36** Tutti i testi dell'interfaccia sono in italiano e coincidono con quelli citati in queste specifiche.
 - **CA-43** Senza partita salvata la Home non mostra "Riprendi partita" e "Nuova partita" apre direttamente la Configurazione. Con una partita salvata valida "Riprendi partita" compare sopra "Nuova partita".
 - **CA-44** Con una partita salvata, "Nuova partita" mostra "Esiste una partita in corso. Iniziarne una nuova?"; "Annulla" resta in Home con la partita intatta; "Nuova partita" apre la Configurazione e, dopo "Inizia", la partita salvata è sostituita dalla nuova.
 - **CA-45** Chiudendo l'app (processo terminato) in Passaggio k, "Riprendi partita" mostra "Passa il telefono a <nome k>" con gli stessi ruoli, parola e giocatore iniziale di prima.
 - **CA-46** Chiudendo l'app mentre il ruolo del giocatore k è visibile, "Riprendi partita" mostra "Passa il telefono a <nome k>" e nessun ruolo; il ruolo compare solo dopo il tocco su "Sono <nome k>".
-- **CA-47** Chiudendo l'app nella schermata di Gioco, "Riprendi partita" riporta alla schermata di Gioco con lo stesso "Inizia <nome>".
-- **CA-48** La partita salvata è cancellata (la Home non mostra "Riprendi partita") dopo: ingresso in Rivela, conferma "Interrompere la partita?" con Sì.
+- **CA-47** Chiudendo l'app nella schermata di Gioco, "Riprendi partita" riporta alla schermata di Gioco con lo stesso "Parla per primo: <nome>".
+- **CA-48** La partita salvata è cancellata (la Home non mostra "Riprendi partita") dopo: ingresso in Rivela, conferma "Interrompere la partita?" con "Interrompi".
 - **CA-49** Con la partita salvata incoerente col file parole (categoria o parola rimossa) o dati illeggibili, la Home non mostra "Riprendi partita" e non compare alcun messaggio di errore.
 - **CA-50** Le parole usate sopravvivono alla chiusura dell'app: dopo riavvio, una nuova partita non estrae parole già usate finché il pool non è esaurito.
 - **CA-51** La schermata di Gioco mostra il pulsante "Rivedi la parola", visivamente secondario rispetto a "Rivela"; non compare in Distribuzione né in Rivela.
 - **CA-52** Il tocco su "Rivedi la parola" apre la schermata "Rivedi la parola" con tutti i giocatori, con i nomi effettivi e nell'ordine della partita; nessun ruolo è visibile.
-- **CA-53** Dall'Elenco, il tasto indietro (di sistema o freccia) torna alla schermata di Gioco senza conferma e con lo stesso "Inizia <nome>".
+- **CA-53** Dall'Elenco, il tasto indietro (di sistema o freccia) torna alla schermata di Gioco senza conferma e con lo stesso "Parla per primo: <nome>".
 - **CA-54** Toccando un nome compare "Passa il telefono a <nome>" con il pulsante "Sono <nome>", senza parola né testo di ruolo; il tasto indietro torna all'Elenco.
 - **CA-55** Dopo "Sono <nome>" la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
 - **CA-56** Si può rivedere la parola più volte, anche dello stesso giocatore o di giocatori diversi, senza limiti; ruoli, parola e giocatore iniziale restano invariati.
 - **CA-57** Mettere l'app in background o ruotare lo schermo in qualsiasi schermata di Rivedi la parola riporta alla schermata di Gioco, con nessun ruolo visibile.
 - **CA-58** Le schermate di Rivedi la parola hanno FLAG_SECURE: lo screenshot è bloccato e l'anteprima in Recents non mostra il contenuto.
-- **CA-59** Chiudendo l'app (processo terminato) durante Rivedi la parola, "Riprendi partita" porta alla schermata di Gioco con lo stesso "Inizia <nome>"; la partita salvata non contiene alcuno stato di revisione.
+- **CA-59** Chiudendo l'app (processo terminato) durante Rivedi la parola, "Riprendi partita" porta alla schermata di Gioco con lo stesso "Parla per primo: <nome>"; la partita salvata non contiene alcuno stato di revisione.
 - **CA-60** "Rivedi la parola" non modifica la macchina a stati della Distribuzione (CA-18 resta valido) né la partita salvata; CA-28 e CA-35 restano validi per la sola Distribuzione.
+- **CA-62** Ogni campo nome ha un pulsante "x" che lo svuota (il nome torna "Giocatore n"); la tastiera dei campi nome mostra il tasto Avanti, che passa al campo successivo.
+- **CA-63** Nella Configurazione compare "Parole ancora da giocare: X / Y" coerente con categorie e modalità scelte e si aggiorna al loro variare; "Azzera" chiede "Rimettere in gioco tutte le parole delle categorie scelte?" con "Annulla" / "Azzera"; "Annulla" non cambia X, "Azzera" porta X a Y per le categorie scelte lasciando intatte le usate delle altre (logica: CA-61).
+- **CA-64** In Distribuzione l'ultimo giocatore vede "Nascondi e inizia" al posto di "Nascondi e passa"; il pulsante è disabilitato nei primi 400 ms dopo la comparsa del ruolo e poi si attiva; la schermata di Passaggio mostra "Gli altri non guardino lo schermo".
+- **CA-65** Il feedback tattile della rivelazione è identico per civili e impostori, in entrambe le modalità (una sola vibrazione leggera); anche quello del passaggio è identico per tutti.
 
 ## 9. Fuori perimetro (v1)
 

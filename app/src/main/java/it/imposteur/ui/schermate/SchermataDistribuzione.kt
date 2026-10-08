@@ -194,15 +194,10 @@ internal fun Rivelazione(
     val etichettaPulsante = testoPulsante
         ?: if (ultimo) R.string.distribuzione_nascondi_ultimo else R.string.distribuzione_nascondi
     val haptic = LocalHapticFeedback.current
-    val impostore = contenuto is ContenutoRuolo.Impostore
 
-    // Segnale alla comparsa del ruolo: due impulsi per l'impostore, uno per gli altri.
+    // Segnale alla comparsa del ruolo: un solo impulso, identico per tutti (impostore compreso).
     LaunchedEffect(indice) {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        if (impostore) {
-            delay(150)
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
     }
     // Il pulsante si abilita dopo un breve ritardo, per evitare il doppio tocco.
     var abilitato by remember(indice) { mutableStateOf(false) }

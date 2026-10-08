@@ -18,6 +18,7 @@ import it.imposteur.ui.schermate.SchermataConfigurazione
 import it.imposteur.ui.schermate.SchermataDistribuzione
 import it.imposteur.ui.schermate.SchermataGioco
 import it.imposteur.ui.schermate.SchermataHome
+import it.imposteur.ui.schermate.SchermataImpostazioni
 import it.imposteur.ui.schermate.SchermataRegole
 import it.imposteur.ui.schermate.SchermataRivela
 import it.imposteur.ui.schermate.SchermataRivedi
@@ -30,6 +31,7 @@ object Rotte {
     const val GIOCO = "gioco"
     const val RIVELA = "rivela"
     const val RIVEDI = "rivedi"
+    const val IMPOSTAZIONI = "impostazioni"
 }
 
 private fun NavHostController.vaiAConfigurazione() {
@@ -90,6 +92,19 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                         navController.navigate(Rotte.REGOLE) { launchSingleTop = true }
                     }
                 },
+                onImpostazioni = {
+                    if (navController.inRotta(Rotte.HOME)) {
+                        navController.navigate(Rotte.IMPOSTAZIONI) { launchSingleTop = true }
+                    }
+                },
+            )
+        }
+        composable(Rotte.IMPOSTAZIONI) {
+            val aspetto by viewModel.aspetto.collectAsStateWithLifecycle()
+            SchermataImpostazioni(
+                aspetto = aspetto,
+                onCambia = { viewModel.impostaAspetto(it) },
+                onIndietro = { if (navController.inRotta(Rotte.IMPOSTAZIONI)) navController.popBackStack() },
             )
         }
         composable(Rotte.REGOLE) {

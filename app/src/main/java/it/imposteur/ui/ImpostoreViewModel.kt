@@ -3,6 +3,8 @@ package it.imposteur.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import it.imposteur.data.Aspetto
+import it.imposteur.data.RepositoryAspetto
 import it.imposteur.data.RepositoryConfigurazione
 import it.imposteur.data.RepositoryParole
 import it.imposteur.data.RepositorySessione
@@ -22,8 +24,10 @@ import it.imposteur.game.VoceParola
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -53,6 +57,7 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
     private val repoParole = RepositoryParole(application)
     private val repoConfig = RepositoryConfigurazione(application)
     private val repoSessione = RepositorySessione(application)
+    private val repoAspetto = RepositoryAspetto(application)
     private var gestore = GestorePartite(Random.Default)
     /** True se la partita in UI fa parte della sessione salvata. */
     private var partitaAttiva = false
@@ -62,6 +67,14 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _revisione = MutableStateFlow<Revisione?>(null)
     val revisione: StateFlow<Revisione?> = _revisione.asStateFlow()
+
+    /** Aspetto scelto: parte dal default e passa subito al valore salvato appena letto. */
+    val aspetto: StateFlow<Aspetto> = repoAspetto.aspetto
+        .stateIn(viewModelScope, SharingStarted.Eagerly, Aspetto())
+
+    fun impostaAspetto(a: Aspetto) {
+        viewModelScope.launch { repoAspetto.salva(a) }
+    }
 
     private var salvataggio: Job? = null
 

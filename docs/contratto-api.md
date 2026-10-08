@@ -167,6 +167,37 @@ La UI calcola il pool con `Regole.pool(categorie, config.categorieSelezionate, c
 
 Caso limite: a pool esaurito `rimanenti` vale 0. La partita successiva azzera da sola le usate del pool (regola §5.2.3), quindi la UI mostra 0 senza errori.
 
+## Segnalazioni (v1.3)
+
+```kotlin
+// data/Segnalazioni.kt (Kotlin puro)
+enum class MotivoSegnalazione { TROPPO_SIMILI, TROPPO_DIVERSE, POCO_CONOSCIUTA, CATEGORIA_SBAGLIATA }
+data class Segnalazione(
+    val tipo: String,                     // "coppia" | "app"
+    val istante: String,                  // ISO-8601 locale, es. "2026-10-08T21:14:03"
+    val categoriaId: String? = null,      // solo tipo "coppia"
+    val parola: String? = null,
+    val affine: String? = null,
+    val modalita: String? = null,         // Modalita.name
+    val motivi: List<MotivoSegnalazione> = emptyList(),
+    val nota: String = "",                // trim, max 500 caratteri
+)
+object FormatoSegnalazioni {
+    fun riga(s: Segnalazione): String                 // una riga JSON, senza a capo
+    fun leggi(testo: String): List<Segnalazione>      // JSONL; le righe malformate vengono saltate
+}
+
+// data/RepositorySegnalazioni.kt (Android)
+class RepositorySegnalazioni(context: Context) {
+    // File: context.getExternalFilesDir(null) ?: context.filesDir, nome "segnalazioni.jsonl"
+    suspend fun aggiungi(s: Segnalazione)             // append + a capo, Dispatchers.IO
+    suspend fun conta(): Int
+    suspend fun cancellaTutte()
+}
+```
+
+Una segnalazione di tipo "coppia" senza motivi né nota non si salva: il pulsante Salva resta disattivato.
+
 ## `it.imposteur.ui` (UI: la scrive solo l'agente dedicato)
 
 `ImpostoreViewModel` (AndroidViewModel) espone `StateFlow<UiState>` e possiede un unico `GestorePartite(Random.Default)`. Navigazione Compose con le rotte: home, regole, configurazione, distribuzione, gioco, rivela.

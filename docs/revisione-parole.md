@@ -69,27 +69,30 @@
 | Corpo umano | Pelle / Cicatrice | Pelle / Pelo | Cicatrice poco plausibile |
 | Corpo umano | Cranio / Mandibola | Cranio / Scheletro | Mandibola troppo specifica |
 
-## Dubbi
+## Dubbi risolti
 
-Coppie non modificate che un umano dovrebbe guardare.
+Tutte le 20 coppie dubbie sono state risolte. Categoria Abbigliamento rinominata "Abbigliamento e accessori" (id invariato).
 
-- Cibo: Uovo / Frittata (affine derivato dalla parola, facile da distinguere)
-- Cibo: Pesce / Gambero (gambero e un crostaceo)
-- Luoghi: Faro / Torre
-- Oggetti di casa: Ombrello / Bastone (affine debole)
-- Oggetti di casa: Televisore / Computer
-- Natura: Dune / Oasi (Deserto compare in Luoghi)
-- Natura: Vulcano / Geyser (Geyser poco noto ai ragazzi)
-- Strumenti musicali: Tastiera / Sintetizzatore (quasi sinonimi)
-- Strumenti musicali: Kazoo / Fischietto (Kazoo poco noto)
-- Strumenti musicali: Diapason / Metronomo (attrezzi, non strumenti)
-- Strumenti musicali: Campane / Campanelli (molto simili)
-- Abbigliamento: Zaino, Occhiali, Anello, Collana sono accessori, non propriamente abbigliamento
-- Abbigliamento: Occhiali / Lenti a Contatto
-- Mezzi di trasporto: Pattini / Rollerblade (quasi stessa cosa)
-- Mezzi di trasporto: Canoa (e anche affine di Canottaggio in Sport)
-- Mestieri: Soldato / Marinaio
-- Sport: Arrampicata / Alpinismo (molto vicini)
-- Feste e eventi: Palio / Giostra
-- Corpo umano: Ombelico / Ascella (affine debole)
-- Animali: Topo / Criceto
+| Categoria | Prima | Dopo | Motivo |
+|---|---|---|---|
+| Cibo | Uovo / Frittata | Popcorn / Patatine | affine derivato dalla parola |
+| Cibo | Pesce / Gambero | Tonno / Salmone | il gambero è un crostaceo |
+| Luoghi | Faro / Torre | Municipio / Tribunale | coppia debole, ora due edifici pubblici |
+| Oggetti di casa | Ombrello / Bastone | Scatola / Cestino | affine debole |
+| Oggetti di casa | Televisore / Computer | Televisore / Radio | affine più vicino (apparecchi per audio e video) |
+| Natura | Dune / Oasi | Palude / Stagno | Deserto compare in Luoghi |
+| Natura | Vulcano / Geyser | Valle / Pianura | Geyser poco noto ai ragazzi |
+| Strumenti musicali | Tastiera / Sintetizzatore | Clavicembalo / Pianoforte | quasi sinonimi |
+| Strumenti musicali | Kazoo / Fischietto | Armonica a Bocca / Fisarmonica | Kazoo poco noto |
+| Strumenti musicali | Diapason / Metronomo | Cornetta / Tromba | attrezzi, non strumenti |
+| Strumenti musicali | Campane / Campanelli | Conga / Bongo | molto simili |
+| Abbigliamento e accessori | Zaino, Occhiali, Anello, Collana | invariati (categoria rinominata) | gli accessori ora sono ammessi |
+| Abbigliamento e accessori | Occhiali / Lenti a Contatto | Occhiali / Maschera | troppo vicini |
+| Abbigliamento e accessori | Collana / Ciondolo | Collana / Spilla | il ciondolo è parte della collana |
+| Mezzi di trasporto | Pattini / Rollerblade | Hoverboard / Monopattino Elettrico | quasi la stessa cosa |
+| Mezzi di trasporto | Canoa / Pedalò | Pedalò / Zattera | Canoa è anche in Sport |
+| Mestieri | Soldato / Marinaio | Carabiniere / Vigile | coppia poco plausibile |
+| Sport | Arrampicata / Alpinismo | Arrampicata / Parkour | molto vicini |
+| Feste e eventi | Palio / Giostra | Festa del Papà / Festa della Mamma | Giostra è ambigua e Palio poco noto ai ragazzi |
+| Corpo umano | Ombelico / Ascella | Gomito / Ginocchio | affine debole |
+| Animali | Topo / Criceto | Topo / Talpa | il criceto è un topo domestico, troppo vicino |

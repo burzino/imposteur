@@ -87,4 +87,15 @@
     <string name="rivela_categoria">Categoria: %1$s</string>
     <string name="rivela_cambia_impostazioni">Modifica giocatori e opzioni</string>
     <string name="rivela_rigioca">Rigioca (stessi giocatori)</string>
+
+    <!-- Impostazioni -->
+    <string name="impostazioni_titolo">Impostazioni</string>
+    <string name="impostazioni_apri">Apri le impostazioni</string>
+    <string name="tema_titolo">Tema</string>
+    <string name="tema_sistema">Sistema</string>
+    <string name="tema_chiaro">Chiaro</string>
+    <string name="tema_scuro">Scuro</string>
+    <string name="tema_alto_contrasto">Alto contrasto</string>
+    <string name="colori_telefono">Colori del telefono</string>
+    <string name="colori_telefono_descrizione">Usa i colori dello sfondo (Android 12+)</string>
 </resources>

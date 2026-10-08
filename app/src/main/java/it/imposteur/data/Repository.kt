@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-private val Context.dataStore by preferencesDataStore(name = "impostore_config")
+internal val Context.dataStore by preferencesDataStore(name = "impostore_config")
 
 class RepositoryParole(private val context: Context) {
     suspend fun carica(): RisultatoCaricamento = withContext(Dispatchers.IO) {

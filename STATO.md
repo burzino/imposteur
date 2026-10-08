@@ -23,6 +23,11 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 5. [fatto] Revisione statica della UI (docs/revisione-ui.md): corretti D1-D8 e aggiunto FLAG_SECURE in Distribuzione. Build verde, 96/96.
 6. [da fare, serve l utente] Collaudo su telefono fisico via USB. L emulatore non parte: manca l accelerazione hardware (Hyper-V/WHPX non attivi, servono i privilegi di amministratore). Verificare anche: doppio tocco, am kill (process death), Recents, back predittivo.
 
+## Decisioni recenti (2026-10-08)
+- Nome dell'app: "Imposteur". Cambia solo il nome mostrato: package e id restano invariati.
+- Aggiunti: Rivedi la parola; proposte UX 1–7, 13, 14 e 16; tema (Sistema, Chiaro, Scuro, Alto contrasto, più i colori dinamici); segnalazioni di coppie e suggerimenti in `Android/data/it.imposteur/files/segnalazioni.jsonl`, da leggere con adb.
+- La vibrazione è identica per tutti, per non rivelare l'impostore.
+
 ## Punti aperti
 - Collaudo sul telefono fisico da fare con l utente (ondata 6).
 - Revisione qualità parole in corso (docs/revisione-parole.md). Poi secondo giro di collaudo: affine, doppio tocco, am kill, Recents.

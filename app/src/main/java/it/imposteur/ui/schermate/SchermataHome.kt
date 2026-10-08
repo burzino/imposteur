@@ -1,7 +1,12 @@
 package it.imposteur.ui.schermate
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,12 +34,21 @@ import it.imposteur.R
 import it.imposteur.ui.UiState
 
 @Composable
-fun SchermataHome(stato: UiState, onNuovaPartita: () -> Unit, onRiprendi: () -> Unit, onRegole: () -> Unit) {
+fun SchermataHome(
+    stato: UiState,
+    onNuovaPartita: () -> Unit,
+    onRiprendi: () -> Unit,
+    onRegole: () -> Unit,
+    onImpostazioni: () -> Unit,
+) {
     var chiediNuova by rememberSaveable { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+    IconButton(onClick = onImpostazioni, modifier = Modifier.align(Alignment.TopEnd)) {
+        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.impostazioni_apri))
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -69,6 +83,7 @@ fun SchermataHome(stato: UiState, onNuovaPartita: () -> Unit, onRiprendi: () -> 
             onClick = onRegole,
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) { Text(stringResource(R.string.come_si_gioca), style = MaterialTheme.typography.titleMedium) }
+    }
     }
     if (chiediNuova) {
         AlertDialog(
