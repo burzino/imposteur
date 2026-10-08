@@ -77,6 +77,10 @@
 
     <!-- Rivedi la parola -->
     <string name="rivedi_titolo">Rivedi la parola</string>
+    <string name="rivedi_intestazione">Chi vuole rivedere la parola?</string>
+    <string name="rivedi_sottotitolo">Tocca il tuo nome</string>
+    <string name="rivedi_cd_giocatore">Rivedi la parola di %1$s</string>
+    <string name="rivedi_torna_gioco">Torna al gioco</string>
     <string name="rivedi_nascondi">Nascondi</string>
 
     <!-- Rivela -->

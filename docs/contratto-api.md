@@ -176,6 +176,52 @@ Caso limite: a pool esaurito `rimanenti` vale 0. La partita successiva azzera da
 fun ordineDiParola(): List<Int>
 ```
 
+## Opzioni avanzate (v1.6)
+
+Tutte disattivate per default, così la partita base resta identica a prima.
+
+```kotlin
+// game, nuovi campi di Configurazione (con default: le configurazioni salvate prima restano leggibili)
+data class Configurazione(
+    ...esistenti...,
+    val impostoreNonPrimo: Boolean = false,       // 1. chi parla per primo è sempre un civile
+    val impostoriSorpresa: Boolean = false,       // 2. K effettivo uniforme in 1..numeroImpostori (numeroImpostori diventa il massimo)
+    val ordineCasuale: Boolean = false,           // 3. ordine di parola mescolato invece che a giro
+    val partitaTrappola: Boolean = false,         // 4. con probabilità Regole.PROBABILITA_TRAPPOLA nessuno è impostore
+    val promemoriaUltimaPossibilita: Boolean = false, // 5. solo testo nella schermata finale
+    val giriIndizi: Int = 1,                      // 6. 1..3; solo visualizzazione dell'ordine ripetuto per giro
+)
+object Regole { const val PROBABILITA_TRAPPOLA = 0.10; const val MAX_GIRI = 3 }
+
+// game, Partita: nuovi campi
+data class Partita(
+    ...esistenti...,                              // impostori può ora essere VUOTO (partita trappola)
+    val ordine: List<Int> = List(giocatori.size) { (primoGiocatore + it) % giocatori.size },
+    val giriIndizi: Int = 1,
+    val promemoriaUltimaPossibilita: Boolean = false,
+) {
+    fun ordineDiParola(): List<Int> = ordine
+    val trappola: Boolean get() = impostori.isEmpty()
+}
+```
+
+Algoritmo di `GestorePartite.nuovaPartita`, nell'ordine e sempre con il `Random` iniettato:
+1. Trappola: se `partitaTrappola` e `random.nextDouble() < PROBABILITA_TRAPPOLA`, allora K = 0.
+2. Altrimenti K = `impostoriSorpresa ? random.nextInt(1, numeroImpostori + 1) : numeroImpostori`.
+3. Gli impostori sono K indici distinti, scelti in modo uniforme.
+4. Primo giocatore: se `impostoreNonPrimo` e K > 0, uniforme tra i civili; altrimenti uniforme tra tutti.
+5. Ordine: se `ordineCasuale`, [primo] + una permutazione casuale degli altri; altrimenti la rotazione da primo.
+6. `giriIndizi` (limitato a 1..3) e `promemoriaUltimaPossibilita` vengono copiati dalla configurazione nella partita.
+
+Con K = 0 ogni giocatore riceve la parola dei civili, in entrambe le modalità.
+
+`TestiGioco`: con K = 0 lo svelamento è "Nessun impostore: era una partita trappola!", seguito dalla parola (e dall'affine in modalità affine) e dalla categoria. Il promemoria, mostrato solo se attivo e K > 0, è "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!".
+
+Serializzazione:
+- Configurazione: i campi mancanti prendono il default; `giriIndizi` viene limitato a 1..3.
+- Sessione: `ordine`, `giriIndizi` e `promemoria` vengono salvati. Se `ordine` manca (salvataggi vecchi), si usa la rotazione. Un `ordine` che non è una permutazione di 0..N-1 o non inizia con `primoGiocatore` fa scartare la partita.
+- Impostori vuoti: ora sono validi, perché indicano una partita trappola.
+
 ## Segnalazioni (v1.3)
 
 ```kotlin
