@@ -1,0 +1,1421 @@
+{
+ "versione": 1,
+ "categorie": [
+  {
+   "id": "cibo",
+   "nome": "Cibo",
+   "parole": [
+    {
+     "parola": "Pizza",
+     "affine": "Focaccia"
+    },
+    {
+     "parola": "Pasta",
+     "affine": "Riso"
+    },
+    {
+     "parola": "Pane",
+     "affine": "Grissini"
+    },
+    {
+     "parola": "Formaggio",
+     "affine": "Burro"
+    },
+    {
+     "parola": "Prosciutto",
+     "affine": "Salame"
+    },
+    {
+     "parola": "Gelato",
+     "affine": "Sorbetto"
+    },
+    {
+     "parola": "Cioccolato",
+     "affine": "Caramello"
+    },
+    {
+     "parola": "Mela",
+     "affine": "Pera"
+    },
+    {
+     "parola": "Banana",
+     "affine": "Ananas"
+    },
+    {
+     "parola": "Arancia",
+     "affine": "Mandarino"
+    },
+    {
+     "parola": "Fragola",
+     "affine": "Lampone"
+    },
+    {
+     "parola": "Uva",
+     "affine": "Ciliegia"
+    },
+    {
+     "parola": "Pomodoro",
+     "affine": "Peperone"
+    },
+    {
+     "parola": "Carota",
+     "affine": "Zucchina"
+    },
+    {
+     "parola": "Patata",
+     "affine": "Cipolla"
+    },
+    {
+     "parola": "Uovo",
+     "affine": "Frittata"
+    },
+    {
+     "parola": "Torta",
+     "affine": "Crostata"
+    },
+    {
+     "parola": "Biscotto",
+     "affine": "Cracker"
+    },
+    {
+     "parola": "Miele",
+     "affine": "Marmellata"
+    },
+    {
+     "parola": "Latte",
+     "affine": "Yogurt"
+    },
+    {
+     "parola": "Hamburger",
+     "affine": "Panino"
+    },
+    {
+     "parola": "Lasagna",
+     "affine": "Cannelloni"
+    },
+    {
+     "parola": "Insalata",
+     "affine": "Spinaci"
+    },
+    {
+     "parola": "Pesce",
+     "affine": "Gambero"
+    },
+    {
+     "parola": "Zuppa",
+     "affine": "Minestrone"
+    },
+    {
+     "parola": "Caffè",
+     "affine": "Tè"
+    },
+    {
+     "parola": "Succo",
+     "affine": "Frullato"
+    },
+    {
+     "parola": "Pollo",
+     "affine": "Tacchino"
+    }
+   ]
+  },
+  {
+   "id": "animali",
+   "nome": "Animali",
+   "parole": [
+    {
+     "parola": "Gatto",
+     "affine": "Tigre"
+    },
+    {
+     "parola": "Cane",
+     "affine": "Lupo"
+    },
+    {
+     "parola": "Cavallo",
+     "affine": "Asino"
+    },
+    {
+     "parola": "Mucca",
+     "affine": "Pecora"
+    },
+    {
+     "parola": "Maiale",
+     "affine": "Cinghiale"
+    },
+    {
+     "parola": "Leone",
+     "affine": "Leopardo"
+    },
+    {
+     "parola": "Elefante",
+     "affine": "Rinoceronte"
+    },
+    {
+     "parola": "Giraffa",
+     "affine": "Zebra"
+    },
+    {
+     "parola": "Scimmia",
+     "affine": "Gorilla"
+    },
+    {
+     "parola": "Orso",
+     "affine": "Panda"
+    },
+    {
+     "parola": "Coniglio",
+     "affine": "Lepre"
+    },
+    {
+     "parola": "Topo",
+     "affine": "Criceto"
+    },
+    {
+     "parola": "Aquila",
+     "affine": "Falco"
+    },
+    {
+     "parola": "Gallina",
+     "affine": "Anatra"
+    },
+    {
+     "parola": "Pinguino",
+     "affine": "Gabbiano"
+    },
+    {
+     "parola": "Delfino",
+     "affine": "Squalo"
+    },
+    {
+     "parola": "Balena",
+     "affine": "Foca"
+    },
+    {
+     "parola": "Rana",
+     "affine": "Tartaruga"
+    },
+    {
+     "parola": "Serpente",
+     "affine": "Lucertola"
+    },
+    {
+     "parola": "Ragno",
+     "affine": "Scorpione"
+    },
+    {
+     "parola": "Farfalla",
+     "affine": "Libellula"
+    },
+    {
+     "parola": "Ape",
+     "affine": "Vespa"
+    },
+    {
+     "parola": "Formica",
+     "affine": "Scarabeo"
+    },
+    {
+     "parola": "Volpe",
+     "affine": "Sciacallo"
+    },
+    {
+     "parola": "Canguro",
+     "affine": "Koala"
+    },
+    {
+     "parola": "Cammello",
+     "affine": "Lama"
+    },
+    {
+     "parola": "Pappagallo",
+     "affine": "Canarino"
+    },
+    {
+     "parola": "Coccodrillo",
+     "affine": "Alligatore"
+    }
+   ]
+  },
+  {
+   "id": "luoghi",
+   "nome": "Luoghi",
+   "parole": [
+    {
+     "parola": "Scuola",
+     "affine": "Università"
+    },
+    {
+     "parola": "Ospedale",
+     "affine": "Farmacia"
+    },
+    {
+     "parola": "Cinema",
+     "affine": "Teatro"
+    },
+    {
+     "parola": "Museo",
+     "affine": "Biblioteca"
+    },
+    {
+     "parola": "Stazione",
+     "affine": "Aeroporto"
+    },
+    {
+     "parola": "Supermercato",
+     "affine": "Mercato"
+    },
+    {
+     "parola": "Ristorante",
+     "affine": "Pizzeria"
+    },
+    {
+     "parola": "Parco",
+     "affine": "Giardino"
+    },
+    {
+     "parola": "Piscina",
+     "affine": "Palestra"
+    },
+    {
+     "parola": "Stadio",
+     "affine": "Palazzetto"
+    },
+    {
+     "parola": "Chiesa",
+     "affine": "Cimitero"
+    },
+    {
+     "parola": "Banca",
+     "affine": "Posta"
+    },
+    {
+     "parola": "Hotel",
+     "affine": "Campeggio"
+    },
+    {
+     "parola": "Castello",
+     "affine": "Palazzo"
+    },
+    {
+     "parola": "Ponte",
+     "affine": "Tunnel"
+    },
+    {
+     "parola": "Piazza",
+     "affine": "Strada"
+    },
+    {
+     "parola": "Spiaggia",
+     "affine": "Scogliera"
+    },
+    {
+     "parola": "Montagna",
+     "affine": "Collina"
+    },
+    {
+     "parola": "Fattoria",
+     "affine": "Stalla"
+    },
+    {
+     "parola": "Zoo",
+     "affine": "Acquario"
+    },
+    {
+     "parola": "Circo",
+     "affine": "Luna Park"
+    },
+    {
+     "parola": "Autostrada",
+     "affine": "Sentiero"
+    },
+    {
+     "parola": "Panificio",
+     "affine": "Pasticceria"
+    },
+    {
+     "parola": "Macelleria",
+     "affine": "Pescheria"
+    },
+    {
+     "parola": "Prigione",
+     "affine": "Tribunale"
+    },
+    {
+     "parola": "Faro",
+     "affine": "Torre"
+    },
+    {
+     "parola": "Isola",
+     "affine": "Penisola"
+    },
+    {
+     "parola": "Deserto",
+     "affine": "Savana"
+    }
+   ]
+  },
+  {
+   "id": "oggetti-di-casa",
+   "nome": "Oggetti di casa",
+   "parole": [
+    {
+     "parola": "Divano",
+     "affine": "Poltrona"
+    },
+    {
+     "parola": "Tavolo",
+     "affine": "Scrivania"
+    },
+    {
+     "parola": "Sedia",
+     "affine": "Sgabello"
+    },
+    {
+     "parola": "Letto",
+     "affine": "Culla"
+    },
+    {
+     "parola": "Armadio",
+     "affine": "Cassettiera"
+    },
+    {
+     "parola": "Lampada",
+     "affine": "Candela"
+    },
+    {
+     "parola": "Specchio",
+     "affine": "Quadro"
+    },
+    {
+     "parola": "Tappeto",
+     "affine": "Zerbino"
+    },
+    {
+     "parola": "Tenda",
+     "affine": "Persiana"
+    },
+    {
+     "parola": "Cuscino",
+     "affine": "Coperta"
+    },
+    {
+     "parola": "Forchetta",
+     "affine": "Cucchiaio"
+    },
+    {
+     "parola": "Coltello",
+     "affine": "Forbici"
+    },
+    {
+     "parola": "Piatto",
+     "affine": "Ciotola"
+    },
+    {
+     "parola": "Bicchiere",
+     "affine": "Tazza"
+    },
+    {
+     "parola": "Pentola",
+     "affine": "Padella"
+    },
+    {
+     "parola": "Frigorifero",
+     "affine": "Congelatore"
+    },
+    {
+     "parola": "Forno",
+     "affine": "Microonde"
+    },
+    {
+     "parola": "Lavatrice",
+     "affine": "Asciugatrice"
+    },
+    {
+     "parola": "Aspirapolvere",
+     "affine": "Scopa"
+    },
+    {
+     "parola": "Televisore",
+     "affine": "Computer"
+    },
+    {
+     "parola": "Telefono",
+     "affine": "Citofono"
+    },
+    {
+     "parola": "Orologio",
+     "affine": "Sveglia"
+    },
+    {
+     "parola": "Chiave",
+     "affine": "Lucchetto"
+    },
+    {
+     "parola": "Spazzolino",
+     "affine": "Pettine"
+    },
+    {
+     "parola": "Sapone",
+     "affine": "Shampoo"
+    },
+    {
+     "parola": "Asciugamano",
+     "affine": "Accappatoio"
+    },
+    {
+     "parola": "Ombrello",
+     "affine": "Bastone"
+    },
+    {
+     "parola": "Vaso",
+     "affine": "Bottiglia"
+    }
+   ]
+  },
+  {
+   "id": "mestieri",
+   "nome": "Mestieri",
+   "parole": [
+    {
+     "parola": "Medico",
+     "affine": "Infermiere"
+    },
+    {
+     "parola": "Maestro",
+     "affine": "Professore"
+    },
+    {
+     "parola": "Cuoco",
+     "affine": "Pasticcere"
+    },
+    {
+     "parola": "Pilota",
+     "affine": "Autista"
+    },
+    {
+     "parola": "Pompiere",
+     "affine": "Poliziotto"
+    },
+    {
+     "parola": "Contadino",
+     "affine": "Pescatore"
+    },
+    {
+     "parola": "Falegname",
+     "affine": "Muratore"
+    },
+    {
+     "parola": "Idraulico",
+     "affine": "Elettricista"
+    },
+    {
+     "parola": "Dentista",
+     "affine": "Veterinario"
+    },
+    {
+     "parola": "Giornalista",
+     "affine": "Scrittore"
+    },
+    {
+     "parola": "Pittore",
+     "affine": "Scultore"
+    },
+    {
+     "parola": "Cantante",
+     "affine": "Attore"
+    },
+    {
+     "parola": "Panettiere",
+     "affine": "Macellaio"
+    },
+    {
+     "parola": "Barista",
+     "affine": "Cameriere"
+    },
+    {
+     "parola": "Parrucchiere",
+     "affine": "Estetista"
+    },
+    {
+     "parola": "Sarto",
+     "affine": "Calzolaio"
+    },
+    {
+     "parola": "Meccanico",
+     "affine": "Carrozziere"
+    },
+    {
+     "parola": "Avvocato",
+     "affine": "Giudice"
+    },
+    {
+     "parola": "Architetto",
+     "affine": "Ingegnere"
+    },
+    {
+     "parola": "Fotografo",
+     "affine": "Regista"
+    },
+    {
+     "parola": "Postino",
+     "affine": "Corriere"
+    },
+    {
+     "parola": "Commesso",
+     "affine": "Cassiere"
+    },
+    {
+     "parola": "Astronauta",
+     "affine": "Scienziato"
+    },
+    {
+     "parola": "Soldato",
+     "affine": "Marinaio"
+    },
+    {
+     "parola": "Bibliotecario",
+     "affine": "Libraio"
+    },
+    {
+     "parola": "Giardiniere",
+     "affine": "Boscaiolo"
+    },
+    {
+     "parola": "Minatore",
+     "affine": "Operaio"
+    },
+    {
+     "parola": "Fornaio",
+     "affine": "Gelataio"
+    }
+   ]
+  },
+  {
+   "id": "sport",
+   "nome": "Sport",
+   "parole": [
+    {
+     "parola": "Calcio",
+     "affine": "Rugby"
+    },
+    {
+     "parola": "Basket",
+     "affine": "Pallavolo"
+    },
+    {
+     "parola": "Tennis",
+     "affine": "Ping Pong"
+    },
+    {
+     "parola": "Nuoto",
+     "affine": "Tuffi"
+    },
+    {
+     "parola": "Atletica",
+     "affine": "Maratona"
+    },
+    {
+     "parola": "Ciclismo",
+     "affine": "Motociclismo"
+    },
+    {
+     "parola": "Sci",
+     "affine": "Snowboard"
+    },
+    {
+     "parola": "Pattinaggio",
+     "affine": "Hockey"
+    },
+    {
+     "parola": "Pugilato",
+     "affine": "Judo"
+    },
+    {
+     "parola": "Scherma",
+     "affine": "Tiro con l'arco"
+    },
+    {
+     "parola": "Golf",
+     "affine": "Baseball"
+    },
+    {
+     "parola": "Equitazione",
+     "affine": "Polo"
+    },
+    {
+     "parola": "Surf",
+     "affine": "Vela"
+    },
+    {
+     "parola": "Canottaggio",
+     "affine": "Canoa"
+    },
+    {
+     "parola": "Ginnastica",
+     "affine": "Danza"
+    },
+    {
+     "parola": "Arrampicata",
+     "affine": "Alpinismo"
+    },
+    {
+     "parola": "Corsa",
+     "affine": "Camminata"
+    },
+    {
+     "parola": "Salto in alto",
+     "affine": "Salto con l'asta"
+    },
+    {
+     "parola": "Lancio del peso",
+     "affine": "Lancio del disco"
+    },
+    {
+     "parola": "Bocce",
+     "affine": "Biliardo"
+    },
+    {
+     "parola": "Freccette",
+     "affine": "Bowling"
+    },
+    {
+     "parola": "Skateboard",
+     "affine": "Monopattino"
+    },
+    {
+     "parola": "Yoga",
+     "affine": "Pilates"
+    },
+    {
+     "parola": "Karate",
+     "affine": "Taekwondo"
+    },
+    {
+     "parola": "Handball",
+     "affine": "Pallanuoto"
+    },
+    {
+     "parola": "Rafting",
+     "affine": "Immersioni"
+    },
+    {
+     "parola": "Formula Uno",
+     "affine": "Rally"
+    },
+    {
+     "parola": "Triathlon",
+     "affine": "Pentathlon"
+    }
+   ]
+  },
+  {
+   "id": "mezzi-di-trasporto",
+   "nome": "Mezzi di trasporto",
+   "parole": [
+    {
+     "parola": "Automobile",
+     "affine": "Furgone"
+    },
+    {
+     "parola": "Autobus",
+     "affine": "Tram"
+    },
+    {
+     "parola": "Treno",
+     "affine": "Metropolitana"
+    },
+    {
+     "parola": "Aereo",
+     "affine": "Elicottero"
+    },
+    {
+     "parola": "Nave",
+     "affine": "Traghetto"
+    },
+    {
+     "parola": "Barca",
+     "affine": "Gommone"
+    },
+    {
+     "parola": "Bicicletta",
+     "affine": "Monopattino Elettrico"
+    },
+    {
+     "parola": "Motocicletta",
+     "affine": "Scooter"
+    },
+    {
+     "parola": "Camion",
+     "affine": "Trattore"
+    },
+    {
+     "parola": "Taxi",
+     "affine": "Limousine"
+    },
+    {
+     "parola": "Ambulanza",
+     "affine": "Camionetta"
+    },
+    {
+     "parola": "Funivia",
+     "affine": "Seggiovia"
+    },
+    {
+     "parola": "Razzo",
+     "affine": "Navetta"
+    },
+    {
+     "parola": "Sottomarino",
+     "affine": "Battello"
+    },
+    {
+     "parola": "Veliero",
+     "affine": "Gondola"
+    },
+    {
+     "parola": "Mongolfiera",
+     "affine": "Deltaplano"
+    },
+    {
+     "parola": "Carrozza",
+     "affine": "Carretto"
+    },
+    {
+     "parola": "Slitta",
+     "affine": "Bob"
+    },
+    {
+     "parola": "Pattini",
+     "affine": "Rollerblade"
+    },
+    {
+     "parola": "Passeggino",
+     "affine": "Triciclo"
+    },
+    {
+     "parola": "Ruspa",
+     "affine": "Gru"
+    },
+    {
+     "parola": "Escavatore",
+     "affine": "Betoniera"
+    },
+    {
+     "parola": "Quad",
+     "affine": "Go-kart"
+    },
+    {
+     "parola": "Canoa",
+     "affine": "Pedalò"
+    },
+    {
+     "parola": "Dirigibile",
+     "affine": "Aliante"
+    },
+    {
+     "parola": "Ascensore",
+     "affine": "Scala Mobile"
+    },
+    {
+     "parola": "Cabinovia",
+     "affine": "Skilift"
+    },
+    {
+     "parola": "Autocaravan",
+     "affine": "Roulotte"
+    }
+   ]
+  },
+  {
+   "id": "natura",
+   "nome": "Natura",
+   "parole": [
+    {
+     "parola": "Mare",
+     "affine": "Lago"
+    },
+    {
+     "parola": "Fiume",
+     "affine": "Ruscello"
+    },
+    {
+     "parola": "Vulcano",
+     "affine": "Geyser"
+    },
+    {
+     "parola": "Foresta",
+     "affine": "Bosco"
+    },
+    {
+     "parola": "Prato",
+     "affine": "Pascolo"
+    },
+    {
+     "parola": "Dune",
+     "affine": "Oasi"
+    },
+    {
+     "parola": "Cascata",
+     "affine": "Sorgente"
+    },
+    {
+     "parola": "Scoglio",
+     "affine": "Atollo"
+    },
+    {
+     "parola": "Grotta",
+     "affine": "Canyon"
+    },
+    {
+     "parola": "Nuvola",
+     "affine": "Nebbia"
+    },
+    {
+     "parola": "Pioggia",
+     "affine": "Grandine"
+    },
+    {
+     "parola": "Neve",
+     "affine": "Ghiaccio"
+    },
+    {
+     "parola": "Vento",
+     "affine": "Tempesta"
+    },
+    {
+     "parola": "Fulmine",
+     "affine": "Tuono"
+    },
+    {
+     "parola": "Arcobaleno",
+     "affine": "Aurora"
+    },
+    {
+     "parola": "Sole",
+     "affine": "Luna"
+    },
+    {
+     "parola": "Stella",
+     "affine": "Cometa"
+    },
+    {
+     "parola": "Pianeta",
+     "affine": "Asteroide"
+    },
+    {
+     "parola": "Terremoto",
+     "affine": "Valanga"
+    },
+    {
+     "parola": "Alluvione",
+     "affine": "Siccità"
+    },
+    {
+     "parola": "Albero",
+     "affine": "Cespuglio"
+    },
+    {
+     "parola": "Fiore",
+     "affine": "Erba"
+    },
+    {
+     "parola": "Rosa",
+     "affine": "Margherita"
+    },
+    {
+     "parola": "Girasole",
+     "affine": "Tulipano"
+    },
+    {
+     "parola": "Quercia",
+     "affine": "Pino"
+    },
+    {
+     "parola": "Foglia",
+     "affine": "Ramo"
+    },
+    {
+     "parola": "Sasso",
+     "affine": "Roccia"
+    },
+    {
+     "parola": "Sabbia",
+     "affine": "Ghiaia"
+    }
+   ]
+  },
+  {
+   "id": "abbigliamento",
+   "nome": "Abbigliamento",
+   "parole": [
+    {
+     "parola": "Maglietta",
+     "affine": "Camicia"
+    },
+    {
+     "parola": "Pantaloni",
+     "affine": "Jeans"
+    },
+    {
+     "parola": "Gonna",
+     "affine": "Vestito"
+    },
+    {
+     "parola": "Giacca",
+     "affine": "Cappotto"
+    },
+    {
+     "parola": "Maglione",
+     "affine": "Cardigan"
+    },
+    {
+     "parola": "Felpa",
+     "affine": "Gilet"
+    },
+    {
+     "parola": "Calzini",
+     "affine": "Calze"
+    },
+    {
+     "parola": "Scarpe",
+     "affine": "Stivali"
+    },
+    {
+     "parola": "Sandali",
+     "affine": "Ciabatte"
+    },
+    {
+     "parola": "Sneakers",
+     "affine": "Mocassini"
+    },
+    {
+     "parola": "Cappello",
+     "affine": "Berretto"
+    },
+    {
+     "parola": "Sciarpa",
+     "affine": "Foulard"
+    },
+    {
+     "parola": "Guanti",
+     "affine": "Muffole"
+    },
+    {
+     "parola": "Cravatta",
+     "affine": "Papillon"
+    },
+    {
+     "parola": "Cintura",
+     "affine": "Bretelle"
+    },
+    {
+     "parola": "Pigiama",
+     "affine": "Camicia da Notte"
+    },
+    {
+     "parola": "Costume",
+     "affine": "Bikini"
+    },
+    {
+     "parola": "Tuta",
+     "affine": "Salopette"
+    },
+    {
+     "parola": "Impermeabile",
+     "affine": "K-way"
+    },
+    {
+     "parola": "Occhiali",
+     "affine": "Lenti a Contatto"
+    },
+    {
+     "parola": "Orologio da Polso",
+     "affine": "Braccialetto"
+    },
+    {
+     "parola": "Collana",
+     "affine": "Ciondolo"
+    },
+    {
+     "parola": "Anello",
+     "affine": "Orecchino"
+    },
+    {
+     "parola": "Zaino",
+     "affine": "Borsa"
+    },
+    {
+     "parola": "Portafoglio",
+     "affine": "Borsellino"
+    },
+    {
+     "parola": "Grembiule",
+     "affine": "Divisa"
+    },
+    {
+     "parola": "Mutande",
+     "affine": "Canottiera"
+    },
+    {
+     "parola": "Smoking",
+     "affine": "Frac"
+    }
+   ]
+  },
+  {
+   "id": "strumenti-musicali",
+   "nome": "Strumenti musicali",
+   "parole": [
+    {
+     "parola": "Chitarra",
+     "affine": "Mandolino"
+    },
+    {
+     "parola": "Pianoforte",
+     "affine": "Organo"
+    },
+    {
+     "parola": "Violino",
+     "affine": "Violoncello"
+    },
+    {
+     "parola": "Flauto",
+     "affine": "Clarinetto"
+    },
+    {
+     "parola": "Tromba",
+     "affine": "Trombone"
+    },
+    {
+     "parola": "Batteria",
+     "affine": "Tamburo"
+    },
+    {
+     "parola": "Arpa",
+     "affine": "Lira"
+    },
+    {
+     "parola": "Sassofono",
+     "affine": "Oboe"
+    },
+    {
+     "parola": "Fisarmonica",
+     "affine": "Armonica"
+    },
+    {
+     "parola": "Basso",
+     "affine": "Contrabbasso"
+    },
+    {
+     "parola": "Tastiera",
+     "affine": "Sintetizzatore"
+    },
+    {
+     "parola": "Ukulele",
+     "affine": "Banjo"
+    },
+    {
+     "parola": "Xilofono",
+     "affine": "Glockenspiel"
+    },
+    {
+     "parola": "Tamburello",
+     "affine": "Maracas"
+    },
+    {
+     "parola": "Triangolo",
+     "affine": "Piatti"
+    },
+    {
+     "parola": "Campane",
+     "affine": "Campanelli"
+    },
+    {
+     "parola": "Cornamusa",
+     "affine": "Zampogna"
+    },
+    {
+     "parola": "Flauto Dolce",
+     "affine": "Ocarina"
+    },
+    {
+     "parola": "Fagotto",
+     "affine": "Corno"
+    },
+    {
+     "parola": "Tuba",
+     "affine": "Eufonio"
+    },
+    {
+     "parola": "Timpani",
+     "affine": "Bongo"
+    },
+    {
+     "parola": "Castagnette",
+     "affine": "Nacchere"
+    },
+    {
+     "parola": "Rullante",
+     "affine": "Grancassa"
+    },
+    {
+     "parola": "Pianola",
+     "affine": "Clavicembalo"
+    },
+    {
+     "parola": "Kazoo",
+     "affine": "Fischietto"
+    },
+    {
+     "parola": "Gong",
+     "affine": "Cimbali"
+    },
+    {
+     "parola": "Diapason",
+     "affine": "Metronomo"
+    },
+    {
+     "parola": "Microfono",
+     "affine": "Altoparlante"
+    }
+   ]
+  },
+  {
+   "id": "feste-e-eventi",
+   "nome": "Feste e eventi",
+   "parole": [
+    {
+     "parola": "Natale",
+     "affine": "Capodanno"
+    },
+    {
+     "parola": "Pasqua",
+     "affine": "Ferragosto"
+    },
+    {
+     "parola": "Carnevale",
+     "affine": "Halloween"
+    },
+    {
+     "parola": "Compleanno",
+     "affine": "Anniversario"
+    },
+    {
+     "parola": "Matrimonio",
+     "affine": "Battesimo"
+    },
+    {
+     "parola": "Funerale",
+     "affine": "Commemorazione"
+    },
+    {
+     "parola": "Laurea",
+     "affine": "Diploma"
+    },
+    {
+     "parola": "Concerto",
+     "affine": "Festival"
+    },
+    {
+     "parola": "Sagra",
+     "affine": "Fiera"
+    },
+    {
+     "parola": "Processione",
+     "affine": "Parata"
+    },
+    {
+     "parola": "Fuochi d'Artificio",
+     "affine": "Falò"
+    },
+    {
+     "parola": "Epifania",
+     "affine": "Befana"
+    },
+    {
+     "parola": "Vacanza",
+     "affine": "Gita"
+    },
+    {
+     "parola": "Picnic",
+     "affine": "Grigliata"
+    },
+    {
+     "parola": "Cena",
+     "affine": "Pranzo"
+    },
+    {
+     "parola": "Aperitivo",
+     "affine": "Brindisi"
+    },
+    {
+     "parola": "Torneo",
+     "affine": "Gara"
+    },
+    {
+     "parola": "Elezioni",
+     "affine": "Referendum"
+    },
+    {
+     "parola": "Sciopero",
+     "affine": "Manifestazione"
+    },
+    {
+     "parola": "Mostra",
+     "affine": "Esposizione"
+    },
+    {
+     "parola": "Spettacolo",
+     "affine": "Recital"
+    },
+    {
+     "parola": "Cerimonia",
+     "affine": "Inaugurazione"
+    },
+    {
+     "parola": "Riunione",
+     "affine": "Assemblea"
+    },
+    {
+     "parola": "Vendemmia",
+     "affine": "Raccolta"
+    },
+    {
+     "parola": "Palio",
+     "affine": "Giostra"
+    },
+    {
+     "parola": "Serata",
+     "affine": "Veglione"
+    },
+    {
+     "parola": "Festa a Sorpresa",
+     "affine": "Pigiama Party"
+    },
+    {
+     "parola": "Ballo",
+     "affine": "Discoteca"
+    }
+   ]
+  },
+  {
+   "id": "corpo-umano",
+   "nome": "Corpo umano",
+   "parole": [
+    {
+     "parola": "Testa",
+     "affine": "Collo"
+    },
+    {
+     "parola": "Capelli",
+     "affine": "Barba"
+    },
+    {
+     "parola": "Occhio",
+     "affine": "Sopracciglio"
+    },
+    {
+     "parola": "Naso",
+     "affine": "Bocca"
+    },
+    {
+     "parola": "Orecchio",
+     "affine": "Guancia"
+    },
+    {
+     "parola": "Dente",
+     "affine": "Lingua"
+    },
+    {
+     "parola": "Labbro",
+     "affine": "Mento"
+    },
+    {
+     "parola": "Spalla",
+     "affine": "Gomito"
+    },
+    {
+     "parola": "Braccio",
+     "affine": "Polso"
+    },
+    {
+     "parola": "Mano",
+     "affine": "Piede"
+    },
+    {
+     "parola": "Dito",
+     "affine": "Unghia"
+    },
+    {
+     "parola": "Pollice",
+     "affine": "Mignolo"
+    },
+    {
+     "parola": "Schiena",
+     "affine": "Petto"
+    },
+    {
+     "parola": "Pancia",
+     "affine": "Fianco"
+    },
+    {
+     "parola": "Gamba",
+     "affine": "Coscia"
+    },
+    {
+     "parola": "Ginocchio",
+     "affine": "Caviglia"
+    },
+    {
+     "parola": "Tallone",
+     "affine": "Alluce"
+    },
+    {
+     "parola": "Cuore",
+     "affine": "Polmone"
+    },
+    {
+     "parola": "Cervello",
+     "affine": "Stomaco"
+    },
+    {
+     "parola": "Fegato",
+     "affine": "Rene"
+    },
+    {
+     "parola": "Osso",
+     "affine": "Muscolo"
+    },
+    {
+     "parola": "Pelle",
+     "affine": "Cicatrice"
+    },
+    {
+     "parola": "Sangue",
+     "affine": "Sudore"
+    },
+    {
+     "parola": "Costola",
+     "affine": "Vertebra"
+    },
+    {
+     "parola": "Fronte",
+     "affine": "Tempia"
+    },
+    {
+     "parola": "Nuca",
+     "affine": "Gola"
+    },
+    {
+     "parola": "Ombelico",
+     "affine": "Ascella"
+    },
+    {
+     "parola": "Cranio",
+     "affine": "Mandibola"
+    }
+   ]
+  }
+ ]
+}

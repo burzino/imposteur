@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Impostore</string>
+
+    <!-- Comuni -->
+    <string name="si">Sì</string>
+    <string name="no">No</string>
+    <string name="interrompere_partita">Interrompere la partita?</string>
+    <string name="indietro">Indietro</string>
+    <string name="annulla">Annulla</string>
+
+    <!-- Home -->
+    <string name="home_titolo">Impostore</string>
+    <string name="nuova_partita">Nuova partita</string>
+    <string name="riprendi_partita">Riprendi partita</string>
+    <string name="partita_in_corso_conferma">Esiste una partita in corso. Iniziarne una nuova?</string>
+    <string name="come_si_gioca">Come si gioca</string>
+    <string name="errore_caricamento_parole">Impossibile caricare le parole</string>
+
+    <!-- Regole -->
+    <string name="regole_modalita_senza_parola_titolo">Impostore senza parola</string>
+    <string name="regole_modalita_senza_parola">Ogni giocatore, a turno, scopre in segreto il proprio ruolo. I civili vedono la parola segreta; l\'impostore non la vede e, se l\'opzione è attiva, vede soltanto la categoria. Poi si discute a voce: ognuno dà indizi sulla parola senza dirla, l\'impostore cerca di non farsi scoprire.</string>
+    <string name="regole_modalita_affine_titolo">Parola affine</string>
+    <string name="regole_modalita_affine">Tutti i giocatori vedono una parola. I civili hanno la parola segreta, gli impostori una parola affine, simile ma diversa. Nessuno sa se ha la parola vera o quella affine: discutendo a voce bisogna capire chi ha una parola diversa.</string>
+    <string name="regole_fine_titolo">Come finisce</string>
+    <string name="regole_fine">Dopo la discussione si vota. Quando avete deciso, premete Rivela per scoprire chi era l\'impostore e quale era la parola. I civili sono sempre più numerosi degli impostori.</string>
+
+    <!-- Configurazione -->
+    <string name="config_titolo">Configurazione</string>
+    <string name="config_numero_giocatori">Numero giocatori</string>
+    <string name="config_nomi">Nomi</string>
+    <string name="config_giocatore_n">Giocatore %1$d</string>
+    <string name="config_numero_impostori">Numero impostori</string>
+    <string name="config_modalita">Modalità</string>
+    <string name="modalita_senza_parola">Impostore senza parola</string>
+    <string name="modalita_affine">Parola affine</string>
+    <string name="config_mostra_categoria">Mostra categoria all\'impostore</string>
+    <string name="config_categorie">Categorie</string>
+    <string name="config_seleziona_tutte">Seleziona tutte</string>
+    <string name="config_deseleziona_tutte">Deseleziona tutte</string>
+    <string name="config_nome_duplicato">Nome già usato</string>
+    <string name="config_nessuna_categoria">Seleziona almeno una categoria</string>
+    <string name="config_pool_vuoto">Nessuna parola disponibile con queste impostazioni</string>
+    <string name="config_inizia">Inizia</string>
+    <string name="config_diminuisci">Diminuisci</string>
+    <string name="config_aumenta">Aumenta</string>
+
+    <!-- Distribuzione -->
+    <string name="distribuzione_indicatore">Giocatore %1$d di %2$d</string>
+    <string name="distribuzione_passa">Passa il telefono a %1$s</string>
+    <string name="distribuzione_sono">Sono %1$s</string>
+    <string name="distribuzione_nascondi">Nascondi e passa</string>
+    <string name="ruolo_la_parola_e">La parola è:</string>
+    <string name="ruolo_la_tua_parola_e">La tua parola è:</string>
+    <string name="ruolo_sei_impostore">Sei l\'impostore</string>
+    <string name="ruolo_categoria">Categoria: %1$s</string>
+
+    <!-- Gioco -->
+    <string name="gioco_titolo">Si gioca!</string>
+    <string name="gioco_inizia">Inizia %1$s</string>
+    <string name="gioco_istruzioni">Discutete a voce, poi votate. Quando avete deciso, premete Rivela.</string>
+    <string name="gioco_rivela">Rivela</string>
+    <string name="gioco_conferma_rivela">Rivelare i ruoli?</string>
+
+    <!-- Rivela -->
+    <string name="rivela_titolo">Svelamento</string>
+    <string name="rivela_impostore">L\'impostore era: %1$s</string>
+    <string name="rivela_impostori">Gli impostori erano: %1$s</string>
+    <string name="rivela_parola">La parola era: %1$s</string>
+    <string name="rivela_affine">La parola affine era: %1$s</string>
+    <string name="rivela_categoria">Categoria: %1$s</string>
+    <string name="rivela_cambia_impostazioni">Cambia impostazioni</string>
+</resources>
