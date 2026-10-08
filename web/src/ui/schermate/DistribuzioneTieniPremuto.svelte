@@ -2,11 +2,11 @@
   import { onDestroy } from "svelte";
   import { t } from "../testi";
 
-  // Pulsante a pressione lunga (600 ms) con Pointer Events: rilascio, uscita e cancel annullano.
+  // Pulsante a pressione lunga (300 ms) con Pointer Events: rilascio, uscita e cancel annullano.
   // Tastiera e tecnologie assistive: click con detail 0 = rivelazione immediata.
   let { abilitato, onRivela }: { abilitato: boolean; onRivela: () => void } = $props();
 
-  const DURATA_PRESSIONE_MS = 600;
+  const DURATA_PRESSIONE_MS = 300;
   let premuto = $state(false);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let fatto = false;
@@ -99,7 +99,7 @@
   }
   .riempimento.premuto {
     transform: scaleX(1);
-    transition: transform 600ms linear;
+    transition: transform 300ms linear;
   }
   .etichetta {
     position: relative;

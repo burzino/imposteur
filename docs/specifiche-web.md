@@ -76,7 +76,7 @@ Vitest = test automatici sulla logica; Browser = collaudo manuale/automatizzato 
 - **CA-W06** (Browser) Con `visibilitychange` (pagina nascosta) mentre il ruolo è visibile, al ritorno compare "Passa il telefono a <nome>" dello stesso giocatore, senza ruolo (CA-29 sostituito). Lo stesso in Rivedi: si torna al Gioco (CA-57).
 - **CA-W07** (Browser) Ricaricando la pagina con il ruolo visibile, "Riprendi partita" o la ripresa automatica mostra Passaggio k, non Rivelazione k (CA-46).
 - **CA-W08** (Browser) Il tasto indietro del browser in Distribuzione e Gioco mostra "Interrompere la partita?" e non porta mai a un ruolo precedente (CA-35); "Continua a giocare" resta, "Interrompi" cancella la partita e va alla Configurazione.
-- **CA-W09** (Browser) La pressione lunga (600 ms) su "Tieni premuto per scoprire" rivela il ruolo con mouse e tocco; rilascio anticipato, tocco breve o `pointercancel` non rivelano e azzerano la barra (CA-27, CA-67).
+- **CA-W09** (Browser) La pressione lunga (300 ms) su "Tieni premuto per scoprire" rivela il ruolo con mouse e tocco; rilascio anticipato, tocco breve o `pointercancel` non rivelano e azzerano la barra (CA-27, CA-67).
 - **CA-W10** (Browser) Senza `navigator.vibrate` nessun errore in console e nessun messaggio; con `navigator.vibrate` la chiamata è identica per tutti i ruoli e le modalità (CA-65).
 - **CA-W11** (Browser) Dopo il primo caricamento, in modalità aereo l'app si apre, si gioca una partita completa e le parole sono disponibili.
 - **CA-W12** (Browser) Il manifest è valido (Lighthouse "installabile"), con icone 192/512/maskable; l'app installata si apre in `standalone` al base path corretto.

@@ -412,7 +412,7 @@ private fun PulsanteTieniPremuto(indice: Int, abilitato: Boolean, onRivela: () -
 
 /** Ritardo anti doppio tocco prima di abilitare i pulsanti "Tieni premuto" e "Nascondi e passa". */
 private const val RITARDO_NASCONDI_MS = 600L
-private const val DURATA_PRESSIONE_MS = 600
+private const val DURATA_PRESSIONE_MS = 300
 private const val DURATA_PRONTI_MS = 1200L
 
 @Composable
