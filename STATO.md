@@ -49,16 +49,20 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Collaudo su OnePlus 9 superato. Corretti il doppio tocco (ritardo di 600 ms) e il dialogo di segnalazione sopra la tastiera. Script di collaudo: `tools/collaudo/ui.py`.
 - Restyling della distribuzione (commit 9c15180): "Tieni premuto per scoprire" (pressione lunga), carta che si gira, fila di avatar, overlay "Tutti pronti!". 150/150 test. In attesa del parere dell'utente.
 
-## Prossima ondata: PWA (da avviare in una sessione nuova)
-1. analista-funzionale: aggiunge `docs/specifiche-web.md` con le differenze dalla versione Android (salvataggio, visibilitychange, esportazione delle segnalazioni, installazione, iOS). sviluppatore: aggiunge al contratto la parte TS di `game/` e `data/`.
-2. In parallelo: lo sviluppatore crea lo scheletro di `web/` (Vite + Svelte + TS + PWA) e porta `game/` e `data/` in TS puro; il tester porta i test JVM in Vitest.
-3. sviluppatore: le schermate Svelte (home, regole, configurazione con le opzioni avanzate, distribuzione con il restyling, gioco, rivedi, rivela con la segnalazione, impostazioni con i temi).
-4. esecutore-build: `npm ci && npm test && npm run build`. Poi il collaudo nel browser lo fa un agente, non la sessione principale.
-5. Workflow per GitHub Pages: prima l'utente esegue `gh auth refresh -s workflow`. Poi il dominio su Aruba.
-Node.js 24 e npm 11 sono installati sul PC.
+## PWA: stato (2026-10-08 sera)
+- Fatte le ondate 1-3: specifiche web, contratto TS v2.0 e UI v2.1, porting di game/data, 8 schermate Svelte, 277 test Vitest verdi, build verde, vitest 5 (0 vulnerabilità), icone ricavate da quella Android.
+- Pubblicata su https://burzino.github.io/imposteur/ dal workflow `.github/workflows/pages.yml` (Pages con sorgente GitHub Actions, scope `workflow` concesso).
+- Collaudo in Chrome headless (puppeteer-core, script e rapporto nello scratchpad della sessione): 8 flussi OK, console pulita, 360 px senza tagli.
+- Agenti in parallelo: lo sviluppatore A aveva sovrascritto i test del tester; ora sviluppatore.md vieta di toccare i test.
+
+## Prossimi passi PWA
+1. Collaudo sul telefono vero (Android Chrome e iPhone Safari): installazione, vibrazione, wake lock, pressione lunga in Rivedi entro 400 ms dal tocco sul nome (in headless non rivela: probabile ritardo anti doppio tocco di 600 ms, voluto).
+2. Non verificati: persistenza del tema dopo il reload (CA-W14), contenuto del file di segnalazioni esportato, localStorage bloccato, rotazione.
+3. Dominio imposteur.burzi.eu: CNAME su Aruba verso `burzino.github.io.`, poi BASE_PATH=/ nel workflow e dominio personalizzato in Pages.
+4. Rivedi: il codice Android mostra "Giocatore k di N", il CA-54 aggiornato dice di no (la PWA segue il CA-54). Decidere quale vale.
+5. Le action di Pages girano ancora su Node 20 (avviso di deprecazione): aggiornarle quando escono versioni nuove.
 
 ## Punti aperti
-- Push dei commit da c498f04 in poi.
 - L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.
 - Specifiche da aggiornare per il restyling (pressione lunga, overlay).
 - Collaudo sul telefono fisico da fare con l utente (ondata 6).
