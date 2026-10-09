@@ -68,6 +68,7 @@ import it.imposteur.ui.componenti.CartaGirevole
 import it.imposteur.ui.componenti.DialogoConferma
 import it.imposteur.ui.componenti.FilaAvatar
 import it.imposteur.ui.componenti.PulsantePieno
+import it.imposteur.game.DurataPressione
 import it.imposteur.ui.componenti.PulsantePressioneLunga
 import it.imposteur.ui.componenti.ScaffoldConBarra
 import it.imposteur.ui.theme.DURATA_PRONTI_MS
@@ -87,6 +88,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SchermataDistribuzione(
     stato: UiState,
+    durataPressioneMs: Int,
     onSono: (StatoDistribuzione) -> Unit,
     onNascondiEPassa: (StatoDistribuzione) -> Unit,
     onInterrompiRivelazione: () -> Unit,
@@ -140,7 +142,7 @@ fun SchermataDistribuzione(
     if (partita != null) {
         ScaffoldConBarra(titolo = stringResource(R.string.distribuzione_titolo), onHome = onHome) {
             when (fase) {
-                is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice) { onSono(fase) }
+                is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice, durataPressioneMs) { onSono(fase) }
                 is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice) { onNascondiEPassa(fase) }
                 StatoDistribuzione.Gioco -> Unit
             }
@@ -211,6 +213,7 @@ internal fun Contenitore(
 internal fun Passaggio(
     partita: Partita,
     indice: Int,
+    durataPressioneMs: Int,
     mostraAvanzamento: Boolean = true,
     onSono: () -> Unit,
 ) {
@@ -221,20 +224,22 @@ internal fun Passaggio(
         delay(RITARDO_NASCONDI_MS)
         abilitato = true
     }
+    val soloTocco = DurataPressione.soloTocco(durataPressioneMs)
     val ridotto = rilevaRiduciAnimazioni()
     Contenitore(
         azione = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 PulsantePressioneLunga(
-                    etichetta = stringResource(R.string.distribuzione_tieni_premuto),
+                    etichetta = stringResource(if (soloTocco) R.string.distribuzione_tocca else R.string.distribuzione_tieni_premuto),
                     descrizioneAzione = stringResource(R.string.distribuzione_scopri_cd),
                     chiave = indice,
                     abilitato = abilitato,
+                    durataMs = durataPressioneMs,
                     onCompletato = onSono,
                 )
                 Spacer(Modifier.height(Spazio.s2))
                 Text(
-                    stringResource(R.string.distribuzione_sono_premuto, nome),
+                    stringResource(if (soloTocco) R.string.distribuzione_sono_tocca else R.string.distribuzione_sono_premuto, nome),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

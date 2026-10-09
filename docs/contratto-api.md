@@ -257,6 +257,61 @@ Una segnalazione di tipo "coppia" senza motivi, nota o coppia proposta valida no
 
 v1.4: `FormatoSegnalazioni.leggi` deve leggere anche le righe salvate prima della v1.4 (campi di proposta assenti, quindi null). `FormatoSegnalazioni.normalizza(s)` applica trim e limiti a nota e proposte; `riga()` la usa. Aggiungi anche `fun propostaValida(s: Segnalazione): Boolean`.
 
+## Durata della pressione (v1.8 Kotlin, v2.3 TS)
+
+Decisione utente 2026-10-09: la durata della pressione lunga di "Tieni premuto per scoprire" (Distribuzione e Rivedi) si sceglie nelle Impostazioni. Specifiche 4.7, 4.3, 6; CA-106…CA-112, CA-W20, CA-W21.
+
+Logica pura (nessun import `android.*`), `it.imposteur.game`:
+
+```kotlin
+object DurataPressione {
+    const val MIN_MS = 0
+    const val MAX_MS = 1000
+    const val PASSO_MS = 50
+    const val PREDEFINITA_MS = 150
+    /** Riporta al valore valido più vicino: clamp a 0..1000, poi multiplo di 50 più vicino (metà strada per eccesso: 125 -> 150). Mai eccezioni. CA-106 */
+    fun normalizza(valore: Int): Int
+    /** Testo -> valore valido. null, vuoto, non numerico, NaN, infinito -> PREDEFINITA_MS; decimali ("149.6") e notazione esponenziale ("1e9") accettati e poi normalizzati; spazi ai lati ignorati. CA-106 */
+    fun daTesto(s: String?): Int
+    /** true se ms == 0: nessuna barra, rivelazione al rilascio, testi "Tocca per scoprire". CA-107 */
+    fun soloTocco(ms: Int): Boolean
+}
+```
+
+Aspetto Android (`it.imposteur.data`, `Aspetto.kt`, stesso DataStore di tema e configurazione, chiavi distinte):
+
+```kotlin
+data class Aspetto(
+    val tema: Tema = Tema.SISTEMA,
+    val coloriDinamici: Boolean = true,
+    val durataPressioneMs: Int = DurataPressione.PREDEFINITA_MS,   // sempre già normalizzata
+)
+class RepositoryAspetto(private val context: Context) {
+    // chiavi: "aspetto_tema" (string), "aspetto_colori_dinamici" (boolean), NUOVA "aspetto_durata_pressione_ms" (stringPreferencesKey, testo decimale)
+    val aspetto: Flow<Aspetto>              // la durata è letta con DurataPressione.daTesto(p[chiave]): assente/illeggibile -> 150; una chiave illeggibile non azzera tema né colori
+    suspend fun salva(a: Aspetto)           // scrive DurataPressione.normalizza(a.durataPressioneMs) come testo; subito a ogni cambio
+}
+// ImpostoreViewModel:
+fun impostaDurataPressione(ms: Int)        // = impostaAspetto(aspetto.value.copy(durataPressioneMs = DurataPressione.normalizza(ms)))
+```
+
+Il tema continua a leggersi e scriversi con le stesse chiavi di prima; i salvataggi precedenti (senza la nuova chiave) danno 150.
+
+TypeScript, `web/src/game/durataPressione.ts`:
+
+```ts
+export const DURATA_PRESSIONE: { readonly min: 0; readonly max: 1000; readonly passo: 50; readonly predefinita: 150 };
+/** Stesso esito di DurataPressione.normalizza. number finito: clamp + multiplo di 50 più vicino (metà strada per eccesso); NaN, ±Infinity, string, null, undefined, boolean, oggetti -> 150. */
+export function normalizzaDurataPressione(valore: unknown): number;
+/** Stesso esito di DurataPressione.daTesto: string|null -> Number(trim) finito -> normalizza; altrimenti 150. */
+export function durataPressioneDaTesto(s: string | null): number;
+export function soloTocco(ms: number): boolean;           // ms === 0
+```
+
+Casi limite comuni (JUnit e Vitest identici): 0→0; 1000→1000; 150→150; 125→150; 124→100; 25→50; 24→0; -30→0; 1049→1000; 5000→1000; decimale 149.6→150; "200"→200; " 200 "→200; ""/"abc"/"NaN"/"Infinity"/null→150; "1e9"→1000. Il risultato è sempre multiplo di 50 in 0..1000.
+
+UI: la durata si legge da `aspetto.durataPressioneMs` (Android: `viewModel.aspetto`; web: `stato.aspetto`); le schermate Distribuzione e Rivedi non leggono la chiave direttamente. Durata della barra = durata; con `soloTocco` la barra non viene disegnata. Il cursore delle Impostazioni chiama `impostaDurataPressione` / `impostaAspetto({ ...stato.aspetto, durataPressioneMs })`, che normalizza e salva.
+
 ## `it.imposteur.ui` (UI: la scrive solo l'agente dedicato)
 
 `ImpostoreViewModel` (AndroidViewModel) espone `StateFlow<UiState>` e possiede un unico `GestorePartite(Random.Default)`. Navigazione Compose con le rotte: home, regole, configurazione, distribuzione, gioco, rivela.
@@ -486,11 +541,13 @@ Sul web non c'è un file: `archivio.ts` conserva il testo JSONL e l'esportazione
 
 ```ts
 export type Tema = "SISTEMA" | "CHIARO" | "SCURO" | "ALTO_CONTRASTO";
-export interface Aspetto { readonly tema: Tema; readonly coloriDinamici: boolean }
-export const aspettoDefault: Aspetto;                                // { tema: "SISTEMA", coloriDinamici: true }
-export function aspettoAStringa(a: Aspetto): string;                 // {"tema":"...","coloriDinamici":bool}
-export function aspettoDaStringa(s: string | null): Aspetto;         // null/malformata/valori sconosciuti -> default per campo
+export interface Aspetto { readonly tema: Tema; readonly coloriDinamici: boolean; readonly durataPressioneMs: number }
+export const aspettoDefault: Aspetto;                                // { tema: "SISTEMA", coloriDinamici: true, durataPressioneMs: 150 }
+export function aspettoAStringa(a: Aspetto): string;                 // {"tema":"...","coloriDinamici":bool,"durataPressioneMs":n}; scrive il valore normalizzato
+export function aspettoDaStringa(s: string | null): Aspetto;         // null/malformata/valori sconosciuti -> default per campo; durataPressioneMs via normalizzaDurataPressione
 ```
+
+Durata della pressione, funzione pura in `web/src/game/durataPressione.ts` (porting di `DurataPressione.kt`, v2.3; vedi "Durata della pressione" sotto).
 
 Su web `coloriDinamici` è conservato ma la UI può ignorarlo (nessun Material You).
 
@@ -654,6 +711,7 @@ Hash `#/home` ecc.; vuoto o sconosciuto = `home`. Regole:
 - Chiave: nome Android in camelCase (`config_numero_giocatori` -> `configNumeroGiocatori`, `app_name` -> `appName`, `torna_home` -> `tornaHome`); i numeri restano attaccati (`opz_x2` -> `opzX2`).
 - Stringa senza parametri: proprietà `string`. Con segnaposto (`%1$d`, `%2$s`): funzione con parametri posizionali nello stesso ordine (`configGiocatoreN: (n: number) => string`).
 - `<plurals>`: funzione `(n: number) => string` (`opzAttive(n)`), con `Intl.PluralRules("it")`; `<string-array>`: `readonly string[]`.
+- Testi della durata della pressione (v2.3; anche in `strings.xml`): `distribuzioneTocca` ("Tocca per scoprire"), `distribuzioneSonoTocca(nome)` ("Sono <nome> — tocca"), `impostazioniPressioneTitolo` ("Pressione per scoprire"), `impostazioniPressioneEtichetta` ("Durata della pressione"), `impostazioniPressioneDescrizione` ("Quanto tempo tenere premuto per scoprire il ruolo. Con 0 basta un tocco."), `impostazioniPressioneValore(ms)` ("<ms> ms"), `impostazioniPressioneA11y(ms)` ("<ms> millisecondi"), `impostazioniPressioneA11yZero` ("0 millisecondi, basta un tocco").
 - Testi nuovi del web, aggiunti da A: `esportaSegnalazioni` ("Esporta segnalazioni"), `condividiSegnalazioni` ("Condividi"), `segnalazioniSalvateN(n)` ("1 segnalazione salvata" / "n segnalazioni salvate"), `installaIos` ("Per installare l'app su iPhone: tocca Condividi, poi Aggiungi a Home.").
 - `testi.test.ts` (A) legge `app/src/main/res/values/strings.xml` e verifica che ogni `<string>`, `<plurals>` e `<string-array>` abbia la chiave corrispondente.
 - Un testo mancante si chiede ad A; nessuna stringa italiana letterale nelle schermate.
@@ -668,6 +726,7 @@ Props con `$props()`, eventi come props-funzione `onXxx`, contenuto come `Snippe
 - `CampoTesto.svelte`: `{ valore: string; onCambia: (v: string) => void; etichetta: string; segnaposto?: string; maxLunghezza?: number; errore?: string; multilinea?: boolean; righe?: number }`. Valore controllato, font >= 16 px (niente zoom su iOS).
 - `Interruttore.svelte`: `{ valore: boolean; onCambia: (v: boolean) => void; etichetta: string; descrizione?: string; disabilitato?: boolean }`.
 - `Selettore.svelte` (segmenti/radio): `{ opzioni: { valore: string; etichetta: string }[]; valore: string; onCambia: (v: string) => void; etichetta?: string }`.
+- `Cursore.svelte` (nuovo, v2.3): `{ valore: number; min: number; max: number; passo: number; onCambia: (v: number) => void; etichetta: string; testoValore: string; testoAccessibile: string; descrizione?: string }`. Un `<input type="range">` nativo (frecce, Home, End; `aria-valuetext={testoAccessibile}`), etichetta associata, `onCambia` a ogni `input`.
 - `Contatore.svelte` (-/+): `{ valore: number; min: number; max: number; onCambia: (n: number) => void; etichetta: string }`.
 - `Fisarmonica.svelte`: `{ titolo: string; aperta: boolean; onCambia: (a: boolean) => void; children: Snippet }`.
 - `TestoAdattivo.svelte`: `{ testo: string; classe?: string; maxRighe?: number /* 2 */ }`: riduce del 10% a passo fino al 40% finché sta in larghezza e righe e non spezza parole.

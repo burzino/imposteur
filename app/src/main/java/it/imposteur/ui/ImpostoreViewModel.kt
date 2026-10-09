@@ -93,6 +93,10 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { repoAspetto.salva(a) }
     }
 
+    fun impostaDurataPressione(ms: Int) {
+        impostaAspetto(aspetto.value.copy(durataPressioneMs = it.imposteur.game.DurataPressione.normalizza(ms)))
+    }
+
     private val _segnalazioniSalvate = MutableStateFlow(0)
     val segnalazioniSalvate: StateFlow<Int> = _segnalazioniSalvate.asStateFlow()
 

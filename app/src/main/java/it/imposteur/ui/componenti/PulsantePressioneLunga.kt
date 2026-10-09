@@ -30,19 +30,20 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.launch
-import it.imposteur.ui.theme.DURATA_BARRA_MS
+import it.imposteur.game.DurataPressione
 import it.imposteur.ui.theme.DURATA_RILASCIO_BARRA_MS
 import it.imposteur.ui.theme.Forme
 import it.imposteur.ui.theme.Spazio
 import it.imposteur.ui.theme.bordoLivello
 
 /**
- * Pulsante a pressione lunga: la barra [primary] avanza da sinistra a destra in [DURATA_BARRA_MS]
+ * Pulsante a pressione lunga: la barra [primary] avanza da sinistra a destra in [durataMs]
  * mentre lo si tiene premuto, poi chiama [onCompletato]. Rilasciato prima, la barra torna a zero
  * in [DURATA_RILASCIO_BARRA_MS] senza effetti. Il testo ha due livelli identici: quello sotto in
  * onPrimaryContainer, quello sopra in onPrimary ritagliato dalla larghezza della barra.
  * [descrizioneAzione] e' l'azione di accessibilita' (tocco singolo) che equivale alla pressione lunga.
- * [chiave] azzera la barra quando cambia (es. il giocatore).
+ * Con [durataMs] == 0 niente barra: si rivela al rilascio dentro il pulsante (un gesto annullato o
+ * uscito dal pulsante non rivela). [chiave] azzera la barra quando cambia (es. il giocatore).
  */
 @Composable
 fun PulsantePressioneLunga(
@@ -50,10 +51,11 @@ fun PulsantePressioneLunga(
     descrizioneAzione: String,
     chiave: Any,
     abilitato: Boolean,
+    durataMs: Int,
     onCompletato: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val progresso = remember(chiave) { Animatable(0f) }
+    val progresso = remember(chiave, durataMs) { Animatable(0f) }
     val scope = rememberCoroutineScope()
     val completato by rememberUpdatedState(onCompletato)
     val abilitatoAttuale by rememberUpdatedState(abilitato)
@@ -78,12 +80,16 @@ fun PulsantePressioneLunga(
                     }
                 }
             }
-            .pointerInput(chiave) {
+            .pointerInput(chiave, durataMs) {
                 detectTapGestures(
                     onPress = {
                         if (!abilitatoAttuale) return@detectTapGestures
+                        if (DurataPressione.soloTocco(durataMs)) {
+                            if (tryAwaitRelease()) completato()
+                            return@detectTapGestures
+                        }
                         val lavoro = scope.launch {
-                            progresso.animateTo(1f, tween(DURATA_BARRA_MS, easing = LinearEasing))
+                            progresso.animateTo(1f, tween(durataMs, easing = LinearEasing))
                             completato()
                         }
                         tryAwaitRelease()
@@ -97,7 +103,7 @@ fun PulsantePressioneLunga(
         contentAlignment = Alignment.Center,
     ) {
         Text(etichetta, style = stile, color = colori.onPrimaryContainer)
-        Box(
+        if (!DurataPressione.soloTocco(durataMs)) Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clearAndSetSemantics { }

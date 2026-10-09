@@ -42,6 +42,7 @@ import it.imposteur.ui.theme.bordoLivello
 fun SchermataRivedi(
     partita: Partita?,
     revisione: Revisione?,
+    durataPressioneMs: Int,
     onScegli: (Int) -> Unit,
     onSono: () -> Unit,
     onInterrompi: () -> Unit,
@@ -81,7 +82,7 @@ fun SchermataRivedi(
             if (revisione.rivelato) {
                 Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi, mostraFila = false) { onChiudi() }
             } else {
-                Passaggio(partita, revisione.indice, mostraAvanzamento = false) { onSono() }
+                Passaggio(partita, revisione.indice, durataPressioneMs, mostraAvanzamento = false) { onSono() }
             }
         }
         return

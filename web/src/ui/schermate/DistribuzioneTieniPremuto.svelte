@@ -1,17 +1,24 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { t } from "../testi";
+  import { getStato } from "../stato.svelte";
+  import { soloTocco } from "../../game/durataPressione";
 
-  // Pulsante a pressione lunga (300 ms) con Pointer Events: rilascio, uscita e cancel annullano.
+  // Pulsante a pressione lunga (durata dall'aspetto; 0 = rivelazione al rilascio) con Pointer Events: rilascio, uscita e cancel annullano.
   // Tastiera e tecnologie assistive: click con detail 0 = rivelazione immediata.
   let { abilitato, onRivela }: { abilitato: boolean; onRivela: () => void } = $props();
 
-  const DURATA_PRESSIONE_MS = 300;
+  const stato = getStato();
+  const durata = $derived(stato.aspetto.durataPressioneMs);
+  const tocco = $derived(soloTocco(durata));
   let premuto = $state(false);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let fatto = false;
 
+  let inizioTocco = false;
+
   function annulla() {
+    inizioTocco = false;
     if (timer !== null) {
       clearTimeout(timer);
       timer = null;
@@ -28,12 +35,26 @@
     } catch {
       /* ignorato */
     }
+    if (tocco) {
+      inizioTocco = true;
+      return;
+    }
     premuto = true;
     timer = setTimeout(() => {
       timer = null;
       fatto = true;
       onRivela();
-    }, DURATA_PRESSIONE_MS);
+    }, durata);
+  }
+
+  function su() {
+    if (tocco && inizioTocco && abilitato && !fatto) {
+      inizioTocco = false;
+      fatto = true;
+      onRivela();
+      return;
+    }
+    annulla();
   }
 
   function clic(e: MouseEvent) {
@@ -51,9 +72,10 @@
   class="tieni"
   class:spento={!abilitato}
   aria-disabled={!abilitato}
+  style:--durata-barra="{durata}ms"
   aria-label={t.distribuzioneScopriCd}
   onpointerdown={giu}
-  onpointerup={annulla}
+  onpointerup={su}
   onpointercancel={annulla}
   onpointerleave={annulla}
   oncontextmenu={(e) => e.preventDefault()}
@@ -61,9 +83,13 @@
   onclick={clic}
 >
   <!-- Due livelli di testo identici: sotto su binario, sopra su riempimento, ritagliato alla stessa larghezza -->
-  <span class="riempimento riempimento-info" class:premuto aria-hidden="true"></span>
-  <span class="etichetta">{t.distribuzioneTieniPremuto}</span>
-  <span class="etichetta sopra riempimento-info" class:premuto aria-hidden="true">{t.distribuzioneTieniPremuto}</span>
+  {#if tocco}
+    <span class="etichetta">{t.distribuzioneTocca}</span>
+  {:else}
+    <span class="riempimento riempimento-info" class:premuto aria-hidden="true"></span>
+    <span class="etichetta">{t.distribuzioneTieniPremuto}</span>
+    <span class="etichetta sopra riempimento-info" class:premuto aria-hidden="true">{t.distribuzioneTieniPremuto}</span>
+  {/if}
 </button>
 
 <style>
@@ -113,7 +139,7 @@
     clip-path: inset(0 100% 0 0);
     transition: clip-path var(--durata-rilascio-barra) ease-out;
   }
-  /* il riempimento avanza in 300 ms lineari, in sincronia con il timer di rivelazione */
+  /* il riempimento avanza nella durata scelta (--durata-barra), lineare, in sincronia con il timer di rivelazione */
   .riempimento.premuto,
   .etichetta.sopra.premuto {
     clip-path: inset(0 0 0 0);

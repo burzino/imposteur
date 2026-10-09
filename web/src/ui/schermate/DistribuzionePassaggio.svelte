@@ -5,6 +5,8 @@
   import Pagina from "../componenti/Pagina.svelte";
   import TestoAdattivo from "../componenti/TestoAdattivo.svelte";
   import { t } from "../testi";
+  import { getStato } from "../stato.svelte";
+  import { soloTocco } from "../../game/durataPressione";
   import DistribuzioneFilaAvatar from "./DistribuzioneFilaAvatar.svelte";
   import DistribuzioneTieniPremuto from "./DistribuzioneTieniPremuto.svelte";
 
@@ -27,6 +29,7 @@
     onIndietro: () => void;
   } = $props();
 
+  const stato = getStato();
   const RITARDO_MS = 600;
   let abilitato = $state(false);
   const nome = $derived(partita.giocatori[indice] ?? "");
@@ -57,7 +60,7 @@
   {#snippet piede()}
     <div class="piede">
       <DistribuzioneTieniPremuto {abilitato} onRivela={onSono} />
-      <p class="didascalia">{t.distribuzioneSonoPremuto(nome)}</p>
+      <p class="didascalia">{soloTocco(stato.aspetto.durataPressioneMs) ? t.distribuzioneSonoTocca(nome) : t.distribuzioneSonoPremuto(nome)}</p>
     </div>
   {/snippet}
 </Pagina>

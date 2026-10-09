@@ -216,7 +216,7 @@ describe("StatoApp: revisione", () => {
 describe("StatoApp: aspetto e segnalazioni", () => {
   it("CA-W14 CA-W16 l'aspetto si salva e si rilegge; localStorage che lancia non rompe nulla", async () => {
     const { s, storage } = await pronto();
-    s.impostaAspetto({ tema: "SCURO", coloriDinamici: true });
+    s.impostaAspetto({ tema: "SCURO", coloriDinamici: true, durataPressioneMs: 150 });
     expect(s.aspetto.tema).toBe("SCURO");
     const s2 = crea(storage).s;
     expect(s2.aspetto.tema).toBe("SCURO");
@@ -1178,7 +1178,7 @@ describe("StatoApp: aspetto e tema (CA-W14)", () => {
     const { s } = await pronto();
     const attesi = { SISTEMA: "sistema", CHIARO: "chiaro", SCURO: "scuro", ALTO_CONTRASTO: "alto-contrasto" } as const;
     for (const [tema, attributo] of Object.entries(attesi)) {
-      s.impostaAspetto({ tema: tema as keyof typeof attesi, coloriDinamici: false });
+      s.impostaAspetto({ tema: tema as keyof typeof attesi, coloriDinamici: false, durataPressioneMs: 150 });
       expect(imposta).toHaveBeenLastCalledWith("data-tema", attributo);
       expect(s.aspetto.tema).toBe(tema);
     }
@@ -1187,7 +1187,7 @@ describe("StatoApp: aspetto e tema (CA-W14)", () => {
   it("CA-W14 il tema scelto persiste e viene riapplicato all'avvio successivo", async () => {
     const imposta = fingiDom();
     const { s, storage } = await pronto();
-    s.impostaAspetto({ tema: "ALTO_CONTRASTO", coloriDinamici: true });
+    s.impostaAspetto({ tema: "ALTO_CONTRASTO", coloriDinamici: true, durataPressioneMs: 150 });
     imposta.mockClear();
     const s2 = creaCon(storage);
     expect(s2.aspetto.tema).toBe("ALTO_CONTRASTO");
@@ -1203,7 +1203,7 @@ describe("StatoApp: aspetto e tema (CA-W14)", () => {
 
   it("CA-W14 senza DOM (Node) impostaAspetto non lancia", async () => {
     const { s } = await pronto();
-    expect(() => s.impostaAspetto({ tema: "SCURO", coloriDinamici: true })).not.toThrow();
+    expect(() => s.impostaAspetto({ tema: "SCURO", coloriDinamici: true, durataPressioneMs: 150 })).not.toThrow();
     expect(s.aspetto.tema).toBe("SCURO");
   });
 

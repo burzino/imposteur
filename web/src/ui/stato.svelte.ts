@@ -1,6 +1,6 @@
 import { getContext, hasContext } from "svelte";
 import { creaArchivio, type Archivio, type ArchivioStorage } from "../data/archivio";
-import type { Aspetto } from "../data/aspetto";
+import { aspettoDefault, type Aspetto } from "../data/aspetto";
 import { parseParole, type RisultatoCaricamento } from "../data/parserParole";
 import { FormatoSegnalazioni, type Segnalazione } from "../data/segnalazioni";
 import { casualeDiSistema, type Casuale } from "../game/casuale";
@@ -75,7 +75,7 @@ export class StatoApp {
     paroleTotali: 0,
   });
   #revisione = $state.raw<Revisione | null>(null);
-  #aspetto = $state.raw<Aspetto>({ tema: "SISTEMA", coloriDinamici: true });
+  #aspetto = $state.raw<Aspetto>(aspettoDefault);
   #segnalazioniSalvate = $state.raw(0);
   #errori = $derived.by<readonly ErroreConfigurazione[]>(() =>
     this.#ui.categorie.length === 0 ? [] : Regole.valida(this.#ui.config, this.#ui.categorie),

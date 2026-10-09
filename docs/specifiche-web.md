@@ -14,6 +14,7 @@ Questo documento elenca SOLO le differenze rispetto a `docs/specifiche.md` (nel 
 - Tutte le regole di § 6 restano (correzione ai limiti, ignorare id non più presenti, cancellazione della partita in Rivela, Rivelazione k → Passaggio k al ripristino, stato di Rivedi non salvato).
 - Sessione illeggibile o incoerente con `parole.json` (JSON non valido, indici fuori limite, categoria/parola/affine inesistenti): scartata in silenzio, senza messaggi né "Riprendi partita".
 - `localStorage` non disponibile o che lancia eccezioni (navigazione privata, dati bloccati) o quota piena: l'app funziona senza salvataggio, in silenzio; nessun errore a schermo.
+- La durata della pressione (4.7) sta nello stesso valore JSON dell'aspetto/tema (chiave `impostore.aspetto`, campo `durataPressioneMs`), salvata subito a ogni cambio; normalizzazione e fallback come in § 6 (campo assente = 150; non numerico/non finito/tipo errato = 150; fuori intervallo o non multiplo di 50 = valore valido più vicino). Con `localStorage` non disponibile vale per la sessione in memoria.
 - I dati restano nel browser e nel dominio dell'utente: sono per-dispositivo e per-browser; cancellare i dati del sito li elimina. Nessuna rete, nessun account.
 
 ## W3. Protezione del ruolo (sostituisce FLAG_SECURE e ON_STOP in 4.3, 4.4.1)
@@ -78,7 +79,7 @@ Vitest = test automatici sulla logica; Browser = collaudo manuale/automatizzato 
 - **CA-W06** (Browser) Con `visibilitychange` (pagina nascosta) mentre il ruolo è visibile, al ritorno compare "Passa il telefono a <nome>" dello stesso giocatore, senza ruolo (CA-29 sostituito). Lo stesso in Rivedi: si torna al Gioco (CA-57).
 - **CA-W07** (Browser) Ricaricando la pagina con il ruolo visibile, "Riprendi partita" o la ripresa automatica mostra Passaggio k, non Rivelazione k (CA-46).
 - **CA-W08** (Browser) Il tasto indietro del browser in Distribuzione e Gioco mostra "Interrompere la partita?" e non porta mai a un ruolo precedente (CA-35); "Continua a giocare" resta, "Interrompi" cancella la partita e va alla Configurazione.
-- **CA-W09** (Browser) La pressione lunga (300 ms) su "Tieni premuto per scoprire" rivela il ruolo con mouse e tocco; rilascio anticipato, tocco breve o `pointercancel` non rivelano e azzerano la barra (CA-27, CA-67).
+- **CA-W09** (modificato, Browser) La pressione lunga (durata scelta nelle Impostazioni, predefinita 150 ms) su "Tieni premuto per scoprire" rivela il ruolo con mouse e tocco; rilascio anticipato, tocco breve o `pointercancel` non rivelano e azzerano la barra (CA-27, CA-67). Con 0 ms il ruolo si rivela al rilascio (`pointerup` sul pulsante); `pointercancel` o uscita del puntatore prima del rilascio non rivelano (CA-107); il rilascio con tastiera (Invio/Spazio sul pulsante) equivale all'azione "Scopri il ruolo".
 - **CA-W10** (Browser) Senza `navigator.vibrate` nessun errore in console e nessun messaggio; con `navigator.vibrate` la chiamata è identica per tutti i ruoli e le modalità (CA-65).
 - **CA-W11** (Browser) Dopo il primo caricamento, in modalità aereo l'app si apre, si gioca una partita completa e le parole sono disponibili.
 - **CA-W12** (Browser) Il manifest è valido (Lighthouse "installabile"), con icone 192/512/maskable; l'app installata si apre in `standalone` al base path corretto.
@@ -88,7 +89,9 @@ Vitest = test automatici sulla logica; Browser = collaudo manuale/automatizzato 
 - **CA-W16** (Browser) Con `localStorage` bloccato (navigazione privata) l'app si avvia e si gioca una partita; nessun errore a schermo.
 - **CA-W17** (Browser) Il rotare lo schermo durante un ruolo visibile lascia il ruolo visibile senza perdere lo stato (differenza accettata da CA-29).
 - **CA-W18** (Browser) Tutti i testi dell'interfaccia coincidono con `strings.xml` (CA-36), compresi i testi del restyling (CA-66…CA-68).
-- **CA-W19** (Browser) I CA di interfaccia Android non citati sopra (CA-22…CA-26, CA-43…CA-55, CA-60, CA-62…CA-65, CA-80…CA-96, CA-99…CA-105) sono verificati sul web con le sole sostituzioni di W3 e W4.
+- **CA-W20** (Vitest) `normalizzaDurataPressione` e `durataPressioneDaTesto` hanno gli stessi casi e gli stessi esiti di CA-106; `aspettoDaStringa` legge `durataPressioneMs` assente → 150, illeggibile → 150, fuori intervallo/non multiplo → normalizzato, senza alterare tema e `coloriDinamici`; `aspettoAStringa` → `aspettoDaStringa` è un giro completo (CA-110).
+- **CA-W21** (Browser) Il cursore "Durata della pressione" è un `<input type="range">` con `min=0 max=1000 step=50`, raggiungibile con Tab, con frecce ±50, Home 0, End 1000, etichetta associata e `aria-valuetext` "<n> millisecondi" (CA-109, CA-111); il valore scelto persiste dopo il ricaricamento (CA-110) e con 0 ms compaiono "Tocca per scoprire" e "Sono <nome> — tocca" (CA-107).
+- **CA-W19** (Browser) I CA di interfaccia Android non citati sopra (CA-22…CA-26, CA-43…CA-55, CA-60, CA-62…CA-65, CA-80…CA-96, CA-99…CA-112, tranne CA-106 coperto da CA-W20) sono verificati sul web con le sole sostituzioni di W3 e W4.
 
 ## W11. Fuori perimetro (web)
 

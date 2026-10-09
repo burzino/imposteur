@@ -148,6 +148,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                 onInviaSuggerimento = { viewModel.salvaSegnalazione(it) },
                 onCancellaSegnalazioni = { viewModel.cancellaSegnalazioni() },
                 onCambia = { viewModel.impostaAspetto(it) },
+                onDurataPressione = { viewModel.impostaDurataPressione(it) },
                 onIndietro = { if (navController.inRotta(Rotte.IMPOSTAZIONI)) navController.popBackStack() },
                 onHome = { navController.vaiAHome(Rotte.IMPOSTAZIONI) },
             )
@@ -209,8 +210,10 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             )
         }
         composable(Rotte.DISTRIBUZIONE) {
+            val aspettoDistribuzione by viewModel.aspetto.collectAsStateWithLifecycle()
             SchermataDistribuzione(
                 stato = stato,
+                durataPressioneMs = aspettoDistribuzione.durataPressioneMs,
                 onSono = { da -> viewModel.avanza(da) },
                 onNascondiEPassa = { da -> viewModel.avanza(da) },
                 onInterrompiRivelazione = { viewModel.interrompiRivelazione() },
@@ -259,8 +262,10 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             )
         }
         composable(Rotte.RIVEDI) {
+            val aspettoRivedi by viewModel.aspetto.collectAsStateWithLifecycle()
             SchermataRivedi(
                 partita = stato.partita,
+                durataPressioneMs = aspettoRivedi.durataPressioneMs,
                 revisione = revisione,
                 onScegli = { viewModel.scegliRevisione(it) },
                 onSono = { viewModel.rivelaRevisione() },

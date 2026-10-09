@@ -75,8 +75,8 @@ describe('Archivio', () => {
   it('CA-W14 salva e carica l aspetto; default se assente', () => {
     const a = creaArchivio(storageInMemoria());
     expect(a.leggiAspetto()).toEqual(aspettoDefault);
-    a.salvaAspetto({ tema: 'ALTO_CONTRASTO', coloriDinamici: false });
-    expect(a.leggiAspetto()).toEqual({ tema: 'ALTO_CONTRASTO', coloriDinamici: false });
+    a.salvaAspetto({ tema: 'ALTO_CONTRASTO', coloriDinamici: false, durataPressioneMs: 300 });
+    expect(a.leggiAspetto()).toEqual({ tema: 'ALTO_CONTRASTO', coloriDinamici: false, durataPressioneMs: 300 });
   });
 
   it('CA-W15 segnalazioni: aggiungi, conta, leggi in ordine, cancella', () => {
@@ -118,7 +118,7 @@ describe('Archivio', () => {
     const a = creaArchivio(storageCheLancia());
     expect(() => a.salvaConfigurazione(configurazioneDefault())).not.toThrow();
     expect(() => a.salvaSessione(sessione())).not.toThrow();
-    expect(() => a.salvaAspetto({ tema: 'SCURO', coloriDinamici: true })).not.toThrow();
+    expect(() => a.salvaAspetto({ tema: 'SCURO', coloriDinamici: true, durataPressioneMs: 150 })).not.toThrow();
     expect(() => a.aggiungiSegnalazione(segnalazione({ tipo: 'app', istante: 'a' }))).not.toThrow();
     expect(() => a.cancellaSegnalazioni()).not.toThrow();
   });

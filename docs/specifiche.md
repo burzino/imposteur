@@ -98,7 +98,9 @@ Per ogni giocatore, nell'ordine della lista, si alternano tre stati:
 
 1. **Passaggio**: testo "Passa il telefono a" seguito dal nome del giocatore in grande (equivale a "Passa il telefono a <nome>"), avviso "Gli altri non guardino lo schermo", indicatore "Giocatore k di N", cerchio con l'iniziale del nome e, in basso, il pulsante a pressione lunga "Tieni premuto per scoprire" con sotto la didascalia "Sono <nome> — tieni premuto". Nessun ruolo visibile.
    - Fila di avatar (in alto, decorativa: l'informazione è nel testo "Giocatore k di N"): un cerchio con l'iniziale per ogni giocatore, in ordine; già visti = pieni con spunta, corrente = evidenziato con anello, successivi = attenuati. Fino a 8 giocatori stanno tutti sulla riga; oltre 8 la riga scorre e resta centrata sul corrente.
-   - Pressione lunga: tenendo premuto il pulsante una barra si riempie in 300 ms; a barra piena il ruolo viene rivelato (stato 2). Rilasciando prima, la barra torna a zero e non succede nulla. Un semplice tocco non rivela. Il pulsante è disabilitato (attenuato, ignora la pressione) nei primi 600 ms dopo la comparsa del giocatore (anti doppio tocco). Per l'accessibilità l'azione "Scopri il ruolo" attiva la rivelazione senza pressione lunga.
+   - Pressione lunga: tenendo premuto il pulsante una barra si riempie nella **durata della pressione** scelta nelle Impostazioni (4.7; predefinita 150 ms, da 0 a 1000 ms); a barra piena il ruolo viene rivelato (stato 2). Rilasciando prima, la barra torna a zero e non succede nulla. Con durata > 0 un semplice tocco non rivela.
+   - Durata 0 ms ("solo tocco"): la barra non c'è e il ruolo si rivela **al rilascio** del dito (o del mouse) sul pulsante, non alla pressione. Se il dito esce dal pulsante o il gesto è annullato dal sistema (cancel) prima del rilascio, non succede nulla. Motivo: rivelare alla pressione farebbe comparire il ruolo a ogni contatto involontario (telefono che passa di mano, tasca, dito che sfiora) prima che chi deve guardare sia pronto; al rilascio il giocatore può ancora annullare spostando il dito fuori, e il pulsante si comporta come un normale pulsante. In questa modalità il pulsante legge "Tocca per scoprire" e la didascalia "Sono <nome> — tocca"; tutto il resto (stati, 600 ms, accessibilità) è invariato.
+   - Il pulsante è disabilitato (attenuato, ignora la pressione) nei primi 600 ms dopo la comparsa del giocatore (anti doppio tocco). Per l'accessibilità l'azione "Scopri il ruolo" attiva la rivelazione senza pressione lunga.
 2. **Rivelazione**: la carta si gira (rotazione 3D) mostrando il contenuto del ruolo (vedi tabella) e il pulsante "Nascondi e passa" ("Nascondi e inizia" per l'ultimo giocatore). Il pulsante si attiva 600 ms dopo la comparsa del ruolo (prima è disabilitato). L'animazione è identica per tutti i ruoli.
 3. Il tocco su "Nascondi e passa" nasconde il ruolo e passa allo stato 1 del giocatore successivo. Il tocco su "Nascondi e inizia" (ultimo giocatore) mostra l'overlay "Tutti pronti!": schermata a tutto schermo con il testo "Tutti pronti!" e sotto "Che il bluff abbia inizio"; dopo 1200 ms (o al tocco, che lo salta) si apre la schermata di Gioco. La partita è già nello stato Gioco quando compare l'overlay (salvataggio, ripristino e tasto indietro seguono le regole del Gioco).
 
@@ -132,7 +134,7 @@ Funzione raggiungibile solo dalla schermata di Gioco, dopo la Distribuzione. Ecc
 
 Stati:
 1. **Elenco**: intestazione "Rivedi la parola", testo "Tocca il tuo nome" e l'elenco di tutti i giocatori (nomi effettivi) nell'ordine della partita, uno per riga, toccabili. Nessun ruolo visibile. Tasto indietro (di sistema e freccia in alto): torna alla schermata di Gioco, senza conferma.
-2. **Passaggio**: toccando un nome, stesso Passaggio della Distribuzione (stato 1 di 4.3): testo "Passa il telefono a" + nome in grande, avviso "Gli altri non guardino lo schermo", cerchio con l'iniziale e pulsante a pressione lunga "Tieni premuto per scoprire" con didascalia "Sono <nome> — tieni premuto" (barra che si riempie in 300 ms, pulsante disabilitato nei primi 600 ms, azione di accessibilità "Scopri il ruolo", come in 4.3). Differenze: nessuna fila di avatar e nessun indicatore "Giocatore k di N". Nessun ruolo visibile. Tasto indietro: torna all'Elenco.
+2. **Passaggio**: toccando un nome, stesso Passaggio della Distribuzione (stato 1 di 4.3): testo "Passa il telefono a" + nome in grande, avviso "Gli altri non guardino lo schermo", cerchio con l'iniziale e pulsante a pressione lunga "Tieni premuto per scoprire" con didascalia "Sono <nome> — tieni premuto" (barra che si riempie nella durata della pressione delle Impostazioni, 4.7; con 0 ms nessuna barra, rivelazione al rilascio e testi "Tocca per scoprire" / "Sono <nome> — tocca"; pulsante disabilitato nei primi 600 ms, azione di accessibilità "Scopri il ruolo", come in 4.3). Differenze: nessuna fila di avatar e nessun indicatore "Giocatore k di N". Nessun ruolo visibile. Tasto indietro: torna all'Elenco.
 3. **Rivelazione**: dopo la pressione lunga (barra piena), stesso contenuto, layout, etichette e colori dello stato 2 della Distribuzione (tabella di 4.3, secondo ruolo e modalità del giocatore), con pulsante "Nascondi". Il tocco su "Nascondi" nasconde il ruolo e torna alla schermata di Gioco. Tasto indietro: come "Nascondi".
 
 Regole:
@@ -162,6 +164,17 @@ Dall'app si può segnalare una coppia (parola, affine) o un problema dell'app; l
 - Proposta valida solo se entrambi i campi sono compilati e diversi (senza distinzione maiuscole/minuscole). Con un solo campo compilato, o con due parole uguali, "Salva" è disattivato e compare un avviso.
 - "Salva" è disattivato anche se non c'è alcun motivo, nota o proposta valida.
 - Le righe salvate prima della proposta restano leggibili (proposta assente); le righe malformate sono saltate.
+
+### 4.7 Impostazioni
+Si apre dall'icona Impostazioni della Home (descrizione "Apri le impostazioni"); barra con titolo "Impostazioni" e freccia indietro. Sono impostazioni del dispositivo (non della partita): si applicano e si salvano subito, senza pulsante di conferma. Gruppi, dall'alto:
+1. **Tema**: "Sistema", "Chiaro", "Scuro", "Alto contrasto"; su Android 12+ l'interruttore "Colori del telefono" ("Usa i colori dello sfondo (Android 12+)"), assente sul web.
+2. **Pressione per scoprire** (nuovo, subito sotto Tema e sopra Segnalazioni): cursore con etichetta "Durata della pressione", descrizione "Quanto tempo tenere premuto per scoprire il ruolo. Con 0 basta un tocco." e valore corrente visibile accanto all'etichetta, nel formato "<n> ms" (es. "150 ms"; "0 ms" incluso).
+   - Intervallo 0-1000 ms, passo 50 ms (21 posizioni), predefinito 150 ms.
+   - Vale per Distribuzione (4.3) e Rivedi la parola (4.4.1), su Android e PWA; il cambio ha effetto dal successivo Passaggio mostrato. Il blocco anti doppio tocco di 600 ms non dipende da questa impostazione.
+   - Il cursore ha un solo valore per volta: spostarlo aggiorna subito il testo del valore e salva (al rilascio del cursore o a ogni passo da tastiera).
+   - Accessibilità: il cursore ha nome "Durata della pressione" e valore letto "<n> millisecondi" ("0 millisecondi, basta un tocco" a 0); su Android azioni di aumento/diminuzione di un passo per il lettore di schermo; sul web è un `<input type="range">` nativo: frecce ±50 (`step=50`), Home 0, End 1000, con `aria-valuetext` "<n> millisecondi".
+3. **Segnalazioni** (4.6).
+Persistenza e normalizzazione: vedi 6.
 
 ## 5. Regole di gioco
 
@@ -207,6 +220,7 @@ Memorizzata in locale (es. DataStore/SharedPreferences) e ripristinata all'avvio
 - Partita in corso: si salvano anche ordine di parola, giri di indizi e promemoria. Se l'ordine manca (salvataggi vecchi) si usa la rotazione da primo giocatore, con 1 giro e promemoria spento. Un ordine che non è una permutazione di 0..N−1 o non inizia con il primo giocatore rende la partita non valida. Impostori vuoti sono validi (partita trappola).
 - Al ripristino: un id di categoria non più presente nel file parole viene ignorato; se nessuna categoria valida resta, si selezionano tutte.
 - Valori fuori limite (es. impostori oltre il massimo) vengono corretti ai limiti.
+- **Impostazioni del dispositivo** (aspetto/tema e durata della pressione): salvate subito a ogni cambio, nello stesso archivio dell'aspetto (Android: stesso DataStore, chiavi distinte; PWA: `localStorage`, chiave dell'aspetto) e ripristinate all'avvio; non fanno parte della configurazione né della sessione. Durata della pressione: assente = 150 ms; valore numerico fuori da 0..1000 → riportato al limite più vicino; non multiplo di 50 → riportato al multiplo di 50 più vicino (a metà strada, per eccesso: 125 → 150); valore illeggibile (non numerico, non finito, tipo errato) → 150. Funzione pura condivisa: contratto API "Durata della pressione".
 **Partita in corso.** La sessione di gioco sopravvive alla chiusura dell'app. A ogni cambio di stato si salva:
 - giocatori (nomi effettivi, nell'ordine), indici degli impostori, voce (id categoria, parola, affine), modalità, mostraCategoria, indice del giocatore che inizia, stato della distribuzione (Passaggio k / Rivelazione k / Gioco);
 - l'insieme delle parole usate (chiave: id categoria + parola normalizzata, vedi 7), aggiornato a ogni estrazione. Non si azzera alla chiusura dell'app: persiste finché il pool non si esaurisce (5.2.3).
@@ -294,7 +308,7 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-24** L'interruttore "L'impostore vede la categoria" è visibile solo con modalità "Impostore senza parola".
 - **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Avanti" del passo 3 è disabilitato, con sopra in rosso lo stesso errore; con un nome duplicato compare "Nome già usato" e "Avanti" del passo 1 è disabilitato; per un errore senza testo dedicato sopra i pulsanti compare in rosso "Controlla la configurazione".
 - **CA-26** Chiudendo e riaprendo l'app, la Configurazione mostra gli stessi valori impostati prima della chiusura.
-- **CA-27** La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; il ruolo compare solo dopo la pressione lunga (300 ms) su "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"); un tocco breve o un rilascio anticipato non rivelano nulla e la barra torna a zero.
+- **CA-27** (modificato) La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; con durata > 0 il ruolo compare solo dopo la pressione lunga della durata scelta nelle Impostazioni (predefinita 150 ms) su "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"); un tocco breve o un rilascio anticipato non rivelano nulla e la barra torna a zero. Con durata 0 vale CA-107.
 - **CA-28** Dopo "Nascondi e passa" il ruolo non è più visibile e non esiste alcun controllo né gesto (incluso il tasto indietro) per rivedere il ruolo di un giocatore precedente.
 - **CA-29** Mettere l'app in background o ruotare lo schermo mentre un ruolo è visibile riporta alla schermata "Passa il telefono a <nome>" dello stesso giocatore.
 - **CA-30** In modalità "Parola affine" le schermate di rivelazione di un civile e di un impostore sono indistinguibili in layout, etichette e colori (differiscono solo per la parola).
@@ -316,7 +330,7 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-52** Il tocco su "Rivedi la parola" apre la schermata "Rivedi la parola" con tutti i giocatori, con i nomi effettivi e nell'ordine della partita; nessun ruolo è visibile.
 - **CA-53** Dall'Elenco, il tasto indietro (di sistema o freccia) torna alla schermata di Gioco senza conferma e con lo stesso "Parla per primo: <nome>".
 - **CA-54** Toccando un nome compare "Passa il telefono a <nome>" con il pulsante a pressione lunga "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"), senza fila di avatar, senza indicatore "Giocatore k di N", senza parola né testo di ruolo; un tocco breve non rivela; il tasto indietro torna all'Elenco.
-- **CA-55** Dopo la pressione lunga (300 ms) la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
+- **CA-55** (modificato) Dopo la pressione lunga (durata delle Impostazioni, 4.7; con 0 ms, il rilascio) la rivelazione è identica per layout, etichette e colori alla rivelazione della Distribuzione (CA-30) e mostra il contenuto corretto per ruolo e modalità; "Nascondi" (o tasto indietro) torna alla schermata di Gioco con il ruolo non più visibile.
 - **CA-56** Si può rivedere la parola più volte, anche dello stesso giocatore o di giocatori diversi, senza limiti; ruoli, parola e giocatore iniziale restano invariati.
 - **CA-57** Mettere l'app in background o ruotare lo schermo in qualsiasi schermata di Rivedi la parola riporta alla schermata di Gioco, con nessun ruolo visibile.
 - **CA-58** Le schermate di Rivedi la parola hanno FLAG_SECURE: lo screenshot è bloccato e l'anteprima in Recents non mostra il contenuto.
@@ -368,6 +382,16 @@ Configurazione a passi (4.2, 4.2.1):
 - **CA-105** La configurazione e le sue modifiche (compreso "Impostori a sorpresa") sopravvivono al cambio di passo, alla rotazione e alla chiusura dell'app (stesso formato di prima); "Rigioca (stessi giocatori)" in Rivela non passa dai passi; "Modifica giocatori e opzioni" apre il passo 1.
 
 - **CA-98** Su Android e sul web tutto il testo dell'interfaccia usa Roboto Flex incorporato nell'app/PWA (nessun caricamento da rete); i testi restano in italiano e leggibili anche offline.
+
+Durata della pressione (4.3, 4.4.1, 4.7, 6):
+
+- **CA-106** (logica pura, JUnit) `DurataPressione.normalizza`: 0→0, 1000→1000, 150→150, 125→150, 124→100, 25→50, 24→0, -30→0, 1049→1000, 5000→1000, `Int.MIN_VALUE`→0, `Int.MAX_VALUE`→1000; il risultato è sempre multiplo di 50 in 0..1000. `daTesto`: null, "", "abc", "NaN", "Infinity" → 150; "200" → 200; " 200 " → 200; "149.6" → 150; "1e9" → 1000. Il predefinito è 150.
+- **CA-107** Con durata 0 ms: nessuna barra; il ruolo si rivela al rilascio sul pulsante e non alla pressione; se il dito esce dal pulsante o il gesto è annullato, non si rivela; il pulsante legge "Tocca per scoprire" e la didascalia "Sono <nome> — tocca"; i primi 600 ms restano di blocco; l'azione di accessibilità "Scopri il ruolo" resta. Vale in Distribuzione e in Rivedi. A durata > 0 testi e barra sono quelli di CA-27.
+- **CA-108** Con durata d > 0 la barra si riempie in d ms e il ruolo si rivela a barra piena, in Distribuzione e in Rivedi la parola; rilasciando prima di d ms la barra torna a zero e non si rivela nulla. Al primo avvio d = 150 ms.
+- **CA-109** Nelle Impostazioni, gruppo "Pressione per scoprire" sotto "Tema": cursore "Durata della pressione" 0-1000 ms a passi di 50 (21 posizioni) con il valore mostrato nel formato "<n> ms" ("0 ms", "150 ms", "1000 ms") che si aggiorna mentre si sposta il cursore, e la descrizione di 4.7.
+- **CA-110** La durata scelta si salva subito e sopravvive alla chiusura dell'app; un valore salvato fuori intervallo o non multiplo di 50 è riportato al valore valido più vicino (CA-106), uno illeggibile a 150; la lettura non influisce su tema e colori dinamici (che restano quelli salvati) e viceversa.
+- **CA-111** Il cursore è accessibile: nome "Durata della pressione" e valore letto "<n> millisecondi" ("0 millisecondi, basta un tocco" a 0) dal lettore di schermo, incremento/decremento di un passo (50 ms) con le azioni del lettore (Android) o le frecce (web); area di tocco >= 48 dp.
+- **CA-112** Cambiare la durata non cambia il blocco anti doppio tocco di 600 ms né l'indistinguibilità dei ruoli (CA-30, CA-65): barra, tempi e vibrazione dipendono solo dalla durata, mai dal ruolo.
 
 ## 9. Fuori perimetro (v1)
 

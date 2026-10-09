@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import it.imposteur.R
 import it.imposteur.data.Aspetto
 import it.imposteur.data.Segnalazione
 import it.imposteur.data.Tema
+import it.imposteur.ui.componenti.CursoreDurata
 import it.imposteur.ui.componenti.DialogoConferma
 import it.imposteur.ui.componenti.PulsantePieno
 import it.imposteur.ui.componenti.PulsanteContorno
@@ -51,6 +53,7 @@ fun SchermataImpostazioni(
     onInviaSuggerimento: (Segnalazione) -> Unit,
     onCancellaSegnalazioni: () -> Unit,
     onCambia: (Aspetto) -> Unit,
+    onDurataPressione: (Int) -> Unit,
     onIndietro: () -> Unit,
     onHome: () -> Unit,
 ) {
@@ -58,6 +61,7 @@ fun SchermataImpostazioni(
     val scope = rememberCoroutineScope()
     var suggerimento by rememberSaveable { mutableStateOf("") }
     var chiediCancella by rememberSaveable { mutableStateOf(false) }
+    var anteprimaMs by remember(aspetto.durataPressioneMs) { mutableStateOf(aspetto.durataPressioneMs) }
     val messaggioSalvata = stringResource(R.string.segnala_salvata)
     val opzioni = listOf(
         Tema.SISTEMA to R.string.tema_sistema,
@@ -101,6 +105,33 @@ fun SchermataImpostazioni(
                         onCambia = { onCambia(aspetto.copy(coloriDinamici = it)) },
                     )
                 }
+            }
+            Scheda {
+                Text(
+                    stringResource(R.string.impostazioni_pressione_titolo),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.impostazioni_pressione_etichetta),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        stringResource(R.string.impostazioni_pressione_valore, anteprimaMs),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                }
+                Text(
+                    stringResource(R.string.impostazioni_pressione_descrizione),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                CursoreDurata(durataMs = aspetto.durataPressioneMs, onDurata = onDurataPressione, onAnteprima = { anteprimaMs = it })
             }
             Scheda {
                 Text(

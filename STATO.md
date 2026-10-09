@@ -58,12 +58,12 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Rivedi: vale il CA-54 (utente, 2026-10-08): niente "Giocatore k di N" nel Passaggio, anche su Android (`mostraAvanzamento = false`). APK da reinstallare per il collaudo.
 
 ## Ondata del 2026-10-09: restyling 2026 e configurazione a passi
-- Pressione lunga 300 ms (blocco anti doppio tocco 600 ms invariato). Firma release da `keystore.properties` (escluso da git, modello in `keystore.properties.esempio`): l'utente deve creare la chiave con keytool.
+- Durata della pressione regolabile in Impostazioni (cursore 0-1000 ms, passo 50, predefinita 150; a 0 ms rivela al rilascio; CA-106..112, contratto v1.8/v2.3). Blocco anti doppio tocco 600 ms invariato. Firma release da `keystore.properties` (escluso da git, modello in `keystore.properties.esempio`): l'utente deve creare la chiave con keytool.
 - BOM Compose 2026.09.00, AGP 9.1.1 (Kotlin integrato), Gradle 9.3.1, compileSdk 37. material3 resta 1.4.0: API Expressive internal/sperimentali, molle scritte a mano in `ui/theme/Movimento.kt`.
 - Design unico in `docs/design.md` (agente `designer-ui`), bozza `docs/design/bozza.html`. Roboto Flex incorporato (Android res/font, 1,7 MB non ridotto; PWA @fontsource-variable latin/latin-ext).
 - Configurazione in 4 passi: Giocatori (con "Impostori a sorpresa"), Opzioni, Categorie, Riepilogo; "Inizia" in barra nei passi 1-3. Logica in `game/Passi.kt` e `web/src/game/passi.ts` (contratto v1.7/v2.2), CA-99..105.
 - Revisione Android/PWA in `docs/revisione-design.md`: chiusi tutti (A, M, B).
-- Test: Android 184/184, PWA 322/322. Pushato fino a b06df05 (PWA pubblicata da Pages; esito del workflow non verificato). APK con il restyling (senza i B) installato sul OnePlus 9; quello con i B da installare.
+- Test: Android 198/198, PWA 345/345. APK con cursore installato sul OnePlus 9. Da verificare a occhio: allineamento tacche/maniglia del cursore Android (Slider stabile + Canvas).
 - Collaudo headless (09-10): tema persistente, localStorage bloccato, rotazione, visibilitychange OK. Export segnalazioni non verificato (script instabile): resta nella scaletta del telefono.
 
 ## Prossimi passi

@@ -6,6 +6,8 @@
   import type { Tema } from "../../data/aspetto";
   import Pagina from "../componenti/Pagina.svelte";
   import Pulsante from "../componenti/Pulsante.svelte";
+  import Cursore from "../componenti/Cursore.svelte";
+  import { normalizzaDurataPressione } from "../../game/durataPressione";
   import Selettore from "../componenti/Selettore.svelte";
   import CampoTesto from "../componenti/CampoTesto.svelte";
   import DialogoConferma from "../componenti/DialogoConferma.svelte";
@@ -63,6 +65,19 @@
         etichetta={t.temaTitolo}
         colonne={2}
       />
+    </section>
+    <section class="carta">
+      <h2>{t.impostazioniPressioneTitolo}</h2>
+      <Cursore
+        valore={stato.aspetto.durataPressioneMs}
+        onCambia={(v) => stato.impostaAspetto({ ...stato.aspetto, durataPressioneMs: normalizzaDurataPressione(v) })}
+        etichetta={t.impostazioniPressioneEtichetta}
+        valoreVisibile={t.impostazioniPressioneValore(stato.aspetto.durataPressioneMs)}
+        testoA11y={stato.aspetto.durataPressioneMs === 0
+          ? t.impostazioniPressioneA11yZero
+          : t.impostazioniPressioneA11y(stato.aspetto.durataPressioneMs)}
+      />
+      <p class="nota">{t.impostazioniPressioneDescrizione}</p>
     </section>
     <section class="carta">
       <h2>{t.segnalazioniTitolo}</h2>
