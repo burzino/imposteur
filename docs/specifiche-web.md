@@ -50,6 +50,7 @@ Questo documento elenca SOLO le differenze rispetto a `docs/specifiche.md` (nel 
 
 - Temi: "Sistema", "Chiaro", "Scuro", "Alto contrasto" (stesse etichette Android), salvati in W2. "Sistema" segue `prefers-color-scheme`.
 - I colori dinamici (Material You) non esistono sul web: l'opzione è assente. Decisione presa: nessuna sostituzione; la palette fissa dell'app (stessa degli altri temi) è l'unica.
+- Token di colore, tipografia, forme e layout: `docs/design.md` (fonte unica, comune ad Android). Font Roboto Flex incorporato nella PWA (file locale, precache del service worker, nessuna richiesta di rete per i font), come su Android (CA-98).
 - Stessi testi, layout adattato a viewport verticale da telefono; su schermi larghi il contenuto resta in una colonna centrata (max 480 px).
 
 ## W8. Segnalazioni (sostituisce il file locale di 4.6)
@@ -61,7 +62,8 @@ Questo documento elenca SOLO le differenze rispetto a `docs/specifiche.md` (nel 
 ## W9. Altre differenze
 
 - Tasto indietro "esci dall'app" di Home (4.1): sul web non c'è azione; il tasto indietro del browser esce dal sito.
-- Home, Configurazione, Gioco, Rivela, Rivedi: nessun'altra differenza.
+- Configurazione a passi (4.2): ogni passo è una voce di cronologia (`#/configurazione/1` … `#/configurazione/4`), quindi il tasto indietro del browser torna al passo precedente, dal passo 1 alla Home; "Modifica" del riepilogo e le pillole dell'indicatore aggiungono una voce.
+- Home, Gioco, Rivela, Rivedi: nessun'altra differenza.
 - "Parole usate": per browser e dispositivo, non condivise tra dispositivi (§ 2 invariato per il resto).
 
 ## W10. Criteri di accettazione web
@@ -86,7 +88,7 @@ Vitest = test automatici sulla logica; Browser = collaudo manuale/automatizzato 
 - **CA-W16** (Browser) Con `localStorage` bloccato (navigazione privata) l'app si avvia e si gioca una partita; nessun errore a schermo.
 - **CA-W17** (Browser) Il rotare lo schermo durante un ruolo visibile lascia il ruolo visibile senza perdere lo stato (differenza accettata da CA-29).
 - **CA-W18** (Browser) Tutti i testi dell'interfaccia coincidono con `strings.xml` (CA-36), compresi i testi del restyling (CA-66…CA-68).
-- **CA-W19** (Browser) I CA di interfaccia Android non citati sopra (CA-22…CA-26, CA-43…CA-55, CA-60, CA-62…CA-65, CA-80…CA-90) sono verificati sul web con le sole sostituzioni di W3 e W4.
+- **CA-W19** (Browser) I CA di interfaccia Android non citati sopra (CA-22…CA-26, CA-43…CA-55, CA-60, CA-62…CA-65, CA-80…CA-96, CA-99…CA-105) sono verificati sul web con le sole sostituzioni di W3 e W4.
 
 ## W11. Fuori perimetro (web)
 

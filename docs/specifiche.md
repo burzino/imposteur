@@ -12,6 +12,8 @@ Incluso in v1:
 - opzioni avanzate facoltative (4.2.1), ordine di parola (5.6) e segnalazione di coppie (4.6);
 - memorizzazione della configurazione tra un avvio e l'altro.
 
+Aspetto grafico: `docs/design.md` è la fonte unica di token e layout, comune ad Android e PWA (font Roboto Flex incorporato in entrambe); vedi 8.3.
+
 Discussione e voto avvengono a voce, fuori dall'app. Vedi sezione 9 per il fuori perimetro.
 
 ## 2. Glossario
@@ -40,45 +42,54 @@ Home → Configurazione → Distribuzione ruoli → Gioco → Rivela → (Rigioc
 - Tasto indietro: esce dall'app.
 
 ### 4.2 Configurazione
-Tutti i campi sono precompilati con l'ultima configurazione salvata (o con i default al primo avvio).
+La Configurazione è un percorso di 4 passi: 1 "Giocatori", 2 "Opzioni", 3 "Categorie", 4 "Riepilogo". Tutti i campi sono precompilati con l'ultima configurazione salvata (o con i default al primo avvio). Ogni ingresso ("Nuova partita", "Modifica giocatori e opzioni", "Interrompi" da Gioco) apre il passo 1; il passo corrente non è salvato. Layout dei passi: `docs/design.md` 4.4.
+
+Passo di ogni campo: giocatori, impostori, "Impostori a sorpresa", modalità, nomi = passo 1 (in quest'ordine); opzioni avanzate (4.2.1) = passo 2; categorie e "Parole ancora da giocare" = passo 3; il passo 4 riassume tutto.
 
 | Campo | Controllo | Regole | Default |
 |---|---|---|---|
 | Numero giocatori | stepper "−" / "+" con valore visibile | intero 3–20 | 4 |
 | Nomi | un campo testo per giocatore, etichetta "Giocatore n" | facoltativo; spazi iniziali/finali rimossi; max 20 caratteri; nome vuoto → "Giocatore n"; nomi duplicati (senza distinzione maiuscole/minuscole) non ammessi | vuoto (mostra "Giocatore 1…N") |
 | Numero impostori (etichetta "Impostori (massimo)" con "Impostori a sorpresa" attivo, vedi 4.2.1) | stepper | minimo 1; massimo = floor((giocatori − 1) / 2), cioè i civili sono sempre più degli impostori (3-4 giocatori → 1, 5-6 → 2, 7-8 → 3, …, 20 → 9) | 1 |
-| Modalità | scelta singola: "Impostore senza parola" / "Parola affine" | obbligatoria | "Impostore senza parola" |
+| Impostori a sorpresa | interruttore, subito sotto il numero di impostori (passo 1); non fa parte delle Opzioni avanzate | se attivo, K è scelto a caso in 1..massimo a ogni partita (5.5) | spento |
+| Modalità | scelta singola: "Impostore senza parola" / "Parola affine"; sotto ciascuna una riga di spiegazione: "I civili conoscono la parola, l'impostore deve bluffare." (sotto "Impostore senza parola"), "L'impostore riceve una parola simile ma diversa." (sotto "Parola affine") | obbligatoria | "Impostore senza parola" |
 | L'impostore vede la categoria | interruttore, nel gruppo "Ruoli" delle Opzioni avanzate (4.2.1) | visibile e attivo solo se la modalità è "Impostore senza parola"; nascosto (non applicato) in "Parola affine" | attivo |
 | Categorie | lista con caselle di selezione, più "Seleziona tutte" / "Deseleziona tutte" | almeno una selezionata | tutte selezionate |
 | Parole ancora da giocare | testo "Parole ancora da giocare: X / Y" e pulsante "Azzera" | vedi sotto | calcolato |
-| Opzioni avanzate | card a fisarmonica, vedi 4.2.1 | tutte facoltative | chiusa, tutte spente |
+| Opzioni avanzate | passo 2, tre gruppi sempre visibili, vedi 4.2.1 | tutte facoltative | tutte spente |
 
 Regole di validazione:
 - Se il numero giocatori scende, il numero impostori e i nomi in eccesso si adattano: impostori = min(impostori, nuovo massimo). I nomi dei giocatori oltre N restano memorizzati ma non usati.
-- Se un nome duplicato è presente, il campo mostra l'errore "Nome già usato" e "Inizia" è disabilitato. Il nome di default "Giocatore n" è considerato per il confronto.
-- Se nessuna categoria è selezionata: messaggio "Seleziona almeno una categoria" e "Inizia" disabilitato.
+- Se un nome duplicato è presente, il campo mostra l'errore "Nome già usato" e "Avanti" del passo 1 è disabilitato. Il nome di default "Giocatore n" è considerato per il confronto.
+- Se nessuna categoria è selezionata: messaggio "Seleziona almeno una categoria" e "Avanti" del passo 3 disabilitato.
 - In modalità "Parola affine" una parola senza affine non può essere estratta (vedi 7).
 - Ogni campo nome ha un pulsante "x" che cancella il testo del nome (il campo torna vuoto, quindi vale "Giocatore n"). Sulla tastiera dei campi nome è presente il tasto Avanti, che porta al campo nome successivo.
-- Quando "Inizia" è disabilitato, sopra il pulsante compare in rosso il primo errore di validazione (in ordine di schermata) con il suo testo dedicato ("Nome già usato", "Seleziona almeno una categoria", "Le categorie scelte non contengono parole utilizzabili"); se l'errore non ha un testo dedicato compare "Controlla la configurazione".
+- Quando "Avanti" è disabilitato, sopra i pulsanti compare in rosso l'errore del passo corrente con il suo testo dedicato ("Nome già usato", "Seleziona almeno una categoria", "Le categorie scelte non contengono parole utilizzabili"); se l'errore non ha un testo dedicato compare "Controlla la configurazione".
 - "Parole ancora da giocare: X / Y": Y = dimensione del pool iniziale (5.2 passo 1) per le categorie e la modalità attualmente scelte; X = parole di quel pool non presenti tra le usate. Si aggiorna al variare di categorie e modalità. Il pulsante "Azzera" è abilitato solo se X < Y e chiede conferma "Rimettere in gioco tutte le parole delle categorie scelte?" con pulsanti "Annulla" / "Azzera". Confermando, dalle usate si tolgono solo le parole delle categorie scelte (le usate di altre categorie restano); "Annulla" non cambia nulla.
-- "Inizia" salva la configurazione e apre la Distribuzione ruoli. Tasto indietro: torna alla Home (la configurazione corrente viene salvata).
+- La barra azioni (errore del passo e pulsanti) è fissa in fondo allo schermo, fuori dall'area che scorre: resta visibile in ogni passo con qualsiasi numero di giocatori (fino a 20) e con la tastiera aperta (sale sopra la tastiera). Il contenuto scorrevole ha spazio finale sufficiente perché l'ultimo elemento non resti coperto.
+- **Indicatore dei passi**: pillole semplici (una per passo, nessuna barra ondulata) con etichetta "Passo k di 4 · Nome" (nomi: "Giocatori", "Opzioni", "Categorie", "Riepilogo"); le pillole distinguono passi fatti, corrente e da fare.
+- **Titoli dei passi**: 1 "Chi gioca?" / "Quanti siete e come vi chiamate."; 2 "Opzioni avanzate" / "Sono tutte facoltative: puoi andare avanti senza toccarle."; 3 "Categorie" / "Da quali argomenti pescare le parole."; 4 "Tutto pronto?" / "Controlla e inizia."
+- **Pulsanti**: passo 1 solo "Avanti"; passi 2 e 3 "Indietro" e "Avanti"; passo 4 "Indietro" e "Inizia". "Avanti" è disabilitato solo se il passo corrente ha un errore (passo 1: nome duplicato; passo 2: mai; passo 3: nessuna categoria o nessuna parola utilizzabile).
+- **"Inizia" nella barra superiore**: pulsante testo disponibile da tutti i passi 1-3, compreso il passo 1 (il passo 4 ha già "Inizia" come pulsante). Se la configurazione è valida salva e apre la Distribuzione ruoli; altrimenti porta al primo passo non valido (in ordine 1, 3) e mostra il suo errore (se è il passo corrente, resta lì e mostra l'errore).
+- **Indietro**: pulsante "Indietro", freccia della barra e tasto di sistema tornano al passo precedente, senza essere mai bloccati dalla validazione; dal passo 1 tornano alla Home salvando la configurazione.
+- **Passo 4 "Riepilogo"**: quattro righe, ciascuna con "Modifica" che porta al passo indicato (indietro riporta al riepilogo): "Giocatori" (passo 1; valore "N giocatori, 1 impostore" / "N giocatori, M impostori"; con "Impostori a sorpresa" attivo e massimo > 1 "N giocatori, fino a M impostori", con massimo 1 resta "1 impostore"; seconda riga i nomi separati da ", ", i vuoti come "Giocatore n"); "Modalità" (passo 1); "Opzioni avanzate" (passo 2; riepilogo di 4.2.1 e badge "N attive"); "Categorie" (passo 3; "1 categoria" / "N categorie", seconda riga "Parole ancora da giocare: X / Y").
+- La configurazione è salvata a ogni cambio di passo, a ogni uscita e con "Inizia"; vale il formato di 6.
 
 ### 4.2.1 Opzioni avanzate
-Card a fisarmonica "Opzioni avanzate", chiusa per default (lo stato aperto/chiuso non è persistito), posta dopo le Categorie. Tutte le opzioni sono spente per default e sono salvate con la configurazione (6).
+Passo 2 della Configurazione (tra Giocatori e Categorie): titolo "Opzioni avanzate" con badge "N attive" (N = opzioni contate attive, vedi sotto; assente se N = 0); i tre gruppi sono sempre visibili (nessuna fisarmonica). Tutte le opzioni sono spente per default e sono salvate con la configurazione (6). "Impostori a sorpresa" non è fra le Opzioni avanzate: sta nel passo 1 (4.2).
 
-- **Intestazione della card**: titolo "Opzioni avanzate", badge "N attive" (N = opzioni contate attive, vedi sotto; assente se N = 0) e, a card chiusa, un riassunto: "Regole classiche" se N = 0, altrimenti i nomi brevi delle opzioni attive separati da virgola.
+- **Riepilogo** (riga "Opzioni avanzate" del passo 4): elenco separato da virgole e spazio (", ") delle sole opzioni avanzate non predefinite, in quest'ordine: i nomi brevi degli interruttori attivi ("Non parla per primo", "Trappola", "Ordine casuale", "Promemoria"), "senza categoria" (se "L'impostore vede la categoria" è spento e la modalità è "Impostore senza parola"), "N giri" (se "Giri di indizi" > 1). Se vuoto: "Nessuna opzione attiva". Esempio: "Ordine casuale, 2 giri". Il numero di impostori e "Impostori a sorpresa" NON sono in questo elenco: stanno nella riga "Giocatori" (4.2). Il badge conta solo le opzioni elencate in "Badge" (quindi non "senza categoria"). Il testo "Regole classiche" non esiste più. Il riepilogo riflette sempre lo stato corrente.
 - **Gruppo "Ruoli"**:
   - "L'impostore vede la categoria" (interruttore, spostato qui dalla posizione di 4.2; stesse regole: visibile solo in modalità "Impostore senza parola"; default attivo; NON contata nel badge);
   - "L'impostore non parla per primo" (interruttore);
-  - "Impostori a sorpresa" (interruttore): K è scelto a caso in 1..massimo a ogni partita;
   - "Partita trappola" (interruttore): ogni tanto nessuno è impostore (probabilità 10%).
 - **Gruppo "Turni"**:
   - "Ordine casuale" (interruttore);
   - "Giri di indizi" (scelta singola 1 | 2 | 3, default 1; contata nel badge se > 1).
 - **Gruppo "Fine partita"**:
   - "Promemoria ultima possibilità" (interruttore).
-- **Badge**: N = numero di interruttori attivi tra "L'impostore non parla per primo", "Impostori a sorpresa", "Partita trappola", "Ordine casuale", "Promemoria ultima possibilità", più 1 se "Giri di indizi" > 1.
-- **Etichetta del selettore impostori**: con "Impostori a sorpresa" attivo diventa "Impostori (massimo)"; altrimenti "Numero impostori". Limiti invariati (min 1, max floor((giocatori − 1) / 2)).
+- **Badge**: N = numero di interruttori attivi tra "L'impostore non parla per primo", "Partita trappola", "Ordine casuale", "Promemoria ultima possibilità", più 1 se "Giri di indizi" > 1.
+- **Etichetta del selettore impostori** (passo 1): con "Impostori a sorpresa" attivo diventa "Impostori (massimo)"; altrimenti "Numero impostori". Limiti invariati (min 1, max floor((giocatori − 1) / 2)). Nel riepilogo (passo 4) con "Impostori a sorpresa" attivo: "fino a N impostori" (N > 1), "1 impostore" se il massimo è 1.
 - Nessuna regola di validazione aggiuntiva: ogni combinazione è ammessa. "Partita trappola" e "Impostori a sorpresa" sono compatibili.
 - In modalità "Parola affine" tutte le opzioni restano disponibili; "L'impostore vede la categoria" resta nascosta (4.2).
 
@@ -166,7 +177,7 @@ Dall'app si può segnalare una coppia (parola, affine) o un problema dell'app; l
 4. Si estrae una parola a caso (uniforme) e la si aggiunge a "usate".
 5. L'insieme "usate" è persistente (vedi 6): sopravvive alla chiusura dell'app e si azzera solo per esaurimento del pool (passo 3) o con "Azzera" in Configurazione (4.2), che toglie dalle usate solo le parole delle categorie scelte. Non si azzera cambiando impostazioni o categorie.
 7. Parole rimanenti per un pool (categorie e modalità scelte) = parole del pool non presenti tra le usate; l'azzeramento per pool rimuove dalle usate solo le parole delle categorie scelte (indipendentemente dalla modalità).
-6. Se il pool iniziale (passo 1) è vuoto, "Inizia" è disabilitato con messaggio "Le categorie scelte non contengono parole utilizzabili".
+6. Se il pool iniziale (passo 1) è vuoto, "Avanti" del passo 3 Categorie è disabilitato con messaggio "Le categorie scelte non contengono parole utilizzabili" ("Inizia" porta a quel passo).
 
 ### 5.3 Giocatore che inizia
 Uniforme tra tutti gli N giocatori, estratto a ogni partita.
@@ -281,7 +292,7 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 - **CA-22** Al primo avvio la Configurazione mostra: 4 giocatori, 1 impostore, modalità "Impostore senza parola", opzione categoria attiva, tutte le categorie selezionate, nomi "Giocatore 1…4".
 - **CA-23** I pulsanti "−"/"+" del numero giocatori si fermano a 3 e 20; quelli degli impostori si fermano a 1 e al massimo consentito; il massimo si aggiorna al variare dei giocatori.
 - **CA-24** L'interruttore "L'impostore vede la categoria" è visibile solo con modalità "Impostore senza parola".
-- **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Inizia" è disabilitato e sopra compare in rosso lo stesso errore; con un nome duplicato compare "Nome già usato" e "Inizia" è disabilitato; per un errore senza testo dedicato sopra "Inizia" compare in rosso "Controlla la configurazione".
+- **CA-25** Con nessuna categoria selezionata compare "Seleziona almeno una categoria" e "Avanti" del passo 3 è disabilitato, con sopra in rosso lo stesso errore; con un nome duplicato compare "Nome già usato" e "Avanti" del passo 1 è disabilitato; per un errore senza testo dedicato sopra i pulsanti compare in rosso "Controlla la configurazione".
 - **CA-26** Chiudendo e riaprendo l'app, la Configurazione mostra gli stessi valori impostati prima della chiusura.
 - **CA-27** La schermata "Passa il telefono a <nome>" non contiene né parola né testo di ruolo; il ruolo compare solo dopo la pressione lunga (300 ms) su "Tieni premuto per scoprire" (didascalia "Sono <nome> — tieni premuto"); un tocco breve o un rilascio anticipato non rivelano nulla e la barra torna a zero.
 - **CA-28** Dopo "Nascondi e passa" il ruolo non è più visibile e non esiste alcun controllo né gesto (incluso il tasto indietro) per rivedere il ruolo di un giocatore precedente.
@@ -321,17 +332,42 @@ Opzioni avanzate e ordine di parola (4.2.1, 5.5, 5.6). Ogni caso con `Random` in
 
 Opzioni avanzate, ordine di parola, segnalazioni (4.2, 4.4, 4.5, 4.6):
 
-- **CA-80** Nella Configurazione compare la card "Opzioni avanzate", chiusa per default; chiusa mostra il riassunto "Regole classiche" se nessuna opzione contata è attiva, altrimenti l'elenco sintetico delle opzioni attive; aperta mostra i gruppi "Ruoli", "Turni", "Fine partita" con i controlli di 4.2.1.
-- **CA-81** Il badge mostra "N attive" con N = opzioni contate attive (4.2.1); con N = 0 il badge non compare. "L'impostore vede la categoria" è nel gruppo "Ruoli" ma non è contata nel badge.
-- **CA-82** Con "Impostori a sorpresa" attivo l'etichetta del selettore impostori è "Impostori (massimo)"; spenta torna "Numero impostori". Il limite massimo del selettore (CA-23) non cambia.
+- **CA-80** (modificato) Nella Configurazione il passo 2 "Opzioni avanzate" mostra sempre visibili i gruppi "Ruoli", "Turni", "Fine partita" con i controlli di 4.2.1; non esiste alcuna card chiusa/aperta.
+- **CA-81** (modificato) Il badge "N attive" sta nel titolo del passo 2 e nella riga "Opzioni avanzate" del passo 4; N = opzioni contate attive (4.2.1: "L'impostore non parla per primo", "Partita trappola", "Ordine casuale", "Promemoria ultima possibilità", "Giri di indizi" > 1); con N = 0 il badge non compare. "L'impostore vede la categoria" e "Impostori a sorpresa" non sono contati.
+- **CA-82** (modificato) Nel passo 1 l'interruttore "Impostori a sorpresa" sta subito sotto il numero di impostori; con "Impostori a sorpresa" attivo l'etichetta del selettore è "Impostori (massimo)"; spento torna "Numero impostori". Il limite massimo del selettore (CA-23) non cambia. L'interruttore non compare nel passo 2.
 - **CA-83** Il selettore "Giri di indizi" offre 1, 2, 3 (default 1); riaprendo l'app le opzioni avanzate hanno gli stessi valori impostati prima della chiusura (CA-26 esteso).
 - **CA-84** Con "Giri di indizi" > 1 la schermata di Gioco mostra l'ordine di parola ripetuto con le intestazioni "Giro 1", "Giro 2", …, "Giro n"; con 1 giro mostra un solo elenco senza intestazione "Giro".
 - **CA-85** La schermata di Gioco mostra l'ordine di parola nella sequenza in cui parlano i giocatori, il primo coincide con "Parla per primo: <nome>"; nessun ruolo è visibile.
 - **CA-86** In una partita trappola la schermata Rivela mostra "Nessun impostore: era una partita trappola!", poi "La parola era: <parola>" (e "La parola affine era: <affine>" in modalità "Parola affine") e "Categoria: <nome categoria>"; non compare "L'impostore era" né "Gli impostori erano".
 - **CA-87** Con "Promemoria ultima possibilità" attivo e almeno un impostore, la schermata Rivela mostra il riquadro con "L'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!"; il riquadro non compare se l'opzione è spenta né in una partita trappola.
 - **CA-88** In una partita trappola le schermate di rivelazione in Distribuzione e in "Rivedi la parola" mostrano a tutti il contenuto civile (4.3), identico per layout, etichette e colori; con la modalità "Impostore senza parola" nessun giocatore vede "Sei l'impostore".
-- **CA-89** Con tutte le opzioni avanzate spente le schermate sono identiche a prima dell'introduzione delle opzioni: nessun badge, riassunto "Regole classiche", nessuna intestazione "Giro", nessun riquadro del promemoria.
+- **CA-89** (modificato) Con tutte le opzioni avanzate spente: nessun badge, riga "Opzioni avanzate" del passo 4 = "Nessuna opzione attiva" (non più "1 impostore"), nessuna intestazione "Giro", nessun riquadro del promemoria.
 - **CA-90** La schermata di segnalazione di una coppia offre i campi facoltativi di proposta (parola e affine, max 40 caratteri); "Salva" resta disattivato se non c'è alcun motivo, nota o coppia proposta valida; con un solo campo compilato o con le due parole uguali (senza distinzione maiuscole/minuscole) "Salva" è disattivato e compare un avviso.
+
+Rinnovo grafico: riepilogo, spiegazioni delle modalità, pulsante "Inizia" fisso (4.2, 4.2.1):
+
+- **CA-92** (modificato) Il numero di impostori è nella riga "Giocatori" del passo 4: "1 impostore" con 1, "N impostori" con N > 1, "fino a N impostori" con "Impostori a sorpresa" attivo e N > 1 (con massimo 1: "1 impostore"); es. "5 giocatori, fino a 2 impostori". Il testo "Regole classiche" non compare mai.
+- **CA-93** (modificato) La riga "Opzioni avanzate" del passo 4 elenca, separate da ", " e nell'ordine di 4.2.1, solo le opzioni avanzate non predefinite, senza il numero di impostori né "Impostori a sorpresa". Esempio: "Ordine casuale" attivo e "Giri di indizi" = 2 danno "Ordine casuale, 2 giri"; con "L'impostore vede la categoria" spento (modalità "Impostore senza parola") compare "senza categoria"; in modalità "Parola affine" non compare mai.
+- **CA-94** (modificato) Il riepilogo è nel passo 4 e riflette sempre lo stato corrente (anche dopo "Modifica" e ritorno). Il badge "N attive" resta definito da CA-81: cambiare solo il numero di impostori o "Impostori a sorpresa" non lo modifica.
+- **CA-95** Nella scelta della modalità compare sotto "Impostore senza parola" la riga "I civili conoscono la parola, l'impostore deve bluffare." e sotto "Parola affine" la riga "L'impostore riceve una parola simile ma diversa."; entrambe sono sempre visibili, indipendentemente dalla modalità selezionata.
+- **CA-96** (modificato) In ogni passo la barra azioni è fissa e visibile senza scorrere con 20 giocatori e con la tastiera aperta (in quest'ultimo caso sopra la tastiera); l'errore del passo è sopra i pulsanti, anch'esso visibile. L'ultimo elemento del contenuto può essere scorso fino a non essere coperto dalla barra.
+- **CA-97** (modifica di CA-80, CA-89 e testi di 4.2.1) Nessun criterio né schermata usa più il riassunto "Regole classiche"; i criteri CA-80 e CA-89 sono aggiornati di conseguenza.
+
+## 8.3 Aspetto
+
+L'aspetto (colori, tipografia, forme, spaziature, animazioni, layout delle schermate) è definito in `docs/design.md`, fonte unica dei token e dei layout, comune ad Android e PWA. Il font è Roboto Flex, incorporato in entrambe le piattaforme (non il font di sistema). Le specifiche funzionali non duplicano i valori: in caso di conflitto sui testi vale questo documento, in caso di conflitto su colori e layout vale `docs/design.md`.
+
+Configurazione a passi (4.2, 4.2.1):
+
+- **CA-99** "Nuova partita" apre il passo 1 di 4; l'indicatore mostra "Passo 1 di 4 · Giocatori" con pillole semplici (nessuna barra ondulata) che distinguono passi fatti, corrente e da fare. Nel passo 1 l'ordine è: numero giocatori, numero impostori, "Impostori a sorpresa", modalità, nomi.
+- **CA-100** "Avanti" passa al passo successivo; "Indietro", la freccia e il tasto di sistema tornano al precedente senza controllare la validità; dal passo 1 portano alla Home e la configurazione è salvata.
+- **CA-101** Nel passo 1 un nome duplicato disabilita "Avanti" e mostra "Nome già usato" sopra il pulsante; il passo 2 non blocca mai; nel passo 3 "Avanti" è disabilitato senza categorie ("Seleziona almeno una categoria") o senza parole utilizzabili ("Le categorie scelte non contengono parole utilizzabili").
+- **CA-102** "Inizia" nella barra superiore è presente nei passi 1, 2 e 3. Con configurazione valida salva e apre la Distribuzione ruoli; altrimenti porta al primo passo non valido mostrando il suo errore (dal passo 1 con nome duplicato resta nel passo 1 e mostra "Nome già usato").
+- **CA-103** Il passo 4 mostra le righe "Giocatori", "Modalità", "Opzioni avanzate", "Categorie" con i valori di 4.2; "Modifica" porta al passo corrispondente e indietro riporta al riepilogo; "Inizia" avvia la partita.
+- **CA-104** Con "Impostori a sorpresa" attivo (passo 1) il numero di impostori nel riepilogo è "fino a N impostori" (N > 1) e l'etichetta del contatore è "Impostori (massimo)"; con massimo 1 il riepilogo resta "1 impostore".
+- **CA-105** La configurazione e le sue modifiche (compreso "Impostori a sorpresa") sopravvivono al cambio di passo, alla rotazione e alla chiusura dell'app (stesso formato di prima); "Rigioca (stessi giocatori)" in Rivela non passa dai passi; "Modifica giocatori e opzioni" apre il passo 1.
+
+- **CA-98** Su Android e sul web tutto il testo dell'interfaccia usa Roboto Flex incorporato nell'app/PWA (nessun caricamento da rete); i testi restano in italiano e leggibili anche offline.
 
 ## 9. Fuori perimetro (v1)
 
