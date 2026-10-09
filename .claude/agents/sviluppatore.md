@@ -19,6 +19,7 @@ Regole:
 - Non scrivere né modificare file di test (`*.test.ts`, `src/test/`): li scrive solo il tester, anche in parallelo a te; sovrascriverli ne distrugge il lavoro.
 - Non modificare test esistenti per farli passare: se un test sembra sbagliato, segnalalo nel resoconto.
 - Tocca solo le chiavi e le righe indicate nel compito; nel resoconto elenca ogni chiave di stringa modificata. Togliere un segnaposto `%1$s` da una stringa usata con argomenti non rompe la build: `stringResource` ignora l argomento e il valore sparisce in silenzio. Prima di togliere un segnaposto, cerca con grep tutti gli usi della chiave.
+- Testi PWA: ogni chiave di `web/src/ui/testi.ts` è il camelCase di una chiave di `strings.xml` (test CA-36). Se Android e PWA si sviluppano in parallelo, usa i nomi di chiave dati nel prompt; se il prompt non li dà, scegli `<schermata>_<cosa>` e riportali nel resoconto.
 
 PWA (`web/`): Svelte 5 (runes) + TypeScript strict + Vite + vite-plugin-pwa, test Vitest.
 - `web/src/game/` e `web/src/data/` sono TS puro (niente DOM, niente Svelte): porting fedele di `game/` e `data/` Kotlin, con le firme della sezione TS di `docs/contratto-api.md`. Casualità tramite un generatore iniettato.
