@@ -62,14 +62,14 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - BOM Compose 2026.09.00, AGP 9.1.1 (Kotlin integrato), Gradle 9.3.1, compileSdk 37. material3 resta 1.4.0: API Expressive internal/sperimentali, molle scritte a mano in `ui/theme/Movimento.kt`.
 - Design unico in `docs/design.md` (agente `designer-ui`), bozza `docs/design/bozza.html`. Roboto Flex incorporato (Android res/font, 1,7 MB non ridotto; PWA @fontsource-variable latin/latin-ext).
 - Configurazione in 4 passi: Giocatori (con "Impostori a sorpresa"), Opzioni, Categorie, Riepilogo; "Inizia" in barra nei passi 1-3. Logica in `game/Passi.kt` e `web/src/game/passi.ts` (contratto v1.7/v2.2), CA-99..105.
-- Revisione Android/PWA in `docs/revisione-design.md`: chiusi A1-A6 e M1-M19; restano i B (bassi) e B6 (margine 24 oltre 600 dp su Android).
-- Test: Android 184/184, PWA 322/322. Commit fino a 0610271, NON ancora pushati (il push pubblica la PWA).
+- Revisione Android/PWA in `docs/revisione-design.md`: chiusi tutti (A, M, B).
+- Test: Android 184/184, PWA 322/322. Pushato fino a b06df05 (PWA pubblicata da Pages; esito del workflow non verificato). APK con il restyling (senza i B) installato sul OnePlus 9; quello con i B da installare.
 - Collaudo headless (09-10): tema persistente, localStorage bloccato, rotazione, visibilitychange OK. Export segnalazioni non verificato (script instabile): resta nella scaletta del telefono.
 
 ## Prossimi passi
-1. Esito degli screenshot della PWA restyling (scratchpad della sessione ce72f90a, collaudo/shot/r3-*), poi push.
+1. Installare l APK aggiornato (telefono scollegato al momento della build). Screenshot mancanti della PWA: Gioco, Rivedi, Rivela, Impostazioni.
 2. Collaudo su telefono: APK nuovo (restyling, 4 passi, 300 ms) e PWA secondo `docs/collaudo-pwa-telefono.md`. Su Android verificare medaglione Home, pesi 700/800 di Roboto Flex, "Inizia" sopra la tastiera con 20 giocatori.
-3. Difetti bassi della revisione; nomi su riga separata in Gioco e Rivela (richiede testi divisi).
+3. Nomi su riga separata in Gioco e Rivela (richiede testi divisi).
 4. Dominio imposteur.burzi.eu (CNAME su Aruba, poi BASE_PATH=/).
 5. Action di Pages su Node 20: aggiornarle.
 
