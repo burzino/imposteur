@@ -12,7 +12,7 @@
 - Versioni previste: Gradle 9.1.0, AGP 8.13.0, Kotlin 2.2.20, Compose BOM 2025.09.01, compileSdk/targetSdk 36 (activity 1.11 richiede 36; la piattaforma la scarica AGP), minSdk 26.
 
 ## Agenti (`.claude/agents/`)
-analista-funzionale, redattore-parole, sviluppatore, tester, esecutore-build, collaudatore.
+analista-funzionale, redattore-parole, sviluppatore, tester, revisore, designer-ui, esecutore-build, collaudatore.
 Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agenti generici che leggevano la definizione del proprio ruolo.
 
 ## Ondate
@@ -57,16 +57,22 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 
 - Rivedi: vale il CA-54 (utente, 2026-10-08): niente "Giocatore k di N" nel Passaggio, anche su Android (`mostraAvanzamento = false`). APK da reinstallare per il collaudo.
 
-## Prossimi passi PWA
-1. Collaudo sul telefono vero (Android Chrome e iPhone Safari): installazione, vibrazione, wake lock, pressione lunga in Rivedi entro 400 ms dal tocco sul nome (in headless non rivela: probabile ritardo anti doppio tocco di 600 ms, voluto).
-2. Non verificati: persistenza del tema dopo il reload (CA-W14), contenuto del file di segnalazioni esportato, localStorage bloccato, rotazione.
-3. Dominio imposteur.burzi.eu: CNAME su Aruba verso `burzino.github.io.`, poi BASE_PATH=/ nel workflow e dominio personalizzato in Pages.
-4. Le action di Pages girano ancora su Node 20 (avviso di deprecazione): aggiornarle quando escono versioni nuove.
+## Ondata del 2026-10-09: restyling 2026 e configurazione a passi
+- Pressione lunga 300 ms (blocco anti doppio tocco 600 ms invariato). Firma release da `keystore.properties` (escluso da git, modello in `keystore.properties.esempio`): l'utente deve creare la chiave con keytool.
+- BOM Compose 2026.09.00, AGP 9.1.1 (Kotlin integrato), Gradle 9.3.1, compileSdk 37. material3 resta 1.4.0: API Expressive internal/sperimentali, molle scritte a mano in `ui/theme/Movimento.kt`.
+- Design unico in `docs/design.md` (agente `designer-ui`), bozza `docs/design/bozza.html`. Roboto Flex incorporato (Android res/font, 1,7 MB non ridotto; PWA @fontsource-variable latin/latin-ext).
+- Configurazione in 4 passi: Giocatori (con "Impostori a sorpresa"), Opzioni, Categorie, Riepilogo; "Inizia" in barra nei passi 1-3. Logica in `game/Passi.kt` e `web/src/game/passi.ts` (contratto v1.7/v2.2), CA-99..105.
+- Revisione Android/PWA in `docs/revisione-design.md`: chiusi A1-A6 e M1-M19; restano i B (bassi) e B6 (margine 24 oltre 600 dp su Android).
+- Test: Android 184/184, PWA 322/322. Commit fino a 0610271, NON ancora pushati (il push pubblica la PWA).
+- Collaudo headless (09-10): tema persistente, localStorage bloccato, rotazione, visibilitychange OK. Export segnalazioni non verificato (script instabile): resta nella scaletta del telefono.
+
+## Prossimi passi
+1. Esito degli screenshot della PWA restyling (scratchpad della sessione ce72f90a, collaudo/shot/r3-*), poi push.
+2. Collaudo su telefono: APK nuovo (restyling, 4 passi, 300 ms) e PWA secondo `docs/collaudo-pwa-telefono.md`. Su Android verificare medaglione Home, pesi 700/800 di Roboto Flex, "Inizia" sopra la tastiera con 20 giocatori.
+3. Difetti bassi della revisione; nomi su riga separata in Gioco e Rivela (richiede testi divisi).
+4. Dominio imposteur.burzi.eu (CNAME su Aruba, poi BASE_PATH=/).
+5. Action di Pages su Node 20: aggiornarle.
 
 ## Punti aperti
-- L'utente deve verificare il dialogo "Segnala" con la tastiera aperta.
-- Specifiche da aggiornare per il restyling (pressione lunga, overlay).
-- Collaudo sul telefono fisico da fare con l utente (ondata 6).
-- Revisione qualità parole in corso (docs/revisione-parole.md). Poi secondo giro di collaudo: affine, doppio tocco, am kill, Recents.
-- Build release firmata: da fare, la chiave la crea l utente.
-- Specifiche §10: decisioni dell analista confermate dall utente (2026-10-08).
+- Build release firmata: la chiave la crea l utente.
+- material3 1.5 stabile: quando esce, passare alle API Expressive vere.

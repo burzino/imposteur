@@ -40,4 +40,4 @@ Invarianti che attraversano più file:
 - `STATO.md`: stato del lavoro e punti aperti, per riprendere da una nuova sessione.
 - `app/src/main/assets/parole.json`: categorie con coppie parola/affine (formato in specifiche §7).
 
-Agenti di progetto in `.claude/agents/`: Sonnet: analista-funzionale, redattore-parole, sviluppatore, tester, revisore. Haiku: esecutore-build, collaudatore.
+Agenti di progetto in `.claude/agents/`: Sonnet: analista-funzionale, redattore-parole, sviluppatore, tester, revisore, designer-ui (aspetto e layout comuni, `docs/design.md`). Haiku: esecutore-build, collaudatore.
