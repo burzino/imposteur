@@ -5,7 +5,7 @@
   let { giocatori, corrente }: { giocatori: readonly string[]; corrente: number } = $props();
 
   let contenitore: HTMLElement | undefined = $state();
-  const scorre = $derived(giocatori.length > 8);
+  const scorre = $derived(giocatori.length > 6);
 
   $effect(() => {
     const i = corrente;
@@ -39,13 +39,13 @@
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: safe center;
     gap: var(--spazio-3);
     width: 100%;
     padding-block: 10px;
   }
   .fila.scorre {
-    justify-content: flex-start;
+    justify-content: safe center;
     overflow-x: auto;
     padding-inline: var(--spazio-4);
     scrollbar-width: none;

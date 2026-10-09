@@ -1,6 +1,12 @@
 package it.imposteur.ui.schermate
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,10 +22,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -38,7 +46,10 @@ import it.imposteur.ui.componenti.PulsanteContorno
 import it.imposteur.ui.componenti.PulsantePieno
 import it.imposteur.ui.componenti.PulsanteTesto
 import it.imposteur.ui.componenti.ScaffoldConBarra
+import it.imposteur.ui.theme.DURATA_VELOCE_MS
 import it.imposteur.ui.theme.Spazio
+import it.imposteur.ui.theme.mollaSpaziale
+import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 
 private const val NUMERO_PASSI = 4
 
@@ -50,6 +61,7 @@ private const val NUMERO_PASSI = 4
 @Composable
 fun SchermataConfigurazione(
     passo: Int,
+    direzione: Int,
     stato: UiState,
     viewModel: ImpostoreViewModel,
     onIndietro: () -> Unit,
@@ -83,7 +95,7 @@ fun SchermataConfigurazione(
                 if (errore != null) {
                     Text(
                         stringResource(testoErrore(errore)),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
@@ -116,10 +128,20 @@ fun SchermataConfigurazione(
                 onPasso = onVaiAPasso,
                 modifier = Modifier.padding(horizontal = Spazio.margineSchermata, vertical = Spazio.s2),
             )
+            // Entra solo il contenuto: scorrimento di 48 dp con dissolvenza (solo dissolvenza se ridotto).
+            val visibile = remember { MutableTransitionState(false).apply { targetState = true } }
+            val ridotto = rilevaRiduciAnimazioni()
+            val scostamento = with(LocalDensity.current) { 48.dp.roundToPx() }
+            AnimatedVisibility(
+                visibleState = visibile,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                enter = if (ridotto) fadeIn(tween(DURATA_VELOCE_MS))
+                else slideInHorizontally(mollaSpaziale()) { direzione * scostamento } + fadeIn(),
+                exit = ExitTransition.None,
+            ) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = Spazio.margineSchermata, vertical = Spazio.s2),
                 verticalArrangement = Arrangement.spacedBy(Spazio.s4),
@@ -133,6 +155,7 @@ fun SchermataConfigurazione(
                     PassoConfigurazione.RIEPILOGO -> PassoRiepilogo(stato, onModifica = onVaiAPasso)
                 }
                 Spacer(Modifier.height(96.dp))
+            }
             }
         }
     }
@@ -163,7 +186,7 @@ private fun IntestazionePasso(passo: Int, opzioniAttive: Int) {
     }
     Column(verticalArrangement = Arrangement.spacedBy(Spazio.s1)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spazio.s3)) {
-            Text(stringResource(titolo), style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(titolo), style = MaterialTheme.typography.titleLarge)
             if (passo == 2 && opzioniAttive > 0) BadgeAttive(opzioniAttive)
         }
         Text(

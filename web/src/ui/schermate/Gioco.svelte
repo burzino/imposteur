@@ -1,7 +1,6 @@
 <script lang="ts">
   import { getStato } from "../stato.svelte";
   import { vai, vaiAHome } from "../rotte";
-  import { richiestaInterruzione } from "../rotte";
   import { t } from "../testi";
   import Pagina from "../componenti/Pagina.svelte";
   import Pulsante from "../componenti/Pulsante.svelte";
@@ -34,7 +33,7 @@
   }
 </script>
 
-<Pagina titolo={t.giocoTitolo} onIndietro={() => (richiestaInterruzione.aperta = true)} onHome={home}>
+<Pagina titolo={t.giocoTitolo} onHome={home}>
   {#if partita}
     <div class="corpo">
       <section class="hero">

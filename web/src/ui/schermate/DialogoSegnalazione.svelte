@@ -166,7 +166,6 @@
   .coppia { margin: 0; font: var(--testo-titolo); overflow-wrap: anywhere; }
   .cat { margin: 0; font: var(--testo-corpo-piccolo); color: var(--colore-su-superficie-variante); }
   .riga { display: flex; align-items: center; gap: var(--spazio-3); min-height: var(--altezza-tocco); font: var(--testo-corpo); cursor: pointer; }
-  .riga input { width: 22px; height: 22px; accent-color: var(--colore-primario); flex: none; }
   .sezione { margin: var(--spazio-2) 0 0; font: var(--testo-etichetta); }
   .campo { display: flex; flex-direction: column; gap: 2px; }
   .et { font: var(--testo-didascalia); color: var(--colore-su-superficie-variante); }

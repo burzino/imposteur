@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,7 @@ import it.imposteur.ui.theme.DURATA_BARRA_MS
 import it.imposteur.ui.theme.DURATA_RILASCIO_BARRA_MS
 import it.imposteur.ui.theme.Forme
 import it.imposteur.ui.theme.Spazio
+import it.imposteur.ui.theme.bordoLivello
 
 /**
  * Pulsante a pressione lunga: la barra [primary] avanza da sinistra a destra in [DURATA_BARRA_MS]
@@ -64,6 +66,7 @@ fun PulsantePressioneLunga(
             .graphicsLayer { alpha = if (abilitato) 1f else 0.38f }
             .clip(Forme.XXL)
             .background(colori.primaryContainer)
+            .then(bordoLivello()?.let { Modifier.border(it, Forme.XXL) } ?: Modifier)
             .semantics(mergeDescendants = true) {
                 role = Role.Button
                 onClick(label = descrizioneAzione) {

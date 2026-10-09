@@ -29,7 +29,6 @@
       bind:this={campo}
       type="text"
       value={valore}
-      placeholder={t.configGiocatoreN(indice + 1)}
       autocapitalize="words"
       autocomplete="off"
       enterkeyhint={ultimo ? "done" : "next"}
@@ -48,21 +47,24 @@
   .blocco { display: flex; flex-direction: column; gap: var(--spazio-1); }
   .campo {
     position: relative;
-    border: 1px solid var(--colore-contorno);
-    border-radius: var(--raggio-m);
-    background: var(--colore-sfondo);
+    border-bottom: 2px solid var(--colore-su-superficie-variante);
+    border-radius: var(--raggio-s) var(--raggio-s) 0 0;
+    background: var(--colore-contenitore-superficie-alto);
   }
-  .campo:focus-within { border-color: var(--colore-primario); outline: 1px solid var(--colore-primario); }
-  .campo.errore, .campo.errore:focus-within { border-color: var(--colore-errore); outline-color: var(--colore-errore); }
+  .campo:focus-within { border-bottom-color: var(--colore-primario); box-shadow: 0 1px 0 0 var(--colore-primario); }
+  .campo.errore, .campo.errore:focus-within { border-bottom-color: var(--colore-errore); box-shadow: none; }
+  :global([data-tema="alto-contrasto"]) .campo {
+    border: 2px solid var(--colore-contorno); border-radius: var(--raggio-s);
+  }
   label {
-    position: absolute; top: 4px; left: var(--spazio-3);
-    font-size: 0.75rem; color: var(--colore-su-superficie-variante);
+    position: absolute; top: 4px; left: var(--spazio-4);
+    font: var(--testo-didascalia); color: var(--colore-su-superficie-variante);
   }
   .errore label { color: var(--colore-errore); }
   input {
     box-sizing: border-box; width: 100%; min-height: 56px;
-    padding: 22px 52px 6px var(--spazio-3);
-    border: 0; background: transparent; color: var(--colore-su-sfondo);
+    padding: 22px 52px 6px var(--spazio-4);
+    border: 0; background: transparent; color: var(--colore-su-superficie);
     font: inherit; font-size: 1rem; /* >= 16px: niente zoom su iOS */
     outline: none;
   }

@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -285,7 +285,7 @@ private fun DialogoSegnalaCoppia(
                         Text(stringResource(testo), modifier = Modifier.padding(start = 12.dp))
                     }
                 }
-                OutlinedTextField(
+                TextField(
                     value = nota,
                     onValueChange = { nota = it.take(MAX_COMMENTO) },
                     label = { Text(stringResource(R.string.segnala_commento)) },
@@ -302,7 +302,7 @@ private fun DialogoSegnalaCoppia(
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.segnala_proponi), style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                TextField(
                     value = propParola,
                     onValueChange = { propParola = it.take(MAX_PROPOSTA) },
                     label = { Text(stringResource(R.string.segnala_proponi_parola)) },
@@ -311,7 +311,7 @@ private fun DialogoSegnalaCoppia(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                TextField(
                     value = propAffine,
                     onValueChange = { propAffine = it.take(MAX_PROPOSTA) },
                     label = { Text(stringResource(R.string.segnala_proponi_affine)) },
@@ -323,7 +323,7 @@ private fun DialogoSegnalaCoppia(
                     Text(
                         stringResource(if (propostaMezza) R.string.segnala_proponi_manca else R.string.segnala_proponi_uguali),
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }

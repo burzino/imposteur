@@ -37,7 +37,7 @@
   });
 </script>
 
-<Pagina {titolo} {onHome} {onIndietro}>
+<Pagina {titolo} {onHome} {onIndietro} piedeNudo>
   <div class="scena">
     {#if mostraFila}
       <div class="testata">

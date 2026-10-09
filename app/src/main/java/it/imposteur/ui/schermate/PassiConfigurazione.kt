@@ -331,7 +331,7 @@ private fun RigaRiepilogo(
                 if (secondaria != null) {
                     Text(
                         secondaria,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -365,7 +365,7 @@ fun BadgeAttive(n: Int) {
 
 @Composable
 private fun TitoloSezione(testo: String) {
-    Text(testo, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    Text(testo, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
 }
 
 /** Contatore: riga in carta con etichetta a sinistra e "-" valore "+" a destra; il valore rimbalza al cambio. */

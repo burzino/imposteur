@@ -8,11 +8,13 @@
     onIndietro?: () => void;
     children: Snippet;
     piede?: Snippet;
+    /** Piede senza contenitore tonale (Distribuzione: la rivelazione non cambia sfondo). */
+    piedeNudo?: boolean;
     azione?: Snippet;
     /** Fascia fissa sotto la barra (es. indicatore dei passi). */
     testata?: Snippet;
   }
-  let { titolo, onHome, onIndietro, children, piede, azione, testata }: Props = $props();
+  let { titolo, onHome, onIndietro, children, piede, piedeNudo = false, azione, testata }: Props = $props();
 
   let scorso = $state(false);
 </script>
@@ -32,7 +34,7 @@
     </div>
   </main>
   {#if piede}
-    <footer class="piede">
+    <footer class="piede" class:nudo={piedeNudo}>
       <div class="colonna">
         {@render piede()}
       </div>
@@ -55,8 +57,8 @@
     padding-right: env(safe-area-inset-right);
   }
   .testata .colonna {
-    padding-top: 0;
-    padding-bottom: 0;
+    padding-top: var(--spazio-2);
+    padding-bottom: var(--spazio-2);
   }
   .scorrevole {
     flex: 1;
@@ -83,6 +85,11 @@
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
   }
+  .piede.nudo {
+    background: none;
+    border: 0;
+    border-radius: 0;
+  }
   .piede .colonna {
     padding-top: var(--spazio-4);
     padding-bottom: var(--spazio-4);
@@ -90,11 +97,5 @@
   /* senza piede, il contenuto scorrevole rispetta l'area sicura in basso */
   .scorrevole:last-child {
     padding-bottom: env(safe-area-inset-bottom);
-  }
-  @media (min-width: 600px) {
-    .colonna {
-      padding-left: var(--spazio-5);
-      padding-right: var(--spazio-5);
-    }
   }
 </style>

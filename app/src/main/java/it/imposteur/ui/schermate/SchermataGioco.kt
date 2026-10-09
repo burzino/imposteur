@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.imposteur.R
 import it.imposteur.game.Partita
@@ -99,11 +100,12 @@ fun SchermataGioco(
                 }
                 Spacer(Modifier.height(Spazio.s4))
                 Text(
-                    stringResource(R.string.gioco_ordine_titolo),
-                    style = MaterialTheme.typography.titleLarge,
+                    stringResource(R.string.gioco_istruzioni),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.align(Alignment.Start),
                 )
-                Spacer(Modifier.height(Spazio.s2))
+                Spacer(Modifier.height(Spazio.s4))
                 val ordine = partita.ordineDiParola()
                 val sfondoCarta = MaterialTheme.colorScheme.surfaceContainerLow
                 Surface(
@@ -115,8 +117,15 @@ fun SchermataGioco(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(Spazio.s3),
-                        verticalArrangement = Arrangement.spacedBy(Spazio.s1),
+                        verticalArrangement = Arrangement.spacedBy(Spazio.s2),
                     ) {
+                        item(key = "titolo") {
+                            Text(
+                                stringResource(R.string.gioco_ordine_titolo),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = Spazio.s2, vertical = Spazio.s1),
+                            )
+                        }
                         for (giro in 1..partita.giriIndizi.coerceIn(1, 3)) {
                             if (partita.giriIndizi > 1) {
                                 stickyHeader(key = "giro$giro") {
@@ -159,8 +168,9 @@ fun SchermataGioco(
                                     TestoAdattivo(
                                         testo = partita.giocatori[indice],
                                         stile = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = if (primo) FontWeight.Bold else FontWeight.SemiBold,
+                                            fontWeight = if (primo) FontWeight.Bold else FontWeight.Normal,
                                         ),
+                                        textAlign = TextAlign.Start,
                                         color = testo,
                                         maxRighe = 1,
                                         modifier = Modifier.weight(1f),

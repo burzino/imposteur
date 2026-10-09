@@ -3,22 +3,15 @@ package it.imposteur.ui.navigazione
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import it.imposteur.ui.theme.DURATA_VELOCE_MS
-import it.imposteur.ui.theme.mollaSpaziale
-import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -104,30 +97,18 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         }
     }
 
-    // Cambio passo: scorrimento orizzontale di 48 dp con dissolvenza (solo dissolvenza breve con "Riduci animazioni").
-    val ridotto = rilevaRiduciAnimazioni()
-    val scostamento = with(LocalDensity.current) { 48.dp.roundToPx() }
-    fun direzione(iniziale: NavBackStackEntry, finale: NavBackStackEntry): Int? {
-        val da = iniziale.passo() ?: return null
-        val a = finale.passo() ?: return null
-        return if (a >= da) 1 else -1
-    }
+    // Cambio passo: barra, indicatore e barra azioni restano fermi; scorre solo il contenuto
+    // (SchermataConfigurazione), come sul web. Qui si azzerano le transizioni tra passi.
+    fun trapassoTraPassi(iniziale: NavBackStackEntry, finale: NavBackStackEntry) =
+        iniziale.passo() != null && finale.passo() != null
     val ingressoPasso: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
-        val d = direzione(initialState, targetState)
-        when {
-            d == null -> null
-            ridotto -> fadeIn(tween(DURATA_VELOCE_MS))
-            else -> slideInHorizontally(mollaSpaziale()) { d * scostamento } + fadeIn()
-        }
+        if (trapassoTraPassi(initialState, targetState)) EnterTransition.None else null
     }
     val uscitaPasso: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
-        val d = direzione(initialState, targetState)
-        when {
-            d == null -> null
-            ridotto -> fadeOut(tween(DURATA_VELOCE_MS))
-            else -> slideOutHorizontally(mollaSpaziale()) { -d * scostamento } + fadeOut()
-        }
+        if (trapassoTraPassi(initialState, targetState)) ExitTransition.None else null
     }
+    // Ultimo passo mostrato: dà la direzione dello scorrimento (verso destra avanzando).
+    val ultimoPasso = remember { intArrayOf(0) }
 
     NavHost(navController = navController, startDestination = Rotte.HOME) {
         composable(Rotte.HOME) {
@@ -186,6 +167,8 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             popExitTransition = uscitaPasso,
         ) { voce ->
             val passo = (voce.arguments?.getInt(ARG_PASSO) ?: 1).coerceIn(1, 4)
+            val direzione = remember(voce.id) { if (passo >= ultimoPasso[0]) 1 else -1 }
+            SideEffect { ultimoPasso[0] = passo }
             // Guardia contro il doppio tocco: si agisce solo se questo passo e' ancora quello in cima.
             fun inQuestoPasso() = navController.currentBackStackEntry?.passo() == passo
             fun vaiAPasso(n: Int) {
@@ -195,6 +178,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             }
             SchermataConfigurazione(
                 passo = passo,
+                direzione = direzione,
                 stato = stato,
                 viewModel = viewModel,
                 onIndietro = {

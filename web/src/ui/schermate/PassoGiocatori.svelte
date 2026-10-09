@@ -81,6 +81,6 @@
 <style>
   .corpo { display: flex; flex-direction: column; gap: var(--spazio-4); padding-bottom: 96px; }
   .sezione { display: flex; flex-direction: column; gap: var(--spazio-3); }
-  h3 { margin: 0; font: var(--testo-etichetta); color: var(--colore-primario); }
-  .nomi { display: flex; flex-direction: column; gap: var(--spazio-3); }
+  h3 { margin: 0; font: var(--testo-titolo-sezione); color: var(--colore-primario); }
+  .nomi { display: flex; flex-direction: column; gap: var(--spazio-2); }
 </style>

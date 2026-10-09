@@ -90,7 +90,7 @@
 
 <style>
   .intestazione {
-    padding: var(--spazio-2) var(--spazio-1) var(--spazio-3);
+    padding: var(--spazio-2) 0;
   }
   .intestazione h2 {
     font: var(--testo-titolo-sezione);
@@ -132,7 +132,5 @@
     flex: 1;
     min-width: 0;
     text-align: left;
-    font-size: 1.125rem;
-    font-weight: 600;
   }
 </style>

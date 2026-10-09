@@ -56,14 +56,14 @@
 </script>
 
 {#snippet icona(dim: number)}
-  <svg width={dim} height={dim} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <svg width={dim} height={dim} viewBox="0 0 24 24" fill="var(--colore-primario)" aria-hidden="true">
     <path
       d="M12 2C8 2 5 5 5 9v5.5L3.5 20 8 18.5 12 22l4-3.5 4.5 1.5L19 14.5V9c0-4-3-7-7-7Zm-3 9a1.6 1.6 0 1 1 0 3.2A1.6 1.6 0 0 1 9 11Zm6 0a1.6 1.6 0 1 1 0 3.2A1.6 1.6 0 0 1 15 11Z"
     />
   </svg>
 {/snippet}
 
-<Pagina {titolo} {onHome} {onIndietro}>
+<Pagina {titolo} {onHome} {onIndietro} piedeNudo>
   <div class="scena">
     <div class="testata">
       {#if mostraFila}
@@ -80,7 +80,7 @@
             </p>
             <TestoAdattivo testo={contenuto.testo} classe="dist-parola" />
           {:else}
-            {@render icona(96)}
+            {@render icona(120)}
             <TestoAdattivo testo={t.ruoloSeiImpostore} classe="dist-impostore" />
             {#if contenuto.categoria !== null}
               <p class="categoria">{t.ruoloCategoria(contenuto.categoria)}</p>
@@ -123,19 +123,23 @@
   }
   .intro {
     font: var(--testo-titolo-sezione);
+    color: var(--colore-su-superficie-variante);
   }
   .categoria {
     font: var(--testo-titolo-sezione);
+    color: var(--colore-su-superficie-variante);
   }
   .scena :global(.dist-parola) {
     width: 100%;
     font-size: 2.25rem;
     font-weight: 800;
+    color: var(--colore-primario);
   }
   .scena :global(.dist-impostore) {
     width: 100%;
     font-size: 2.25rem;
     font-weight: 800;
+    color: var(--colore-primario);
   }
   .piede {
     width: 100%;

@@ -14,7 +14,7 @@
   <PassoIntestazione titolo={t.passo3Titolo} sottotitolo={t.passo3Sottotitolo} />
 
   <div class="azioni">
-    <Pulsante variante="contorno" onClick={() => stato.selezionaTutte(true)}>{t.configSelezionaTutte}</Pulsante>
+    <Pulsante variante="tonale" onClick={() => stato.selezionaTutte(true)}>{t.configSelezionaTutte}</Pulsante>
     <Pulsante variante="contorno" onClick={() => stato.selezionaTutte(false)}>{t.configDeselezionaTutte}</Pulsante>
   </div>
   <div class="rimanenti">
@@ -55,17 +55,22 @@
 
 <style>
   .corpo { display: flex; flex-direction: column; gap: var(--spazio-3); padding-bottom: 96px; }
-  .azioni { display: flex; flex-wrap: wrap; gap: var(--spazio-2); }
-  .azioni :global(.pulsante) { width: auto; flex: 1; }
+  .azioni { display: flex; flex-wrap: nowrap; gap: var(--spazio-2); }
+  .azioni :global(.pulsante) { width: auto; flex: 1 1 0; min-width: 0; }
   .rimanenti {
     display: flex; align-items: center; justify-content: space-between; gap: var(--spazio-2);
     font: var(--testo-corpo-piccolo); color: var(--colore-su-superficie-variante);
   }
   .azzera :global(.pulsante) { width: auto; }
-  .elenco { display: flex; flex-direction: column; }
+  .elenco {
+    display: flex; flex-direction: column; gap: 2px; overflow: hidden;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-sfondo);
+  }
   .riga {
     display: flex; align-items: center; gap: var(--spazio-3);
-    min-height: var(--altezza-tocco); cursor: pointer; font: var(--testo-corpo);
+    min-height: var(--altezza-tocco); padding: 0 var(--spazio-4); cursor: pointer; font: var(--testo-corpo);
+    background: var(--colore-contenitore-superficie-basso);
   }
-  .riga input { width: 22px; height: 22px; accent-color: var(--colore-primario); flex: none; }
 </style>

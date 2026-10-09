@@ -93,7 +93,7 @@
     filter: brightness(1.15);
   }
   .etichetta {
-    margin-top: calc(-1 * var(--spazio-2));
+    margin-top: var(--spazio-1);
     font: var(--testo-didascalia);
     color: var(--colore-su-superficie-variante);
   }

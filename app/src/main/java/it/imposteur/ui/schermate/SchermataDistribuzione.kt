@@ -50,8 +50,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -188,7 +190,7 @@ internal fun Contenitore(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Spazio.s5)
+            .padding(horizontal = Spazio.s4)
             .padding(bottom = Spazio.s4),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -259,12 +261,6 @@ internal fun Passaggio(
                 label = "scala",
             )
         }
-        Avatar(
-            nome = nome,
-            indice = indice,
-            misura = Spazio.avatarGrande,
-            modifier = Modifier.graphicsLayer { scaleX = respiro; scaleY = respiro },
-        )
         Text(
             stringResource(R.string.distribuzione_passa_a),
             style = MaterialTheme.typography.bodyLarge,
@@ -276,6 +272,12 @@ internal fun Passaggio(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.fillMaxWidth(),
             maxRighe = 2,
+        )
+        Avatar(
+            nome = nome,
+            indice = indice,
+            misura = Spazio.avatarGrande,
+            modifier = Modifier.graphicsLayer { scaleX = respiro; scaleY = respiro },
         )
         Surface(
             shape = Forme.Piena,
@@ -342,7 +344,7 @@ internal fun Rivelazione(
             PulsantePieno(
                 testo = stringResource(etichettaPulsante),
                 onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onNascondiEPassa()
                 },
                 abilitato = abilitato,
@@ -360,11 +362,12 @@ internal fun Rivelazione(
             rotazione = rotazione.value,
             alpha = opacita.value,
             retro = {
-                Icon(
-                    painterResource(R.drawable.ic_launcher_monochrome),
-                    contentDescription = null,
-                    tint = colori.primary,
-                    modifier = Modifier.size(160.dp),
+                Text(
+                    "?",
+                    style = MaterialTheme.typography.displayLarge,
+                    fontSize = 96.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = colori.primary,
                 )
             },
             fronte = {

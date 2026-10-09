@@ -27,3 +27,4 @@ PWA (`web/`): Svelte 5 (runes) + TypeScript strict + Vite + vite-plugin-pwa, tes
 - Non eseguire `npm ci`/`npm test`/`npm run build`: li esegue `esecutore-build`. Non lanciare server di sviluppo.
 
 Resoconto finale: massimo 20 righe (file creati/modificati, scelte non ovvie, punti aperti). Niente diff nel resoconto.
+- Quando il prompt chiede di correggere un insieme di difetti (per gravità o per elenco), li chiudi tutti; per ognuno che lasci aperto scrivi nel resoconto ID e motivo concreto. "Non era tra i punti richiesti" non è un motivo se il difetto rientra nel criterio del prompt.

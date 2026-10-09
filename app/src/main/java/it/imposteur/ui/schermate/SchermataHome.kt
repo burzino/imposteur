@@ -3,6 +3,10 @@ package it.imposteur.ui.schermate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,58 +54,74 @@ fun SchermataHome(
 ) {
     var chiediNuova by rememberSaveable { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
-        Column(
-            modifier = Modifier
-                .widthIn(max = Spazio.larghezzaMax)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spazio.margineSchermata, vertical = Spazio.s5),
-            verticalArrangement = Arrangement.spacedBy(Spazio.s3, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Medaglione()
-            Text(
-                text = stringResource(R.string.home_titolo),
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = Spazio.s5),
-            )
-            if (stato.erroreCaricamento) {
-                Text(
-                    text = stringResource(R.string.errore_caricamento_parole),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                )
+        // Medaglione e titolo centrati nello spazio libero, pulsanti ancorati in basso (design 4.1).
+        // Scorre solo se lo schermo e' troppo basso (landscape).
+        BoxWithConstraints(modifier = Modifier.widthIn(max = Spazio.larghezzaMax).fillMaxSize()) {
+            val altezzaMinima = maxHeight
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = altezzaMinima)
+                    .padding(horizontal = Spazio.margineSchermata, vertical = Spazio.s5),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(0.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(Spazio.s5),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(vertical = Spazio.s5),
+                ) {
+                    Medaglione()
+                    Text(
+                        text = stringResource(R.string.home_titolo),
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(Spazio.s3),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    if (stato.erroreCaricamento) {
+                        Text(
+                            text = stringResource(R.string.errore_caricamento_parole),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    val nuovaAbilitata = !stato.caricamento && !stato.erroreCaricamento
+                    val nuova = { if (stato.ripristinabile != null) chiediNuova = true else onNuovaPartita() }
+                    if (stato.ripristinabile != null) {
+                        PulsantePieno(
+                            testo = stringResource(R.string.riprendi_partita),
+                            onClick = onRiprendi,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        PulsanteTonale(
+                            testo = stringResource(R.string.nuova_partita),
+                            onClick = nuova,
+                            abilitato = nuovaAbilitata,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        PulsantePieno(
+                            testo = stringResource(R.string.nuova_partita),
+                            onClick = nuova,
+                            abilitato = nuovaAbilitata,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    PulsanteContorno(
+                        testo = stringResource(R.string.come_si_gioca),
+                        onClick = onRegole,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
-            val nuovaAbilitata = !stato.caricamento && !stato.erroreCaricamento
-            val nuova = { if (stato.ripristinabile != null) chiediNuova = true else onNuovaPartita() }
-            if (stato.ripristinabile != null) {
-                PulsantePieno(
-                    testo = stringResource(R.string.riprendi_partita),
-                    onClick = onRiprendi,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                PulsanteTonale(
-                    testo = stringResource(R.string.nuova_partita),
-                    onClick = nuova,
-                    abilitato = nuovaAbilitata,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            } else {
-                PulsantePieno(
-                    testo = stringResource(R.string.nuova_partita),
-                    onClick = nuova,
-                    abilitato = nuovaAbilitata,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            PulsanteContorno(
-                testo = stringResource(R.string.come_si_gioca),
-                onClick = onRegole,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
         // Dopo la Column, così sta sopra: la Column scorrevole intercetterebbe il tocco
         IconButton(onClick = onImpostazioni, modifier = Modifier.align(Alignment.TopEnd)) {

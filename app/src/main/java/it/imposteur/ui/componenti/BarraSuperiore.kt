@@ -1,5 +1,7 @@
 package it.imposteur.ui.componenti
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -30,8 +32,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,11 +66,18 @@ fun BarraSuperiore(
     azioni: @Composable RowScope.() -> Unit = {},
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null,
 ) {
+    val sollevata = (scrollBehavior?.state?.overlappedFraction ?: 0f) > 0.01f
+    val sfondo by animateColorAsState(
+        if (sollevata) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background,
+        label = "sfondoBarra",
+    )
+    // Lo sfondo copre tutta la larghezza; titolo e azioni stanno nella colonna da 480 dp, centrata.
+    Box(modifier = modifier.fillMaxWidth().background(sfondo), contentAlignment = Alignment.TopCenter) {
     TopAppBar(
         title = {
             Text(titolo, style = MaterialTheme.typography.headlineMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
-        modifier = modifier,
+        modifier = Modifier.widthIn(max = Spazio.larghezzaMax).fillMaxWidth(),
         navigationIcon = {
             if (onIndietro != null) {
                 IconButton(onClick = onIndietro) {
@@ -79,11 +90,12 @@ fun BarraSuperiore(
             if (onHome != null) AzioneHome(onHome)
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent,
         ),
         scrollBehavior = scrollBehavior,
     )
+    }
 }
 
 /**
@@ -131,12 +143,17 @@ fun BarraAzioni(modifier: Modifier = Modifier, content: @Composable ColumnScope.
         border = bordoLivello(),
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
-                .padding(Spazio.s4),
-            verticalArrangement = Arrangement.spacedBy(Spazio.s2),
-            content = content,
-        )
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            Column(
+                modifier = Modifier.widthIn(max = Spazio.larghezzaMax).fillMaxWidth().padding(Spazio.s4),
+                verticalArrangement = Arrangement.spacedBy(Spazio.s2),
+                content = content,
+            )
+        }
     }
 }

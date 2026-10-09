@@ -24,6 +24,7 @@ fun TestoAdattivo(
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     maxRighe: Int = 2,
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     var fattore by remember(testo, stile) { mutableFloatStateOf(1f) }
     Text(
@@ -33,7 +34,7 @@ fun TestoAdattivo(
             lineHeight = stile.lineHeight * fattore,
         ),
         color = color.takeIf { it != Color.Unspecified } ?: MaterialTheme.colorScheme.onSurface,
-        textAlign = TextAlign.Center,
+        textAlign = textAlign,
         maxLines = maxRighe,
         overflow = TextOverflow.Clip,
         modifier = modifier,

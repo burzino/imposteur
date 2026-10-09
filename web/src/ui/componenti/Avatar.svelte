@@ -23,12 +23,12 @@
   style:--d="{dimensione}px"
   style:background="var(--colore-avatar-{colore})"
 >
-  <span class="iniziale" aria-hidden="true">{iniziale}</span>
   {#if stato === "fatto"}
     <svg class="spunta" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12" r="12" fill="var(--colore-primario)" />
-      <path fill="var(--colore-su-primario)" d="m9.55 17.65-4.4-4.4 1.4-1.4 3 3 7.9-7.9 1.4 1.4z" />
+      <path fill="#fff" d="m9.55 17.65-4.4-4.4 1.4-1.4 3 3 7.9-7.9 1.4 1.4z" />
     </svg>
+  {:else}
+    <span class="iniziale" aria-hidden="true">{iniziale}</span>
   {/if}
 </span>
 
@@ -63,10 +63,7 @@
       0 0 0 6px var(--colore-primario);
   }
   .spunta {
-    position: absolute;
-    right: -3px;
-    bottom: -3px;
-    width: max(16px, 40%);
-    height: max(16px, 40%);
+    width: 16px;
+    height: 16px;
   }
 </style>

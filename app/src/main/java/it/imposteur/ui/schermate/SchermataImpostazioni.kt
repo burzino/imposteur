@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -85,15 +85,13 @@ fun SchermataImpostazioni(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                // Quattro posizioni su due righe da due segmenti.
-                val selezionato = opzioni.indexOfFirst { it.first == aspetto.tema }
-                opzioni.chunked(2).forEachIndexed { riga, coppia ->
-                    SelettoreSegmenti(
-                        etichette = coppia.map { stringResource(it.second) },
-                        selezionato = selezionato - riga * 2,
-                        onSeleziona = { onCambia(aspetto.copy(tema = coppia[it].first)) },
-                    )
-                }
+                // Quattro posizioni in un unico gruppo connesso 2x2.
+                SelettoreSegmenti(
+                    etichette = opzioni.map { stringResource(it.second) },
+                    selezionato = opzioni.indexOfFirst { it.first == aspetto.tema },
+                    onSeleziona = { onCambia(aspetto.copy(tema = opzioni[it].first)) },
+                    colonne = 2,
+                )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     RigaInterruttore(
                         etichetta = stringResource(R.string.colori_telefono),
@@ -110,7 +108,7 @@ fun SchermataImpostazioni(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                OutlinedTextField(
+                TextField(
                     value = suggerimento,
                     onValueChange = { suggerimento = it.take(500) },
                     label = { Text(stringResource(R.string.segnalazioni_suggerimenti)) },
@@ -154,7 +152,7 @@ fun SchermataImpostazioni(
                 }
                 Text(
                     stringResource(R.string.segnalazioni_locale),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

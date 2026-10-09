@@ -51,6 +51,10 @@
     justify-content: space-between;
     gap: var(--spazio-3);
     min-height: var(--altezza-tocco);
+    padding: var(--spazio-2) var(--spazio-3) var(--spazio-2) 20px;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-basso);
   }
   .etichetta {
     min-width: 0;
@@ -60,7 +64,7 @@
     flex: none;
     display: flex;
     align-items: center;
-    gap: var(--spazio-1);
+    gap: 0;
   }
   .tasto {
     display: grid;

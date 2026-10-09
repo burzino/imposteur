@@ -133,6 +133,7 @@
     margin-top: calc(-1 * var(--spazio-2));
     text-align: end;
     font: var(--testo-didascalia);
+    font-weight: 400;
     color: var(--colore-su-superficie-variante);
   }
   .destra {
@@ -147,6 +148,10 @@
   }
   .riga :global(.pulsante) {
     flex: 1 1 10rem;
+  }
+  .riga:not(.esporta) :global(.pulsante) {
+    flex: none;
+    width: auto;
   }
   .salvate {
     flex: 1;

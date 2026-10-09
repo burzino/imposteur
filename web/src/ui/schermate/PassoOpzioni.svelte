@@ -86,6 +86,7 @@
   .scheda {
     display: flex; flex-direction: column; gap: var(--spazio-1);
     padding: var(--spazio-3) var(--spazio-4);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
     border-radius: var(--raggio-xl);
     background: var(--colore-contenitore-superficie-basso);
     color: var(--colore-su-superficie);

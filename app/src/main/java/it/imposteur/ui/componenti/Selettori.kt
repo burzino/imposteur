@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
@@ -33,23 +35,50 @@ import androidx.compose.ui.unit.dp
 import it.imposteur.ui.theme.Spazio
 import it.imposteur.ui.theme.bordoLivello
 
-/** Selettore a segmenti connessi alti 48 dp, con spunta sul selezionato (secondaryContainer). */
+/**
+ * Selettore a segmenti connessi alti 48 dp, con spunta sul selezionato (secondaryContainer).
+ * Con [colonne] minore del numero di opzioni i segmenti vanno su piu' righe, distanti 2 dp, e restano
+ * un unico gruppo: angoli esterni pieni, interni da 4 dp.
+ */
 @Composable
 fun SelettoreSegmenti(
     etichette: List<String>,
     selezionato: Int,
     onSeleziona: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    colonne: Int = etichette.size,
 ) {
-    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
-        etichette.forEachIndexed { i, etichetta ->
-            SegmentedButton(
-                selected = i == selezionato,
-                onClick = { onSeleziona(i) },
-                shape = SegmentedButtonDefaults.itemShape(i, etichette.size),
-                modifier = Modifier.heightIn(min = Spazio.altezzaTocco),
-                label = { Text(etichetta, style = MaterialTheme.typography.labelLarge, maxLines = 1) },
-            )
+    val col = colonne.coerceIn(1, etichette.size.coerceAtLeast(1))
+    val righe = etichette.indices.chunked(col)
+    val pieno = CornerSize(50)
+    val interno = CornerSize(4.dp)
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        righe.forEachIndexed { r, indici ->
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                indici.forEachIndexed { c, i ->
+                    val primaRiga = r == 0
+                    val ultimaRiga = r == righe.lastIndex
+                    val inizio = c == 0
+                    val fine = c == indici.lastIndex
+                    val forma = if (righe.size == 1) {
+                        SegmentedButtonDefaults.itemShape(i, etichette.size)
+                    } else {
+                        RoundedCornerShape(
+                            topStart = if (primaRiga && inizio) pieno else interno,
+                            topEnd = if (primaRiga && fine) pieno else interno,
+                            bottomEnd = if (ultimaRiga && i == etichette.lastIndex) pieno else interno,
+                            bottomStart = if (ultimaRiga && inizio) pieno else interno,
+                        )
+                    }
+                    SegmentedButton(
+                        selected = i == selezionato,
+                        onClick = { onSeleziona(i) },
+                        shape = forma,
+                        modifier = Modifier.heightIn(min = Spazio.altezzaTocco),
+                        label = { Text(etichette[i], style = MaterialTheme.typography.labelLarge, maxLines = 1) },
+                    )
+                }
+            }
         }
     }
 }

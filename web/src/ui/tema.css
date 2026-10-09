@@ -237,6 +237,35 @@
   --durata-pronti: 1200ms;
 }
 
+@media (min-width: 600px) {
+  :root {
+    --margine-schermata: 24px;
+  }
+}
+
+/* casella M3: 18 px, raggio 4, segno bianco su primario */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--colore-su-superficie-variante);
+  border-radius: var(--raggio-xs);
+  background: transparent center / 16px 16px no-repeat;
+  cursor: pointer;
+}
+input[type="checkbox"]:checked {
+  border-color: var(--colore-primario);
+  background-color: var(--colore-primario);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E");
+}
+input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--colore-primario);
+  outline-offset: 3px;
+}
+
 *,
 *::before,
 *::after {

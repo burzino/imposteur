@@ -94,7 +94,7 @@
         {/if}
         <div class="pulsanti">
           {#if passo > 1}
-            <Pulsante variante="tonale" onClick={indietro}>{t.indietro}</Pulsante>
+            <Pulsante variante="contorno" onClick={indietro}>{t.indietro}</Pulsante>
           {/if}
           {#if passo < 4}
             <Pulsante variante="pieno" disabilitato={errore !== null} onClick={avanti}>{t.passoAvanti}</Pulsante>
@@ -108,11 +108,12 @@
 {/key}
 
 <style>
-  .indicatore { margin: 0 calc(-1 * var(--spazio-4)); }
-  .piede { display: flex; flex-direction: column; gap: var(--spazio-3); }
-  .pulsanti { display: flex; gap: var(--spazio-3); }
-  .pulsanti :global(.pulsante) { flex: 1; }
-  .errore { margin: 0; color: var(--colore-errore); font: var(--testo-corpo-piccolo); }
+  .indicatore { margin: 0 calc(-1 * var(--margine-schermata)); }
+  .piede { display: flex; flex-direction: column; gap: var(--spazio-2); }
+  .pulsanti { display: flex; gap: var(--spazio-2); }
+  .pulsanti :global(.pulsante) { flex: 2; }
+  .pulsanti :global(.pulsante.contorno) { flex: 1; }
+  .errore { margin: 0; text-align: center; color: var(--colore-errore); font: var(--testo-corpo-piccolo); }
   .inizia-barra {
     flex: none; min-height: var(--altezza-tocco); padding: 0 var(--spazio-4);
     border: 0; border-radius: var(--raggio-pieno); background: transparent;
