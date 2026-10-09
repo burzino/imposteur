@@ -83,10 +83,14 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Da fare: design.md (avatar toccabile, foglio, gruppo Impostazioni), specifiche-web W19 esteso a CA-123..140, test, codice Android e PWA, build, collaudo.
 
 ## Dominio burzi.eu (2026-10-09, attivo)
-- burzi.eu = pagina principale "Giochi di gruppo" (repository `burzino/burzino.github.io`, cartella locale `Z:urzino.github.io`, HTML statico con `CNAME` e `.nojekyll`). Imposteur su burzi.eu/imposteur/ (dominio ereditato, BASE_PATH resta /imposteur/); burzino.github.io/imposteur e www.burzi.eu rimandano lì.
+- burzi.eu = pagina principale "Giochi di gruppo" (repository `burzino/burzino.github.io`, cartella locale `Z:\AppGames\burzino.github.io`, HTML statico con `CNAME` e `.nojekyll`). Imposteur su burzi.eu/imposteur/ (dominio ereditato, BASE_PATH resta /imposteur/); burzino.github.io/imposteur e www.burzi.eu rimandano lì.
 - DNS Aruba: 4 A di GitHub su @, CNAME www → burzino.github.io, TXT `_github-pages-challenge-burzino`; record di posta e Aruba lasciati.
 - Un nuovo gioco: repository con Pages attivo + carta in `index.html` della pagina principale.
 - La PWA su burzi.eu ha un'origine nuova: installazione e salvataggi di burzino.github.io non si trasferiscono.
+
+## Cartelle (2026-10-09)
+- Tutti i giochi stanno in `Z:\AppGames\`: `imposteur` (questo progetto), `burzino.github.io` (pagina principale di burzi.eu), `agenteur` (nuovo gioco ispirato a Codenames, nome scelto dall'utente: "Agenteur"; cartella vuota, da avviare).
+- La vecchia cartella `Z:\imposteur` è una copia superata: va cancellata da una sessione aperta in `Z:\AppGames\imposteur`. La memoria di Claude è stata copiata in `~/.claude/projects/Z--AppGames-imposteur/`.
 
 ## Prossimi passi
 1. Installare l APK aggiornato (telefono scollegato al momento della build). Screenshot mancanti della PWA: Gioco, Rivedi, Rivela, Impostazioni.

@@ -8,7 +8,7 @@ omitClaudeMd: true
 disallowedTools: Agent, Edit, Write, NotebookEdit
 ---
 
-Esegui esattamente i comandi del prompt, nell'ordine dato, dalla cartella `Z:\imposteur`.
+Esegui esattamente i comandi del prompt, nell'ordine dato, dalla cartella `Z:\AppGames\imposteur`.
 
 Ambiente (da impostare in ogni comando Bash). I percorsi reali di questa macchina (JDK, SDK, seriale del telefono) sono in `.claude/ambiente-locale.md`, non versionato: leggilo per primo.
 - `export JAVA_HOME="<ANDROID_STUDIO>/jbr"` (JDK 25 incluso in Android Studio)
