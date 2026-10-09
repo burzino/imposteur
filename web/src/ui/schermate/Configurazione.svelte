@@ -7,6 +7,7 @@
   import Pulsante from "../componenti/Pulsante.svelte";
   import IndicatorePassi from "../componenti/IndicatorePassi.svelte";
   import PassoGiocatori from "./PassoGiocatori.svelte";
+  import PassoModalita from "./PassoModalita.svelte";
   import PassoOpzioni from "./PassoOpzioni.svelte";
   import PassoCategorie from "./PassoCategorie.svelte";
   import PassoRiepilogo from "./PassoRiepilogo.svelte";
@@ -14,8 +15,8 @@
   import type { ErroreConfigurazione } from "../../game/modelli";
 
   const stato = getStato();
-  const PASSI: readonly PassoConfigurazione[] = ["GIOCATORI", "OPZIONI", "CATEGORIE", "RIEPILOGO"];
-  const NOMI = [t.passoGiocatori, t.passoOpzioni, t.configCategorie, t.passoRiepilogo];
+  const PASSI: readonly PassoConfigurazione[] = ["GIOCATORI", "MODALITA", "OPZIONI", "CATEGORIE", "RIEPILOGO"];
+  const NOMI = [t.passoGiocatori, t.passoModalita, t.passoOpzioni, t.configCategorie, t.passoRiepilogo];
 
   const passo = $derived(passoCorrente.valore);
   const errore = $derived(Passi.errorePasso(PASSI[passo - 1], stato.config, stato.categorie));
@@ -52,14 +53,14 @@
   }
 
   function avanti() {
-    if (errore === null && passo < 4) vaiAPasso((passo + 1) as 2 | 3 | 4);
+    if (errore === null && passo < 5) vaiAPasso((passo + 1) as 2 | 3 | 4 | 5);
   }
 </script>
 
 {#key passo}
   <Pagina titolo={t.configTitolo} onIndietro={indietro}>
     {#snippet azione()}
-      {#if passo < 4}
+      {#if passo < 5}
         <button type="button" class="inizia-barra" onclick={inizia}>{t.configInizia}</button>
       {/if}
     {/snippet}
@@ -68,9 +69,9 @@
         <IndicatorePassi
           nomi={NOMI}
           corrente={passo}
-          etichetta={t.passoEtichetta(passo, 4, NOMI[passo - 1])}
-          descrizione={t.passoEtichettaCd(passo, 4, NOMI[passo - 1])}
-          onVai={(k) => vaiAPasso(k as 1 | 2 | 3 | 4)}
+          etichetta={t.passoEtichetta(passo, 5, NOMI[passo - 1])}
+          descrizione={t.passoEtichettaCd(passo, 5, NOMI[passo - 1])}
+          onVai={(k) => vaiAPasso(k as 1 | 2 | 3 | 4 | 5)}
         />
       </div>
     {/snippet}
@@ -79,8 +80,10 @@
       {#if passo === 1}
         <PassoGiocatori />
       {:else if passo === 2}
-        <PassoOpzioni />
+        <PassoModalita />
       {:else if passo === 3}
+        <PassoOpzioni />
+      {:else if passo === 4}
         <PassoCategorie />
       {:else}
         <PassoRiepilogo />
@@ -96,7 +99,7 @@
           {#if passo > 1}
             <Pulsante variante="contorno" onClick={indietro}>{t.indietro}</Pulsante>
           {/if}
-          {#if passo < 4}
+          {#if passo < 5}
             <Pulsante variante="pieno" disabilitato={errore !== null} onClick={avanti}>{t.passoAvanti}</Pulsante>
           {:else}
             <Pulsante variante="pieno" onClick={inizia}>{t.configInizia}</Pulsante>

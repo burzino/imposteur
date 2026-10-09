@@ -28,30 +28,31 @@
 </script>
 
 <div class="corpo">
-  <PassoIntestazione titolo={t.passo4Titolo} sottotitolo={t.passo4Sottotitolo} />
+  <PassoIntestazione titolo={t.passo5Titolo} sottotitolo={t.passo5Sottotitolo} />
 
   <ul class="righe">
     <li>
       <button type="button" class="riga" onclick={() => vaiAPasso(1)}>
         <span class="testi">
           <span class="etichetta">{t.passoGiocatori}</span>
-          <span class="valore">{t.riepGiocatoriImpostori(t.riepGiocatori(r.numeroGiocatori), impostori)}</span>
+          <span class="valore">{t.riepGiocatori(r.numeroGiocatori)}</span>
           <span class="secondaria">{r.nomi.join(", ")}</span>
         </span>
         <span class="modifica">{t.passoModifica}</span>
       </button>
     </li>
     <li>
-      <button type="button" class="riga" onclick={() => vaiAPasso(1)}>
+      <button type="button" class="riga" onclick={() => vaiAPasso(2)}>
         <span class="testi">
           <span class="etichetta">{t.configModalita}</span>
           <span class="valore">{r.modalita === "PAROLA_AFFINE" ? t.modalitaAffine : t.modalitaSenzaParola}</span>
+          <span class="secondaria">{impostori}</span>
         </span>
         <span class="modifica">{t.passoModifica}</span>
       </button>
     </li>
     <li>
-      <button type="button" class="riga" onclick={() => vaiAPasso(2)}>
+      <button type="button" class="riga" onclick={() => vaiAPasso(3)}>
         <span class="testi">
           <span class="etichetta">{t.opzTitolo}</span>
           <span class="valore">{opzioni}</span>
@@ -61,7 +62,7 @@
       </button>
     </li>
     <li>
-      <button type="button" class="riga" onclick={() => vaiAPasso(3)}>
+      <button type="button" class="riga" onclick={() => vaiAPasso(4)}>
         <span class="testi">
           <span class="etichetta">{t.configCategorie}</span>
           <span class="valore">{t.riepCategorie(r.numeroCategorie)}</span>

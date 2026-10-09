@@ -7,6 +7,7 @@
   import TestoAdattivo from "../componenti/TestoAdattivo.svelte";
   import { getStato } from "../stato.svelte";
   import { indietro, vaiAHome } from "../rotte";
+  import { ordineDiParola } from "../../game/partita";
   import { t } from "../testi";
   import DistribuzionePassaggio from "./DistribuzionePassaggio.svelte";
   import DistribuzioneRivelazione from "./DistribuzioneRivelazione.svelte";
@@ -14,6 +15,9 @@
   const stato = getStato();
   const partita = $derived(stato.partita);
   const revisione = $derived(stato.revisione);
+  const ordine = $derived(partita ? ordineDiParola(partita) : []);
+  // revisione.indice e' l'indice del giocatore; i componenti di Distribuzione lavorano sulla posizione.
+  const posizione = $derived(revisione ? ordine.indexOf(revisione.indice) : -1);
 
   onMount(() => {
     void richiediSchermoAcceso();
@@ -33,13 +37,13 @@
 </script>
 
 {#if partita !== null}
-  {#if revisione !== null && revisione.indice >= 0 && revisione.indice < partita.giocatori.length}
+  {#if revisione !== null && posizione >= 0}
     {#if revisione.rivelato}
       {#key revisione.indice}
         <DistribuzioneRivelazione
           titolo={t.rivediTitolo}
           {partita}
-          indice={revisione.indice}
+          indice={posizione}
           etichettaPulsante={t.rivediNascondi}
           mostraFila={false}
           onNascondi={indietro}
@@ -52,7 +56,7 @@
         <DistribuzionePassaggio
           titolo={t.rivediTitolo}
           {partita}
-          indice={revisione.indice}
+          indice={posizione}
           mostraFila={false}
           onSono={() => stato.rivelaRevisione()}
           onHome={home}
@@ -67,15 +71,16 @@
         <p>{t.rivediSottotitolo}</p>
       </div>
       <ul class="elenco">
-        {#each partita.giocatori as nome, i (i)}
+        {#each ordine as g (g)}
+          {@const nome = partita.giocatori[g] ?? ""}
           <li>
             <button
               type="button"
               class="riga"
               aria-label={t.rivediCdGiocatore(nome)}
-              onclick={() => stato.scegliRevisione(i)}
+              onclick={() => stato.scegliRevisione(g)}
             >
-              <Avatar {nome} indice={i} stato="pieno" dimensione={40} />
+              <Avatar {nome} indice={g} stato="pieno" dimensione={40} />
               <TestoAdattivo testo={nome} classe="rivedi-nome" maxRighe={2} />
             </button>
           </li>

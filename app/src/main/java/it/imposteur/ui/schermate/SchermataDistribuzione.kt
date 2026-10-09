@@ -142,8 +142,8 @@ fun SchermataDistribuzione(
     if (partita != null) {
         ScaffoldConBarra(titolo = stringResource(R.string.distribuzione_titolo), onHome = onHome) {
             when (fase) {
-                is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice, durataPressioneMs) { onSono(fase) }
-                is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice) { onNascondiEPassa(fase) }
+                is StatoDistribuzione.Passaggio -> Passaggio(partita, fase.indice, partita.giocatoreAlPasso(fase.indice), durataPressioneMs) { onSono(fase) }
+                is StatoDistribuzione.Rivelazione -> Rivelazione(partita, fase.indice, partita.giocatoreAlPasso(fase.indice)) { onNascondiEPassa(fase) }
                 StatoDistribuzione.Gioco -> Unit
             }
         }
@@ -212,6 +212,9 @@ internal fun Contenitore(
 @Composable
 internal fun Passaggio(
     partita: Partita,
+    /** Posizione nella sequenza di parola (0..N-1). */
+    posizione: Int,
+    /** Indice del giocatore mostrato (partita.giocatoreAlPasso(posizione)). */
     indice: Int,
     durataPressioneMs: Int,
     mostraAvanzamento: Boolean = true,
@@ -249,9 +252,9 @@ internal fun Passaggio(
     ) {
         // In Rivedi (CA-54) né fila di avatar né "Giocatore k di N"
         if (mostraAvanzamento) {
-            FilaAvatar(partita.giocatori, indice)
+            FilaAvatar(partita.giocatori, partita.ordineDiParola(), posizione)
             Text(
-                stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
+                stringResource(R.string.distribuzione_indicatore, posizione + 1, partita.giocatori.size),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -306,13 +309,14 @@ private const val RITARDO_NASCONDI_MS = 600L
 @Composable
 internal fun Rivelazione(
     partita: Partita,
+    posizione: Int,
     indice: Int,
     testoPulsante: Int? = null,
     mostraFila: Boolean = true,
     onNascondiEPassa: () -> Unit,
 ) {
     val contenuto = partita.contenutoPer(indice)
-    val ultimo = indice == partita.giocatori.size - 1
+    val ultimo = posizione == partita.giocatori.size - 1
     val etichettaPulsante = testoPulsante
         ?: if (ultimo) R.string.distribuzione_nascondi_ultimo else R.string.distribuzione_nascondi
     val haptic = LocalHapticFeedback.current
@@ -357,9 +361,9 @@ internal fun Rivelazione(
             )
         },
     ) {
-        if (mostraFila) FilaAvatar(partita.giocatori, indice)
+        if (mostraFila) FilaAvatar(partita.giocatori, partita.ordineDiParola(), posizione)
         Text(
-            stringResource(R.string.distribuzione_indicatore, indice + 1, partita.giocatori.size),
+            stringResource(R.string.distribuzione_indicatore, posizione + 1, partita.giocatori.size),
             style = MaterialTheme.typography.labelMedium,
             color = colori.onSurfaceVariant,
         )

@@ -51,10 +51,10 @@ import it.imposteur.ui.theme.Spazio
 import it.imposteur.ui.theme.mollaSpaziale
 import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 
-private const val NUMERO_PASSI = 4
+private const val NUMERO_PASSI = 5
 
 /**
- * Un passo della Configurazione (1..4). [onIndietro] vale per freccia, pulsante "Indietro" e tasto di sistema
+ * Un passo della Configurazione (1..5). [onIndietro] vale per freccia, pulsante "Indietro" e tasto di sistema
  * (mai bloccati dalla validazione); [onVaiAPasso] per indicatore e "Modifica"; [onAvanti] per "Avanti";
  * [onInizia] per "Inizia" in barra e nel passo 4.
  */
@@ -76,6 +76,7 @@ fun SchermataConfigurazione(
 
     val nomiPassi = listOf(
         stringResource(R.string.passo_giocatori),
+        stringResource(R.string.passo_modalita),
         stringResource(R.string.passo_opzioni),
         stringResource(R.string.config_categorie),
         stringResource(R.string.passo_riepilogo),
@@ -149,6 +150,7 @@ fun SchermataConfigurazione(
                 IntestazionePasso(passo, stato.opzioniAttive)
                 when (corrente) {
                     PassoConfigurazione.GIOCATORI -> PassoGiocatori(stato, viewModel)
+                    PassoConfigurazione.MODALITA -> PassoModalita(stato, viewModel)
                     PassoConfigurazione.OPZIONI -> PassoOpzioni(stato, viewModel)
                     PassoConfigurazione.CATEGORIE ->
                         PassoCategorie(stato, viewModel, onChiediAzzera = { chiediAzzera = true })
@@ -175,19 +177,20 @@ fun SchermataConfigurazione(
     }
 }
 
-/** Titolo e riga del passo; nel passo 2 a destra il badge "N attive" (assente se 0). */
+/** Titolo e riga del passo; nel passo 3 a destra il badge "N attive" (assente se 0). */
 @Composable
 private fun IntestazionePasso(passo: Int, opzioniAttive: Int) {
     val (titolo, sottotitolo) = when (passo) {
         1 -> R.string.passo1_titolo to R.string.passo1_sottotitolo
-        2 -> R.string.opz_titolo to R.string.passo2_sottotitolo
-        3 -> R.string.config_categorie to R.string.passo3_sottotitolo
-        else -> R.string.passo4_titolo to R.string.passo4_sottotitolo
+        2 -> R.string.passo2_titolo to R.string.passo2_sottotitolo
+        3 -> R.string.opz_titolo to R.string.passo3_sottotitolo
+        4 -> R.string.config_categorie to R.string.passo4_sottotitolo
+        else -> R.string.passo5_titolo to R.string.passo5_sottotitolo
     }
     Column(verticalArrangement = Arrangement.spacedBy(Spazio.s1)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spazio.s3)) {
             Text(stringResource(titolo), style = MaterialTheme.typography.titleLarge)
-            if (passo == 2 && opzioniAttive > 0) BadgeAttive(opzioniAttive)
+            if (passo == 3 && opzioniAttive > 0) BadgeAttive(opzioniAttive)
         }
         Text(
             stringResource(sottotitolo),

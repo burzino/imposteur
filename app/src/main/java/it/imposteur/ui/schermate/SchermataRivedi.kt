@@ -80,9 +80,9 @@ fun SchermataRivedi(
             onHome = onHome,
         ) {
             if (revisione.rivelato) {
-                Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi, mostraFila = false) { onChiudi() }
+                Rivelazione(partita, posizioneDi(partita, revisione.indice), revisione.indice, R.string.rivedi_nascondi, mostraFila = false) { onChiudi() }
             } else {
-                Passaggio(partita, revisione.indice, durataPressioneMs, mostraAvanzamento = false) { onSono() }
+                Passaggio(partita, posizioneDi(partita, revisione.indice), revisione.indice, durataPressioneMs, mostraAvanzamento = false) { onSono() }
             }
         }
         return
@@ -128,7 +128,8 @@ fun SchermataRivedi(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(modifier = Modifier.padding(Spazio.s2)) {
-                        partita.giocatori.forEachIndexed { i, nome ->
+                        partita.ordineDiParola().forEach { i ->
+                            val nome = partita.giocatori[i]
                             val descrizione = stringResource(R.string.rivedi_cd_giocatore, nome)
                             Surface(
                                 onClick = { onScegli(i) },
@@ -164,3 +165,6 @@ fun SchermataRivedi(
         }
     }
 }
+
+/** Posizione del giocatore [g] nella sequenza di parola. */
+private fun posizioneDi(partita: Partita, g: Int): Int = partita.ordineDiParola().indexOf(g)

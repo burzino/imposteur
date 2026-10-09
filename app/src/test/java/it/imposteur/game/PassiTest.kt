@@ -9,7 +9,6 @@ class PassiTest {
 
     private val erroriGiocatori = { e: ErroreConfigurazione ->
         e is ErroreConfigurazione.TroppoPochiGiocatori || e is ErroreConfigurazione.TroppiGiocatori ||
-            e is ErroreConfigurazione.TroppoPochiImpostori || e is ErroreConfigurazione.TroppiImpostori ||
             e is ErroreConfigurazione.NomeDuplicato || e is ErroreConfigurazione.NomeTroppoLungo
     }
 
@@ -18,12 +17,12 @@ class PassiTest {
     @Test fun `CA-99 ordinale piu uno e il numero del passo`() {
         assertEquals(
             listOf(
-                PassoConfigurazione.GIOCATORI, PassoConfigurazione.OPZIONI,
+                PassoConfigurazione.GIOCATORI, PassoConfigurazione.MODALITA, PassoConfigurazione.OPZIONI,
                 PassoConfigurazione.CATEGORIE, PassoConfigurazione.RIEPILOGO,
             ),
             PassoConfigurazione.entries.toList(),
         )
-        assertEquals(listOf(1, 2, 3, 4), PassoConfigurazione.entries.map { it.ordinal + 1 })
+        assertEquals(listOf(1, 2, 3, 4, 5), PassoConfigurazione.entries.map { it.ordinal + 1 })
     }
 
     // ---- errorePasso ----
@@ -106,7 +105,50 @@ class PassiTest {
         assertEquals(ErroreConfigurazione.TroppoPochiGiocatori, e)
     }
 
+    @Test fun `CA-101 impostori oltre il massimo danno MODALITA e GIOCATORI null`() {
+        val c = configBase(n = 5, k = 3)
+        assertEquals(ErroreConfigurazione.TroppiImpostori, Passi.errorePasso(PassoConfigurazione.MODALITA, c, cats))
+        assertNull(Passi.errorePasso(PassoConfigurazione.GIOCATORI, c, cats))
+        assertNull(Passi.errorePasso(PassoConfigurazione.CATEGORIE, c, cats))
+    }
+
+    @Test fun `CA-101 zero impostori danno TroppoPochiImpostori in MODALITA`() {
+        val c = configBase(n = 5, k = 0)
+        assertEquals(ErroreConfigurazione.TroppoPochiImpostori, Passi.errorePasso(PassoConfigurazione.MODALITA, c, cats))
+        assertNull(Passi.errorePasso(PassoConfigurazione.GIOCATORI, c, cats))
+    }
+
+    @Test fun `CA-101 MODALITA e null con impostori coerenti anche con nomi duplicati e categorie vuote`() {
+        assertNull(Passi.errorePasso(PassoConfigurazione.MODALITA, configBase(), cats))
+        val dup = configBase(n = 4, nomi = listOf("A", "a"), cats = emptySet())
+        assertNull(Passi.errorePasso(PassoConfigurazione.MODALITA, dup, cats))
+    }
+
+    @Test fun `CA-25 MODALITA restituisce solo errori sugli impostori`() {
+        val configs = listOf(
+            configBase(n = 2, k = 0, cats = emptySet()), configBase(n = 21, k = 1), configBase(n = 5, k = 9),
+            configBase(n = 4, nomi = listOf("A", "a")), configBase(n = 5, k = 0),
+        )
+        for (c in configs) {
+            val m = Passi.errorePasso(PassoConfigurazione.MODALITA, c, cats)
+            if (m != null) assertTrue(
+                "MODALITA: $m",
+                m is ErroreConfigurazione.TroppoPochiImpostori || m is ErroreConfigurazione.TroppiImpostori,
+            )
+        }
+    }
+
     // ---- primoPassoNonValido ----
+
+    @Test fun `CA-102 impostori incoerenti e categorie vuote danno MODALITA`() {
+        val c = configBase(n = 5, k = 3, cats = emptySet())
+        assertEquals(PassoConfigurazione.MODALITA, Passi.primoPassoNonValido(c, cats))
+    }
+
+    @Test fun `CA-102 nome duplicato e impostori incoerenti danno GIOCATORI`() {
+        val c = configBase(n = 4, k = 3, nomi = listOf("A", "a"))
+        assertEquals(PassoConfigurazione.GIOCATORI, Passi.primoPassoNonValido(c, cats))
+    }
 
     @Test fun `CA-102 CA-101 nome duplicato e categorie vuote danno GIOCATORI`() {
         val c = configBase(n = 4, cats = emptySet(), nomi = listOf("Anna", "anna", "Bruno", "Carla"))
@@ -133,7 +175,7 @@ class PassiTest {
         )
         for (c in configs) {
             val p = Passi.primoPassoNonValido(c, tutte)
-            assertTrue("$p", p == null || p == PassoConfigurazione.GIOCATORI || p == PassoConfigurazione.CATEGORIE)
+            assertTrue("$p", p == null || p == PassoConfigurazione.GIOCATORI || p == PassoConfigurazione.CATEGORIE || p == PassoConfigurazione.MODALITA)
         }
     }
 
@@ -253,6 +295,135 @@ class PassiTest {
     @Test fun `CA-94 giriIndizi fuori range e limitato a 1-3`() {
         assertEquals(1, Passi.riepilogo(configBase().copy(giriIndizi = 0), cats).giriIndizi)
         assertEquals(3, Passi.riepilogo(configBase().copy(giriIndizi = 9), cats).giriIndizi)
+    }
+
+    // ---- aggiungiGiocatore / rimuoviGiocatore (v1.9) ----
+
+    @Test fun `CA-113 aggiungi con nomi vuoti porta N a 5 e nomi completati`() {
+        val r = Passi.aggiungiGiocatore(configBase(n = 4, nomi = emptyList()))
+        assertEquals(5, r.numeroGiocatori)
+        assertEquals(listOf("", "", "", "", ""), r.nomi)
+        assertEquals(1, r.numeroImpostori)
+        assertEquals(5, Regole.nomiEffettivi(r).size)
+    }
+
+    @Test fun `CA-113 aggiungi completa i nomi corti con vuoti`() {
+        val r = Passi.aggiungiGiocatore(configBase(n = 4, nomi = listOf("A", "B")))
+        assertEquals(listOf("A", "B", "", "", ""), r.nomi)
+        assertEquals(5, r.numeroGiocatori)
+    }
+
+    @Test fun `CA-113 aggiungi scarta i nomi oltre N`() {
+        val r = Passi.aggiungiGiocatore(configBase(n = 3, nomi = listOf("A", "B", "C", "X")))
+        assertEquals(4, r.numeroGiocatori)
+        assertEquals(listOf("A", "B", "C", ""), r.nomi)
+    }
+
+    @Test fun `CA-113 CA-117 aggiungere non modifica gli impostori ne gli altri campi`() {
+        val c = configBase(n = 5, k = 2, mod = Modalita.PAROLA_AFFINE, cats = setOf("cibo"))
+            .copy(partitaTrappola = true, impostoriSorpresa = true, giriIndizi = 2)
+        val r = Passi.aggiungiGiocatore(c)
+        assertEquals(6, r.numeroGiocatori)
+        assertEquals(2, r.numeroImpostori)
+        assertEquals(c.copy(numeroGiocatori = 6, nomi = List(6) { "" }), r)
+    }
+
+    @Test fun `CA-114 aggiungi con 19 porta a 20 e con 20 lascia invariata`() {
+        assertEquals(20, Passi.aggiungiGiocatore(configBase(n = 19)).numeroGiocatori)
+        val c = configBase(n = 20, nomi = listOf("A"))
+        assertEquals(c, Passi.aggiungiGiocatore(c))
+    }
+
+    @Test fun `CA-118 aggiungi e funzione pura e non modifica l'originale`() {
+        val c = configBase(n = 4, nomi = listOf("A", "B"))
+        Passi.aggiungiGiocatore(c)
+        assertEquals(4, c.numeroGiocatori)
+        assertEquals(listOf("A", "B"), c.nomi)
+    }
+
+    @Test fun `CA-116 rimuovi indice 1 fa scalare i successivi e il vuoto segue la posizione`() {
+        val r = Passi.rimuoviGiocatore(configBase(n = 4, nomi = listOf("Anna", "", "Carla", "")), 1)
+        assertEquals(3, r.numeroGiocatori)
+        assertEquals(listOf("Anna", "Carla", ""), r.nomi)
+        assertEquals(listOf("Anna", "Carla", "Giocatore 3"), Regole.nomiEffettivi(r))
+    }
+
+    @Test fun `CA-116 rimuovi indice 0 e ultimo indice`() {
+        val r0 = Passi.rimuoviGiocatore(configBase(n = 4, nomi = listOf("", "Bea", "Cia", "Dino")), 0)
+        assertEquals(listOf("Bea", "Cia", "Dino"), r0.nomi)
+        val rU = Passi.rimuoviGiocatore(configBase(n = 4, nomi = listOf("A", "B", "C", "D")), 3)
+        assertEquals(listOf("A", "B", "C"), rU.nomi)
+    }
+
+    @Test fun `CA-116 rimuovi con nomi piu corti di N`() {
+        val r = Passi.rimuoviGiocatore(configBase(n = 5, nomi = listOf("A")), 3)
+        assertEquals(4, r.numeroGiocatori)
+        // il contratto dice nomi ["A","",""]: si verifica il comportamento osservabile, non la lunghezza di `nomi`
+        assertEquals(listOf("A", "Giocatore 2", "Giocatore 3", "Giocatore 4"), Regole.nomiEffettivi(r))
+    }
+
+    @Test fun `CA-115 rimuovi con 3 giocatori o indice fuori range lascia invariata`() {
+        val c3 = configBase(n = 3, k = 1, nomi = listOf("A", "B", "C"))
+        assertEquals(c3, Passi.rimuoviGiocatore(c3, 0))
+        val c = configBase(n = 5, nomi = listOf("A", "B", "C", "D", "E"))
+        assertEquals(c, Passi.rimuoviGiocatore(c, -1))
+        assertEquals(c, Passi.rimuoviGiocatore(c, 5))
+    }
+
+    @Test fun `CA-117 rimuovere riduce gli impostori al nuovo massimo`() {
+        fun dopo(n: Int, k: Int) =
+            Passi.rimuoviGiocatore(configBase(n = n, k = k), 0).let { it.numeroGiocatori to it.numeroImpostori }
+        assertEquals(6 to 2, dopo(7, 3))
+        assertEquals(4 to 1, dopo(5, 2))
+        assertEquals(5 to 1, dopo(6, 1))
+        assertEquals(19 to 9, dopo(20, 9))
+    }
+
+    @Test fun `CA-117 rimuovere non tocca sorpresa trappola e modalita`() {
+        val c = configBase(n = 6, k = 2, mod = Modalita.PAROLA_AFFINE).copy(impostoriSorpresa = true, partitaTrappola = true)
+        val r = Passi.rimuoviGiocatore(c, 2)
+        assertTrue(r.impostoriSorpresa && r.partitaTrappola)
+        assertEquals(Modalita.PAROLA_AFFINE, r.modalita)
+        assertEquals(c.categorieSelezionate, r.categorieSelezionate)
+    }
+
+    @Test fun `CA-118 rimuovere uno di due duplicati elimina l'errore del passo GIOCATORI`() {
+        val c = configBase(n = 4, nomi = listOf("Ann", "ann", "Bea", "Cia"))
+        assertNotNull(Passi.errorePasso(PassoConfigurazione.GIOCATORI, c, cats))
+        val r = Passi.rimuoviGiocatore(c, 1)
+        assertNull(Passi.errorePasso(PassoConfigurazione.GIOCATORI, r, cats))
+    }
+
+    @Test fun `CA-118 aggiungere crea un duplicato quando un nome coincide con il default della nuova posizione`() {
+        val c = Passi.aggiungiGiocatore(configBase(n = 3, nomi = listOf("Giocatore 4", "B", "C")))
+        assertTrue(Passi.errorePasso(PassoConfigurazione.GIOCATORI, c, cats) is ErroreConfigurazione.NomeDuplicato)
+    }
+
+    @Test fun `CA-114 CA-115 puoAggiungere e puoRimuovere ai bordi`() {
+        assertTrue(Passi.puoAggiungereGiocatore(configBase(n = 19)))
+        assertFalse(Passi.puoAggiungereGiocatore(configBase(n = 20)))
+        assertFalse(Passi.puoRimuovereGiocatore(configBase(n = 3)))
+        assertTrue(Passi.puoRimuovereGiocatore(configBase(n = 4)))
+        assertTrue(Passi.puoAggiungereGiocatore(configBase(n = 3)))
+        assertTrue(Passi.puoRimuovereGiocatore(configBase(n = 20)))
+    }
+
+    @Test fun `CA-113 CA-115 da 3 si aggiunge fino a 20 e si rimuove fino a 3`() {
+        var c = configBase(n = 3, k = 1)
+        while (Passi.puoAggiungereGiocatore(c)) c = Passi.aggiungiGiocatore(c)
+        assertEquals(20, c.numeroGiocatori)
+        while (Passi.puoRimuovereGiocatore(c)) c = Passi.rimuoviGiocatore(c, 0)
+        assertEquals(3, c.numeroGiocatori)
+        assertEquals(1, c.numeroImpostori)
+    }
+
+    @Test fun `CA-104 riepilogo dopo rimozione riflette il nuovo massimo di impostori`() {
+        val c = configBase(n = 5, k = 2).copy(impostoriSorpresa = true)
+        assertTrue(Passi.riepilogo(c, cats).finoA)
+        val r = Passi.riepilogo(Passi.rimuoviGiocatore(c, 0), cats)
+        assertEquals(4, r.numeroGiocatori)
+        assertEquals(1, r.numeroImpostori)
+        assertFalse(r.finoA)
     }
 
     // ---- contaOpzioniAttive ----

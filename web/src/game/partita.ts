@@ -46,6 +46,14 @@ export function ordineDiParola(p: Partita): number[] {
   return Array.from({ length: n }, (_, i) => (p.primoGiocatore + i) % n);
 }
 
+/** Giocatore alla posizione k della sequenza di parola (contratto v2.4). */
+export function giocatoreAlPasso(p: Partita, k: number): number {
+  if (!Number.isInteger(k) || k < 0 || k >= p.giocatori.length) {
+    throw new RangeError(`posizione fuori intervallo: ${k}`);
+  }
+  return ordineDiParola(p)[k];
+}
+
 /** CA-21 */
 export function testoSvelamento(p: Partita): string {
   const nomi = [...p.impostori].sort((a, b) => a - b).map((i) => p.giocatori[i]);

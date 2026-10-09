@@ -1,7 +1,7 @@
 import { createSubscriber } from "svelte/reactivity";
 import type { StatoApp } from "./stato.svelte";
 
-export type Passo = 1 | 2 | 3 | 4;
+export type Passo = 1 | 2 | 3 | 4 | 5;
 
 export type Rotta =
   | "home"
@@ -68,7 +68,7 @@ const sRotta = segnale<Rotta>("home");
 const sInterruzione = segnale(false);
 const sPasso = segnale<Passo>(1);
 
-/** Passo della configurazione letto dall'hash (`#/configurazione/1..4`); 1 fuori da "configurazione". */
+/** Passo della configurazione letto dall'hash (`#/configurazione/1..5`); 1 fuori da "configurazione". */
 export const passoCorrente: { readonly valore: Passo } = {
   get valore() {
     return sPasso.leggi();
@@ -109,7 +109,7 @@ function daHash(hash: string): Rotta {
 
 function passoDaHash(hash: string): Passo {
   const m = /^#\/?configurazione\/([^/?]*)/.exec(hash);
-  return m !== null && /^[1-4]$/.test(m[1]) ? (Number(m[1]) as Passo) : 1;
+  return m !== null && /^[1-5]$/.test(m[1]) ? (Number(m[1]) as Passo) : 1;
 }
 
 function aHash(r: Rotta, passo: Passo = 1): string {

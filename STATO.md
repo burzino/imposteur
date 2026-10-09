@@ -71,6 +71,15 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Workflow Pages: checkout@v7, setup-node@v7, configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5 (Node 24).
 - Test: Android 198/198, PWA 345/345, build verdi.
 
+## Ondata in corso (2026-10-09 sera): configurazione a 5 passi e distribuzione nell'ordine di parola
+- Specifiche e contratto aggiornati (CA-113..122, contratto v1.9/v2.4): Giocatori (solo nomi, "+ Aggiungi giocatore", la x rimuove), Modalità (modalità, impostori, sorpresa), Opzioni, Categorie, Riepilogo. Distribuzione e Rivedi seguono l'ordine di parola (`giocatoreAlPasso(k)`).
+- Fuoco dopo la rimozione di un campo: nessuno spostamento esplicito (decisione della sessione principale).
+- Fatto: design.md (§3 Riga giocatore, §4.4 a 5 passi), codice Android e PWA, test. Android 231/231, PWA 377/377, build verdi. Avatar con nome vuoto: numero del giocatore. Da verificare sul telefono.
+
+## Foto degli avatar (decisa il 2026-10-09, ondata successiva ai 5 passi)
+- Facoltativa, salvata sul dispositivo e riusata nelle partite successive. Legata al NOME del giocatore (non alla posizione).
+- Sorgente: galleria e fotocamera (Android: Photo Picker senza permessi, fotocamera con permesso al primo scatto; PWA: input file con capture).
+
 ## Prossimi passi
 1. Installare l APK aggiornato (telefono scollegato al momento della build). Screenshot mancanti della PWA: Gioco, Rivedi, Rivela, Impostazioni.
 2. Collaudo su telefono: APK nuovo (restyling, 4 passi, 300 ms) e PWA secondo `docs/collaudo-pwa-telefono.md`. Su Android verificare medaglione Home, pesi 700/800 di Roboto Flex, "Inizia" sopra la tastiera con 20 giocatori.

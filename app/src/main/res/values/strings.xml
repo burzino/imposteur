@@ -30,8 +30,6 @@
 
     <!-- Configurazione -->
     <string name="config_titolo">Configurazione</string>
-    <string name="config_numero_giocatori">Numero giocatori</string>
-    <string name="config_nomi">Nomi</string>
     <string name="config_giocatore_n">Giocatore %1$d</string>
     <string name="config_numero_impostori">Numero impostori</string>
     <string name="config_modalita">Modalità</string>
@@ -47,7 +45,6 @@
     <string name="config_pool_vuoto">Le categorie scelte non contengono parole utilizzabili</string>
     <string name="config_inizia">Inizia</string>
     <string name="config_non_valida">Controlla la configurazione</string>
-    <string name="config_cancella_nome">Cancella nome</string>
     <string name="config_parole_rimanenti">Parole ancora da giocare: %1$d / %2$d</string>
     <string name="config_azzera">Azzera</string>
     <string name="config_azzera_conferma">Rimettere in gioco tutte le parole delle categorie scelte?</string>
@@ -60,16 +57,22 @@
     <string name="passo_avanti">Avanti</string>
     <string name="passo_modifica">Modifica</string>
     <string name="passo_giocatori">Giocatori</string>
+    <string name="passo_modalita">Modalità</string>
     <string name="passo_opzioni">Opzioni</string>
     <string name="passo_riepilogo">Riepilogo</string>
     <string name="passo_etichetta">Passo %1$d di %2$d · %3$s</string>
     <string name="passo_etichetta_cd">Passo %1$d di %2$d: %3$s</string>
     <string name="passo1_titolo">Chi gioca?</string>
-    <string name="passo1_sottotitolo">Quanti siete e come vi chiamate.</string>
-    <string name="passo2_sottotitolo">Sono tutte facoltative: puoi andare avanti senza toccarle.</string>
-    <string name="passo3_sottotitolo">Da quali argomenti pescare le parole.</string>
-    <string name="passo4_titolo">Tutto pronto?</string>
-    <string name="passo4_sottotitolo">Controlla e inizia.</string>
+    <string name="passo1_sottotitolo">Come vi chiamate. Da 3 a 20 giocatori.</string>
+    <string name="passo2_titolo">Come si gioca?</string>
+    <string name="passo2_sottotitolo">Scegli la modalità e quanti impostori.</string>
+    <string name="passo3_sottotitolo">Sono tutte facoltative: puoi andare avanti senza toccarle.</string>
+    <string name="passo4_sottotitolo">Da quali argomenti pescare le parole.</string>
+    <string name="passo5_titolo">Tutto pronto?</string>
+    <string name="passo5_sottotitolo">Controlla e inizia.</string>
+    <string name="giocatori_aggiungi">+ Aggiungi giocatore</string>
+    <string name="giocatori_massimo">Massimo 20 giocatori</string>
+    <string name="giocatori_rimuovi">Rimuovi giocatore %1$d</string>
     <plurals name="riep_giocatori">
         <item quantity="one">%d giocatore</item>
         <item quantity="other">%d giocatori</item>
@@ -79,7 +82,6 @@
         <item quantity="other">%d impostori</item>
     </plurals>
     <string name="riep_fino_a">fino a %d impostori</string>
-    <string name="riep_giocatori_impostori">%1$s, %2$s</string>
     <plurals name="riep_categorie">
         <item quantity="one">1 categoria</item>
         <item quantity="other">%d categorie</item>

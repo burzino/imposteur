@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { contenutoPer, type Partita } from "../../game/partita";
+  import { contenutoPer, giocatoreAlPasso, ordineDiParola, type Partita } from "../../game/partita";
   import CartaGirevole from "../componenti/CartaGirevole.svelte";
   import Pagina from "../componenti/Pagina.svelte";
   import Pulsante from "../componenti/Pulsante.svelte";
@@ -22,6 +22,7 @@
   }: {
     titolo: string;
     partita: Partita;
+    /** Posizione k nella sequenza di parola (0..N-1), non indice del giocatore. */
     indice: number;
     etichettaPulsante?: string;
     mostraFila?: boolean;
@@ -33,7 +34,8 @@
   const RITARDO_MS = 600;
   const META_FLIP_MS = 90; // meta rotazione della carta (molla lenta)
   let abilitato = $state(false);
-  const contenuto = $derived(contenutoPer(partita, indice));
+  const contenuto = $derived(contenutoPer(partita, giocatoreAlPasso(partita, indice)));
+  const ordine = $derived(ordineDiParola(partita));
   const ultimo = $derived(indice === partita.giocatori.length - 1);
   const etichetta = $derived(
     etichettaPulsante ?? (ultimo ? t.distribuzioneNascondiUltimo : t.distribuzioneNascondi),
@@ -67,7 +69,7 @@
   <div class="scena">
     <div class="testata">
       {#if mostraFila}
-        <DistribuzioneFilaAvatar giocatori={partita.giocatori} corrente={indice} />
+        <DistribuzioneFilaAvatar giocatori={partita.giocatori} {ordine} corrente={indice} />
       {/if}
       <p class="indicatore">{t.distribuzioneIndicatore(indice + 1, partita.giocatori.length)}</p>
     </div>

@@ -20,7 +20,7 @@
 </script>
 
 <div class="corpo">
-  <PassoIntestazione titolo={t.passo2Titolo} sottotitolo={t.passo2Sottotitolo}>
+  <PassoIntestazione titolo={t.passo3Titolo} sottotitolo={t.passo3Sottotitolo}>
     {#snippet lato()}
       {#if stato.opzioniAttive > 0}<span class="badge">{t.opzAttive(stato.opzioniAttive)}</span>{/if}
     {/snippet}

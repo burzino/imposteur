@@ -11,7 +11,7 @@
 </script>
 
 <div class="corpo">
-  <PassoIntestazione titolo={t.passo3Titolo} sottotitolo={t.passo3Sottotitolo} />
+  <PassoIntestazione titolo={t.passo4Titolo} sottotitolo={t.passo4Sottotitolo} />
 
   <div class="azioni">
     <Pulsante variante="tonale" onClick={() => stato.selezionaTutte(true)}>{t.configSelezionaTutte}</Pulsante>

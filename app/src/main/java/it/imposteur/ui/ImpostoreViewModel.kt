@@ -176,9 +176,11 @@ class ImpostoreViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { repoConfig.salva(config) }
     }
 
-    fun impostaNumeroGiocatori(n: Int) = modificaConfig { c ->
-        Regole.conNumeroGiocatori(c, n.coerceIn(Regole.MIN_GIOCATORI, Regole.MAX_GIOCATORI))
-    }
+    /** "+ Aggiungi giocatore": un campo vuoto in fondo (invariata a 20). */
+    fun aggiungiGiocatore() = modificaConfig { Passi.aggiungiGiocatore(it) }
+
+    /** "x" del campo [indice]: toglie il giocatore (invariata a 3 o con indice fuori intervallo). */
+    fun rimuoviGiocatore(indice: Int) = modificaConfig { Passi.rimuoviGiocatore(it, indice) }
 
     fun impostaNumeroImpostori(n: Int) = modificaConfig { c ->
         c.copy(numeroImpostori = n.coerceIn(1, Regole.maxImpostori(c.numeroGiocatori)))

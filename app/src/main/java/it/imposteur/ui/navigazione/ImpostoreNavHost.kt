@@ -44,7 +44,7 @@ object Rotte {
     const val IMPOSTAZIONI = "impostazioni"
 }
 
-/** Rotta del passo n (1..4) della Configurazione. */
+/** Rotta del passo n (1..5) della Configurazione. */
 private fun rottaPasso(passo: Int) = "configurazione/$passo"
 
 private const val ARG_PASSO = "passo"
@@ -167,7 +167,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             popEnterTransition = ingressoPasso,
             popExitTransition = uscitaPasso,
         ) { voce ->
-            val passo = (voce.arguments?.getInt(ARG_PASSO) ?: 1).coerceIn(1, 4)
+            val passo = (voce.arguments?.getInt(ARG_PASSO) ?: 1).coerceIn(1, 5)
             val direzione = remember(voce.id) { if (passo >= ultimoPasso[0]) 1 else -1 }
             SideEffect { ultimoPasso[0] = passo }
             // Guardia contro il doppio tocco: si agisce solo se questo passo e' ancora quello in cima.
@@ -175,7 +175,7 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
             fun vaiAPasso(n: Int) {
                 if (!inQuestoPasso()) return
                 viewModel.salvaOra()
-                navController.navigate(rottaPasso(n.coerceIn(1, 4)))
+                navController.navigate(rottaPasso(n.coerceIn(1, 5)))
             }
             SchermataConfigurazione(
                 passo = passo,

@@ -30,15 +30,22 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -54,6 +61,7 @@ import it.imposteur.game.Passi
 import it.imposteur.game.Regole
 import it.imposteur.ui.ImpostoreViewModel
 import it.imposteur.ui.UiState
+import it.imposteur.ui.componenti.Avatar
 import it.imposteur.ui.componenti.CartaSelezionabile
 import it.imposteur.ui.componenti.GruppoCarte
 import it.imposteur.ui.componenti.PulsanteContorno
@@ -65,36 +73,129 @@ import it.imposteur.ui.theme.bordoLivello
 import it.imposteur.ui.theme.mollaEffetti
 import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 
-/** Contenuto del passo 1: giocatori, impostori, "Impostori a sorpresa", modalita', nomi. */
+/** Contenuto del passo 1: un campo nome per giocatore (avatar, campo, "x") e "+ Aggiungi giocatore". */
 @Composable
 fun PassoGiocatori(stato: UiState, viewModel: ImpostoreViewModel) {
     val config = stato.config
     val indiciDuplicati = stato.errori.filterIsInstance<ErroreConfigurazione.NomeDuplicato>()
         .flatMap { it.indici }.toSet()
-    Column(verticalArrangement = Arrangement.spacedBy(Spazio.s3)) {
-        Contatore(
-            etichetta = stringResource(R.string.config_numero_giocatori),
-            valore = config.numeroGiocatori,
-            min = Regole.MIN_GIOCATORI,
-            max = Regole.MAX_GIOCATORI,
-            onCambia = viewModel::impostaNumeroGiocatori,
+    // Indice del campo che deve ricevere il fuoco dopo "+ Aggiungi giocatore"; la rimozione non sposta il fuoco.
+    var daFocalizzare by remember { mutableStateOf<Int?>(null) }
+    val focus = LocalFocusManager.current
+    val numero = config.numeroGiocatori
+    val puoRimuovere = Passi.puoRimuovereGiocatore(config)
+    val puoAggiungere = Passi.puoAggiungereGiocatore(config)
+    Column(verticalArrangement = Arrangement.spacedBy(Spazio.s2)) {
+        for (i in 0 until numero) {
+            key(i) {
+                RigaGiocatore(
+                    posizione = i,
+                    ultima = i == numero - 1,
+                    nome = config.nomi.getOrElse(i) { "" },
+                    duplicato = i in indiciDuplicati,
+                    puoRimuovere = puoRimuovere,
+                    daFocalizzare = daFocalizzare == i,
+                    onFocalizzato = { if (daFocalizzare == i) daFocalizzare = null },
+                    onNome = { viewModel.impostaNome(i, it) },
+                    onRimuovi = { viewModel.rimuoviGiocatore(i) },
+                    onAvanti = { focus.moveFocus(FocusDirection.Down) },
+                    onFatto = { focus.clearFocus() },
+                )
+            }
+        }
+        PulsanteTesto(
+            testo = stringResource(if (puoAggiungere) R.string.giocatori_aggiungi else R.string.giocatori_massimo),
+            onClick = {
+                if (puoAggiungere) {
+                    daFocalizzare = numero
+                    viewModel.aggiungiGiocatore()
+                }
+            },
+            abilitato = puoAggiungere,
         )
-        Contatore(
-            etichetta = stringResource(
-                if (config.impostoriSorpresa) R.string.config_numero_impostori_max else R.string.config_numero_impostori,
-            ),
-            valore = config.numeroImpostori,
-            min = 1,
-            max = Regole.maxImpostori(config.numeroGiocatori),
-            onCambia = viewModel::impostaNumeroImpostori,
-        )
-        RigaInterruttore(
-            etichetta = stringResource(R.string.opz_sorpresa),
-            descrizione = stringResource(R.string.opz_desc_sorpresa),
-            attivo = config.impostoriSorpresa,
-            onCambia = { v -> viewModel.impostaOpzione { it.copy(impostoriSorpresa = v) } },
-        )
+    }
+}
 
+/**
+ * Riga giocatore: avatar 40 dp (area 48 x 48, non interattiva; con nome vuoto mostra il numero del giocatore),
+ * campo nome, "x" che rimuove (lo spazio da 48 dp resta riservato anche quando e' assente).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RigaGiocatore(
+    posizione: Int,
+    ultima: Boolean,
+    nome: String,
+    duplicato: Boolean,
+    puoRimuovere: Boolean,
+    daFocalizzare: Boolean,
+    onFocalizzato: () -> Unit,
+    onNome: (String) -> Unit,
+    onRimuovi: () -> Unit,
+    onAvanti: () -> Unit,
+    onFatto: () -> Unit,
+) {
+    val colori = MaterialTheme.colorScheme
+    val etichetta = stringResource(R.string.config_giocatore_n, posizione + 1)
+    val richiedente = remember { FocusRequester() }
+    if (daFocalizzare) {
+        LaunchedEffect(Unit) {
+            richiedente.requestFocus()
+            onFocalizzato()
+        }
+    }
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(Spazio.s2),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+    ) {
+        Box(Modifier.size(Spazio.altezzaTocco).align(Alignment.CenterVertically), contentAlignment = Alignment.Center) {
+            Avatar(
+                nome = nome,
+                indice = posizione,
+                iniziale = if (nome.isBlank()) (posizione + 1).toString() else null,
+                modifier = Modifier.clearAndSetSemantics { },
+            )
+        }
+        TextField(
+            value = nome,
+            onValueChange = onNome,
+            label = { Text(etichetta) },
+            placeholder = { Text(etichetta) },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+                imeAction = if (ultima) ImeAction.Done else ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(onNext = { onAvanti() }, onDone = { onFatto() }),
+            singleLine = true,
+            isError = duplicato,
+            supportingText = if (duplicato) {
+                { Text(stringResource(R.string.config_nome_duplicato)) }
+            } else null,
+            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = colori.surfaceContainerHigh,
+                unfocusedContainerColor = colori.surfaceContainerHigh,
+                errorContainerColor = colori.surfaceContainerHigh,
+            ),
+            modifier = Modifier.weight(1f).focusRequester(richiedente),
+        )
+        Box(Modifier.size(Spazio.altezzaTocco).align(Alignment.CenterVertically), contentAlignment = Alignment.Center) {
+            if (puoRimuovere) {
+                val descrizione = stringResource(R.string.giocatori_rimuovi, posizione + 1)
+                IconButton(onClick = onRimuovi, modifier = Modifier.size(Spazio.altezzaTocco)) {
+                    Icon(Icons.Filled.Clear, contentDescription = descrizione, tint = colori.onSurfaceVariant)
+                }
+            }
+        }
+    }
+}
+
+/** Contenuto del passo 2: modalita', numero di impostori e "Impostori a sorpresa". */
+@Composable
+fun PassoModalita(stato: UiState, viewModel: ImpostoreViewModel) {
+    val config = stato.config
+    Column(verticalArrangement = Arrangement.spacedBy(Spazio.s3)) {
         TitoloSezione(stringResource(R.string.config_modalita))
         GruppoCarte {
             CartaSelezionabile(
@@ -110,76 +211,31 @@ fun PassoGiocatori(stato: UiState, viewModel: ImpostoreViewModel) {
                 descrizione = stringResource(R.string.modalita_affine_desc),
             )
         }
-
-        TitoloSezione(stringResource(R.string.config_nomi))
-        CampiNome(
-            numero = config.numeroGiocatori,
-            nomi = config.nomi,
-            duplicati = indiciDuplicati,
-            onNome = viewModel::impostaNome,
+        Contatore(
+            etichetta = stringResource(
+                if (config.impostoriSorpresa) R.string.config_numero_impostori_max else R.string.config_numero_impostori,
+            ),
+            valore = config.numeroImpostori,
+            min = 1,
+            max = Regole.maxImpostori(config.numeroGiocatori),
+            onCambia = viewModel::impostaNumeroImpostori,
+        )
+        RigaInterruttore(
+            etichetta = stringResource(R.string.opz_sorpresa),
+            descrizione = stringResource(R.string.opz_desc_sorpresa),
+            attivo = config.impostoriSorpresa,
+            onCambia = { v -> viewModel.impostaOpzione { it.copy(impostoriSorpresa = v) } },
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CampiNome(
-    numero: Int,
-    nomi: List<String>,
-    duplicati: Set<Int>,
-    onNome: (Int, String) -> Unit,
-) {
-    val focus = LocalFocusManager.current
-    val colori = MaterialTheme.colorScheme
-    Column(verticalArrangement = Arrangement.spacedBy(Spazio.s2)) {
-        for (i in 0 until numero) {
-            val nome = nomi.getOrElse(i) { "" }
-            val duplicato = i in duplicati
-            val etichetta = stringResource(R.string.config_giocatore_n, i + 1)
-            TextField(
-                value = nome,
-                onValueChange = { onNome(i, it) },
-                label = { Text(etichetta) },
-                placeholder = { Text(etichetta) },
-                trailingIcon = if (nome.isNotEmpty()) {
-                    {
-                        IconButton(onClick = { onNome(i, "") }) {
-                            Icon(Icons.Filled.Clear, contentDescription = stringResource(R.string.config_cancella_nome))
-                        }
-                    }
-                } else null,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = if (i == numero - 1) ImeAction.Done else ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focus.moveFocus(FocusDirection.Down) },
-                    onDone = { focus.clearFocus() },
-                ),
-                singleLine = true,
-                isError = duplicato,
-                supportingText = if (duplicato) {
-                    { Text(stringResource(R.string.config_nome_duplicato)) }
-                } else null,
-                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colori.surfaceContainerHigh,
-                    unfocusedContainerColor = colori.surfaceContainerHigh,
-                    errorContainerColor = colori.surfaceContainerHigh,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    }
-}
-
-/** Contenuto del passo 2: le tre schede di gruppo. */
+/** Contenuto del passo 3: le tre schede di gruppo. */
 @Composable
 fun PassoOpzioni(stato: UiState, viewModel: ImpostoreViewModel) {
     OpzioniAvanzate(config = stato.config, onCambia = viewModel::impostaOpzione)
 }
 
-/** Contenuto del passo 3: categorie e parole ancora da giocare. */
+/** Contenuto del passo 4: categorie e parole ancora da giocare. */
 @Composable
 fun PassoCategorie(stato: UiState, viewModel: ImpostoreViewModel, onChiediAzzera: () -> Unit) {
     val config = stato.config
@@ -244,7 +300,7 @@ fun PassoCategorie(stato: UiState, viewModel: ImpostoreViewModel, onChiediAzzera
     }
 }
 
-/** Contenuto del passo 4: quattro righe di riepilogo, ciascuna con "Modifica". */
+/** Contenuto del passo 5: quattro righe di riepilogo, ciascuna con "Modifica". */
 @Composable
 fun PassoRiepilogo(stato: UiState, onModifica: (Int) -> Unit) {
     val r = stato.riepilogo
@@ -253,11 +309,7 @@ fun PassoRiepilogo(stato: UiState, onModifica: (Int) -> Unit) {
     } else {
         pluralStringResource(R.plurals.riep_impostori, r.numeroImpostori, r.numeroImpostori)
     }
-    val giocatori = stringResource(
-        R.string.riep_giocatori_impostori,
-        pluralStringResource(R.plurals.riep_giocatori, r.numeroGiocatori, r.numeroGiocatori),
-        impostori,
-    )
+    val giocatori = pluralStringResource(R.plurals.riep_giocatori, r.numeroGiocatori, r.numeroGiocatori)
     val opzioni = if (r.opzioni.isEmpty()) {
         stringResource(R.string.riep_nessuna_opzione)
     } else {
@@ -285,19 +337,20 @@ fun PassoRiepilogo(stato: UiState, onModifica: (Int) -> Unit) {
             valore = stringResource(
                 if (r.modalita == Modalita.SENZA_PAROLA) R.string.modalita_senza_parola else R.string.modalita_affine,
             ),
-            onModifica = { onModifica(1) },
+            secondaria = impostori,
+            onModifica = { onModifica(2) },
         )
         RigaRiepilogo(
             etichetta = stringResource(R.string.opz_titolo),
             valore = opzioni,
             badge = attive.takeIf { it > 0 },
-            onModifica = { onModifica(2) },
+            onModifica = { onModifica(3) },
         )
         RigaRiepilogo(
             etichetta = stringResource(R.string.config_categorie),
             valore = pluralStringResource(R.plurals.riep_categorie, r.numeroCategorie, r.numeroCategorie),
             secondaria = stringResource(R.string.config_parole_rimanenti, stato.paroleRimanenti, stato.paroleTotali),
-            onModifica = { onModifica(3) },
+            onModifica = { onModifica(4) },
         )
     }
 }

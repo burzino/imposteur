@@ -31,6 +31,12 @@ data class Partita(
     fun ordineDiParola(): List<Int> =
         ordine ?: List(giocatori.size) { (primoGiocatore + it) % giocatori.size }
 
+    /** Indice del giocatore alla posizione k della sequenza di parola. */
+    fun giocatoreAlPasso(k: Int): Int {
+        require(k in giocatori.indices) { "posizione fuori intervallo: $k" }
+        return ordineDiParola()[k]
+    }
+
     fun testoSvelamento(): String {
         val nomi = impostori.sorted().map { giocatori[it] }
         val righe = mutableListOf<String>()

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Partita } from "../../game/partita";
+  import { giocatoreAlPasso, ordineDiParola, type Partita } from "../../game/partita";
   import Avatar from "../componenti/Avatar.svelte";
   import Pagina from "../componenti/Pagina.svelte";
   import TestoAdattivo from "../componenti/TestoAdattivo.svelte";
@@ -22,6 +22,7 @@
   }: {
     titolo: string;
     partita: Partita;
+    /** Posizione k nella sequenza di parola (0..N-1), non indice del giocatore. */
     indice: number;
     mostraFila?: boolean;
     onSono: () => void;
@@ -32,7 +33,9 @@
   const stato = getStato();
   const RITARDO_MS = 600;
   let abilitato = $state(false);
-  const nome = $derived(partita.giocatori[indice] ?? "");
+  const giocatore = $derived(giocatoreAlPasso(partita, indice));
+  const nome = $derived(partita.giocatori[giocatore] ?? "");
+  const ordine = $derived(ordineDiParola(partita));
 
   onMount(() => {
     const id = setTimeout(() => (abilitato = true), RITARDO_MS);
@@ -44,7 +47,7 @@
   <div class="scena">
     {#if mostraFila}
       <div class="testata">
-        <DistribuzioneFilaAvatar giocatori={partita.giocatori} corrente={indice} />
+        <DistribuzioneFilaAvatar giocatori={partita.giocatori} {ordine} corrente={indice} />
         <p class="indicatore">{t.distribuzioneIndicatore(indice + 1, partita.giocatori.length)}</p>
       </div>
     {/if}
@@ -52,7 +55,7 @@
       <p class="passa">{t.distribuzionePassaA}</p>
       <TestoAdattivo testo={nome} classe="dist-nome" maxRighe={2} />
       <span class="respiro">
-        <Avatar {nome} {indice} stato="pieno" dimensione={96} />
+        <Avatar {nome} indice={giocatore} stato="pieno" dimensione={96} />
       </span>
       <p class="avviso">{t.distribuzioneNonGuardare}</p>
     </div>

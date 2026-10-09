@@ -176,6 +176,28 @@ Caso limite: a pool esaurito `rimanenti` vale 0. La partita successiva azzera da
 fun ordineDiParola(): List<Int>
 ```
 
+## Distribuzione nell'ordine di parola (v1.9 Kotlin, v2.4 TS)
+
+La distribuzione dei ruoli segue `ordineDiParola()` (specifiche 4.3, 5.6): `StatoDistribuzione.Passaggio(k)` / `Rivelazione(k)` hanno `k` = posizione nella sequenza (0..N-1), non indice del giocatore. `Distribuzione.iniziale/avanza/interrompiRivelazione` NON cambiano (lavorano su posizioni, CA-18, CA-121). Il formato salvato della sessione non cambia (`indice` = posizione).
+
+```kotlin
+// game, in Partita
+/** Indice del giocatore (in `giocatori`) alla posizione k della sequenza: ordineDiParola()[k].
+ *  k fuori da 0..giocatori.size-1 -> IllegalArgumentException. */
+fun giocatoreAlPasso(k: Int): Int
+```
+```ts
+// game/partita.ts
+export function giocatoreAlPasso(p: Partita, k: number): number;   // ordineDiParola(p)[k]; k intero fuori 0..N-1 (o non intero) -> RangeError
+```
+
+Uso nella UI (Android e web): in Distribuzione `val g = partita.giocatoreAlPasso(k)`; nome = `giocatori[g]`, ruolo = `contenutoPer(partita, g)` (l'argomento resta l'indice del giocatore, non la posizione), iniziale e colore dell'avatar del giocatore `g` (il colore segue il giocatore, non la posizione); "Giocatore k+1 di N"; fila di avatar = `ordineDiParola()` mappata su `giocatori`; l'ultimo passo (`k == N-1`) mostra "Nascondi e inizia". Rivedi la parola: elenco = `ordineDiParola()` mappata su `giocatori`, il tocco passa l'indice giocatore `g` (non la riga).
+
+| Funzione | CA verificati | Casi |
+|---|---|---|
+| `giocatoreAlPasso` | CA-119, 120, 121 | `ordine` = [0,2,1], k = 0,1,2 -> 0,2,1; `ordine` null, N = 4, `primoGiocatore` = 2 -> k 0..3 = 2,3,0,1; `primoGiocatore` = 0 senza ordine -> identità (comportamento di prima); N = 3 con `ordine` casuale [1,0,2] -> 1,0,2; k = 0 è sempre `primoGiocatore`; l'insieme dei risultati su 0..N-1 è una permutazione (ogni giocatore una volta); k = -1 e k = N -> errore (IllegalArgumentException / RangeError); N = 20 stesso risultato di `ordineDiParola()[k]` |
+| `contenutoPer` con `giocatoreAlPasso` | CA-120 | per `ordine` = [0,2,1] e impostore il giocatore 2: il Passaggio/Rivelazione k = 1 mostra il contenuto da impostore con il nome del giocatore 2 |
+
 ## Opzioni avanzate (v1.6)
 
 Tutte disattivate per default, così la partita base resta identica a prima.
@@ -434,6 +456,7 @@ export interface Partita {
 export function eTrappola(p: Partita): boolean;                       // impostori.size === 0
 export function contenutoPer(p: Partita, indice: number): ContenutoRuolo;   // CA-09, CA-10
 export function ordineDiParola(p: Partita): number[];
+export function giocatoreAlPasso(p: Partita, k: number): number;       // v2.4, vedi "Distribuzione nell'ordine di parola"
 export function testoSvelamento(p: Partita): string;                  // CA-21
 
 export interface ChiaveParola { readonly categoriaId: string; readonly parola: string }  // parola = trim + minuscole
@@ -758,23 +781,41 @@ export function eIosSafariNonInstallato(): boolean;       // iOS Safari e non st
 - B mostra in Impostazioni "Esporta segnalazioni" (e "Condividi" se `condivisioneFileDisponibile()`) solo se `stato.segnalazioniSalvate > 0`, con il contatore e il pulsante di cancellazione già presente su Android. B mostra `t.installaIos` come ultima riga di "Come si gioca" (Regole) solo se `eIosSafariNonInstallato()`. C salva la segnalazione da Rivela con `stato.salvaSegnalazione`.
 - Ogni funzione è in `try/catch` e degrada senza `window`/`navigator` (test in Node).
 
-## Configurazione in 4 passi (v1.7 Kotlin, v2.2 TS)
+## Configurazione in 5 passi (v1.9 Kotlin, v2.4 TS; prima 4 passi, v1.7 / v2.2)
 
-Solo funzioni pure, senza stato di navigazione (il passo corrente non è salvato, specifiche 4.2). Stesse firme e stessa semantica in `game/` (Kotlin, file `Passi.kt`) e in `web/src/game/passi.ts` (TS, unioni di stringhe letterali con gli stessi nomi, `T?` come `T | null`). Nessuna modifica a `Configurazione` né al formato salvato.
+Solo funzioni pure, senza stato di navigazione (il passo corrente non è salvato, specifiche 4.2). Stesse firme e stessa semantica in `game/` (Kotlin, file `Passi.kt`) e in `web/src/game/passi.ts` (TS, unioni di stringhe letterali con gli stessi nomi, `T?` come `T | null`). Nessuna modifica a `Configurazione` né al formato salvato (`numeroGiocatori` = numero di campi del passo 1).
 
 ```kotlin
-enum class PassoConfigurazione { GIOCATORI, OPZIONI, CATEGORIE, RIEPILOGO }    // ordinale + 1 = numero del passo (1..4)
+enum class PassoConfigurazione { GIOCATORI, MODALITA, OPZIONI, CATEGORIE, RIEPILOGO }    // ordinale + 1 = numero del passo (1..5)
 
 object Passi {
     /** Errore del passo, o null se valido. Riusa Regole.valida; ritorna il PRIMO errore di Regole.valida appartenente al passo.
-     *  GIOCATORI: TroppoPochiGiocatori, TroppiGiocatori, TroppoPochiImpostori, TroppiImpostori, NomeDuplicato, NomeTroppoLungo.
+     *  GIOCATORI: TroppoPochiGiocatori, TroppiGiocatori, NomeDuplicato, NomeTroppoLungo.
+     *  MODALITA: TroppoPochiImpostori, TroppiImpostori (raggiungibili solo con dati incoerenti: la UI li impedisce).
      *  OPZIONI e RIEPILOGO: sempre null (nessuna validazione aggiuntiva, 4.2.1).
      *  CATEGORIE: NessunaCategoria, PoolVuoto. */
     fun errorePasso(passo: PassoConfigurazione, config: Configurazione, categorie: List<Categoria>): ErroreConfigurazione?
 
-    /** Primo passo, in ordine GIOCATORI, OPZIONI, CATEGORIE, con errorePasso != null; null se la configurazione è valida
+    /** Primo passo, in ordine GIOCATORI, MODALITA, OPZIONI, CATEGORIE, con errorePasso != null; null se la configurazione è valida
      *  (equivale a Regole.valida(...).isEmpty()). Usato da "Inizia" in barra (4.2). */
     fun primoPassoNonValido(config: Configurazione, categorie: List<Categoria>): PassoConfigurazione?
+
+    /** Aggiunge un giocatore in fondo (passo 1, "+ Aggiungi giocatore").
+     *  Se config.numeroGiocatori >= Regole.MAX_GIOCATORI restituisce config invariata.
+     *  Altrimenti: nomi = primi numeroGiocatori nomi (eventuali nomi oltre N scartati) completati con "" fino a N, più "" in coda;
+     *  numeroGiocatori + 1; numeroImpostori invariato (il massimo cresce o resta). */
+    fun aggiungiGiocatore(config: Configurazione): Configurazione
+
+    /** Rimuove il giocatore alla posizione `indice` (0-based; "x" del campo).
+     *  Se numeroGiocatori <= Regole.MIN_GIOCATORI o indice fuori da 0..numeroGiocatori-1 restituisce config invariata.
+     *  Altrimenti: nomi completati con "" fino a N, tolto l'elemento `indice` (i successivi scalano, i vuoti restano vuoti e
+     *  quindi seguono la nuova posizione, Regole.nomiEffettivi); numeroGiocatori - 1;
+     *  numeroImpostori = min(numeroImpostori, Regole.maxImpostori(N - 1)). */
+    fun rimuoviGiocatore(config: Configurazione, indice: Int): Configurazione
+
+    /** Per la UI: numeroGiocatori < MAX (abilita "+ Aggiungi giocatore") / numeroGiocatori > MIN (mostra la "x"). */
+    fun puoAggiungereGiocatore(config: Configurazione): Boolean
+    fun puoRimuovereGiocatore(config: Configurazione): Boolean
 
     /** Riepilogo come dati: nessuna stringa localizzata, la UI sceglie i testi. */
     fun riepilogo(config: Configurazione, categorie: List<Categoria>): RiepilogoConfigurazione
@@ -788,7 +829,7 @@ enum class OpzioneRiepilogo { NON_PARLA_PER_PRIMO, TRAPPOLA, ORDINE_CASUALE, PRO
 data class RiepilogoConfigurazione(
     val numeroGiocatori: Int,
     val nomi: List<String>,              // Regole.nomiEffettivi(config)
-    val numeroImpostori: Int,            // config.numeroImpostori limitato a 1..max(1, maxImpostori(N)); con fino a = true è il massimo
+    val numeroImpostori: Int,            // config.numeroImpostori limitato a 1..max(1, maxImpostori(N)); con fino a = true è il massimo; mostrato nella riga "Modalità" (passo 2)
     val finoA: Boolean,                  // impostoriSorpresa && numeroImpostori > 1 (CA-92, CA-104)
     val modalita: Modalita,
     val opzioni: List<OpzioneRiepilogo>, // solo non predefinite, nell'ordine dell'enum, senza duplicati; vuota = "Nessuna opzione attiva" (CA-89)
@@ -797,25 +838,30 @@ data class RiepilogoConfigurazione(
 )
 ```
 
-Regole di `riepilogo.opzioni`: NON_PARLA_PER_PRIMO se `impostoreNonPrimo`; TRAPPOLA se `partitaTrappola`; ORDINE_CASUALE se `ordineCasuale`; PROMEMORIA se `promemoriaUltimaPossibilita`; SENZA_CATEGORIA se `!mostraCategoria` e `modalita == SENZA_PAROLA` (mai in PAROLA_AFFINE); GIRI se `giriIndizi` > 1. Né il numero di impostori né `impostoriSorpresa` entrano in `opzioni` (CA-93). `contaOpzioniAttive` = interruttori attivi tra `impostoreNonPrimo`, `partitaTrappola`, `ordineCasuale`, `promemoriaUltimaPossibilita`, più 1 se `giriIndizi` > 1; NON conta `mostraCategoria` né `impostoriSorpresa`, né SENZA_CATEGORIA (CA-81). Il badge del passo 2 e quello della riga del passo 4 usano la stessa funzione; con 0 non compare.
+Regole di `riepilogo.opzioni`: NON_PARLA_PER_PRIMO se `impostoreNonPrimo`; TRAPPOLA se `partitaTrappola`; ORDINE_CASUALE se `ordineCasuale`; PROMEMORIA se `promemoriaUltimaPossibilita`; SENZA_CATEGORIA se `!mostraCategoria` e `modalita == SENZA_PAROLA` (mai in PAROLA_AFFINE); GIRI se `giriIndizi` > 1. Né il numero di impostori né `impostoriSorpresa` entrano in `opzioni` (CA-93). `contaOpzioniAttive` = interruttori attivi tra `impostoreNonPrimo`, `partitaTrappola`, `ordineCasuale`, `promemoriaUltimaPossibilita`, più 1 se `giriIndizi` > 1; NON conta `mostraCategoria` né `impostoriSorpresa`, né SENZA_CATEGORIA (CA-81). Il badge del passo 3 e quello della riga del passo 5 usano la stessa funzione; con 0 non compare.
 
 Il conteggio "Parole ancora da giocare: X / Y" non è nel riepilogo: dipende dalla sessione, la UI lo prende da `GestorePartite.rimanenti(Regole.pool(...))` (v1.2) come nel passo 3.
 
 | Funzione | CA verificati | Casi limite |
 |---|---|---|
-| `errorePasso` | CA-25, 100, 101 | nome duplicato (anche con "Giocatore n" di default) -> GIOCATORI e CATEGORIE null; categorie vuote -> CATEGORIE `NessunaCategoria`; selezione non vuota ma pool vuoto (PAROLA_AFFINE senza affini) -> `PoolVuoto`; OPZIONI null con qualunque combinazione (trappola + sorpresa incluse); RIEPILOGO null; più errori nello stesso passo -> il primo di `Regole.valida`; tipi non del passo non compaiono mai (es. `NessunaCategoria` in GIOCATORI) |
-| `primoPassoNonValido` | CA-102, 101, 25 | nome duplicato e categorie vuote -> GIOCATORI; solo categorie vuote -> CATEGORIE; configurazione valida -> null; non restituisce mai OPZIONI né RIEPILOGO |
+| `errorePasso` | CA-25, 100, 101 | nome duplicato (anche con "Giocatore n" di default) -> GIOCATORI e CATEGORIE null; impostori oltre il massimo (dati incoerenti) -> MODALITA `TroppiImpostori`, GIOCATORI null; categorie vuote -> CATEGORIE `NessunaCategoria`; selezione non vuota ma pool vuoto (PAROLA_AFFINE senza affini) -> `PoolVuoto`; OPZIONI null con qualunque combinazione (trappola + sorpresa incluse); RIEPILOGO null; più errori nello stesso passo -> il primo di `Regole.valida`; tipi non del passo non compaiono mai (es. `NessunaCategoria` in GIOCATORI) |
+| `primoPassoNonValido` | CA-102, 101, 25 | nome duplicato e categorie vuote -> GIOCATORI; impostori incoerenti e categorie vuote -> MODALITA; solo categorie vuote -> CATEGORIE; configurazione valida -> null; non restituisce mai OPZIONI né RIEPILOGO |
+| `aggiungiGiocatore` | CA-113, 114, 118 | N = 4, nomi [] -> N = 5, nomi ["","","","",""], impostori invariati; N = 4, nomi ["A","B"] -> nomi ["A","B","","",""]; N = 3, nomi ["A","B","C","X"] (oltre N) -> N = 4, nomi ["A","B","C",""]; N = 19 -> N = 20; N = 20 -> config identica (stesso oggetto o uguale); 5 giocatori e 2 impostori -> 6 giocatori e 2 impostori; non modifica gli altri campi (modalità, opzioni, categorie); il risultato non è mai modificato in loco (funzione pura); nomiEffettivi del risultato ha la nuova lunghezza |
+| `rimuoviGiocatore` | CA-115, 116, 117, 118 | ["Anna","","Carla",""], indice 1 -> N = 3, ["Anna","Carla",""] (nomiEffettivi "Anna","Carla","Giocatore 3"); ["","Bea","Cia","Dino"], indice 0 -> ["Bea","Cia","Dino"]; ultimo indice -> toglie l'ultimo; nomi più corti di N (N = 5, nomi ["A"]), indice 3 -> N = 4, nomi ["A","",""]; N = 3 -> invariata; indice -1 e indice N -> invariata; N = 7 e 3 impostori, rimozione -> N = 6 e 2; N = 5 e 2 -> N = 4 e 1; N = 6 e 1 -> N = 5 e 1; N = 20 e 9 impostori -> N = 19 e 9; sorpresa e trappola invariati; due nomi duplicati "Ann" e "ann", rimuovendo uno -> `errorePasso(GIOCATORI)` null |
+| `puoAggiungere/RimuovereGiocatore` | CA-114, 115 | N = 19 -> aggiungere true; N = 20 -> aggiungere false; N = 3 -> rimuovere false; N = 4 -> rimuovere true |
 | `riepilogo` | CA-92, 93, 94, 103, 104, 89 | sorpresa attiva con massimo 1 (N = 3 o 4) -> `finoA` false, "1 impostore"; sorpresa attiva con 5 giocatori e 2 -> `finoA` true; nomi vuoti -> "Giocatore n"; PAROLA_AFFINE con `mostraCategoria` false -> niente SENZA_CATEGORIA; tutte le opzioni spente -> `opzioni` vuota, `giriIndizi` 1; esempio "Ordine casuale, 2 giri" -> [ORDINE_CASUALE, GIRI] e `giriIndizi` 2; selezione con id inesistenti non contati; riflette sempre la config corrente (funzione pura, nessuna cache) |
 | `contaOpzioniAttive` | CA-81, 89, 94 | tutte spente -> 0; solo `mostraCategoria` false -> 0; solo `impostoriSorpresa` -> 0; `giriIndizi` 2 o 3 -> 1; tutte le cinque contate attive -> 5 |
 
-### UI web: rotte dei passi (v2.2)
+TS: `Passi` è un oggetto/modulo con le stesse funzioni (`aggiungiGiocatore(config)`, `rimuoviGiocatore(config, indice)`, `puoAggiungereGiocatore`, `puoRimuovereGiocatore`) e `PassoConfigurazione = "GIOCATORI" | "MODALITA" | "OPZIONI" | "CATEGORIE" | "RIEPILOGO"`. `StatoApp` (web) e `ImpostoreViewModel` (Android) espongono `aggiungiGiocatore()` e `rimuoviGiocatore(indice)` che applicano la funzione pura e salvano; il fuoco sul nuovo campo è compito della UI. `Regole.conNumeroGiocatori` resta (CA-06) ma il passo 1 non lo usa più.
 
-Aggiornamento di §3 "Rotte": `Rotta` diventa `... | "configurazione" | ...` invariato, ma la rotta `configurazione` ha un sotto-percorso. Hash `#/configurazione/1` .. `#/configurazione/4`; `#/configurazione` senza numero equivale a `#/configurazione/1`; numero fuori 1..4 o non intero -> `1`. Il passo corrente è letto dall'hash (non salvato, specifiche 4.2).
+### UI web: rotte dei passi (v2.4; v2.2 con 4 passi)
+
+Aggiornamento di §3 "Rotte": `Rotta` diventa `... | "configurazione" | ...` invariato, ma la rotta `configurazione` ha un sotto-percorso. Hash `#/configurazione/1` .. `#/configurazione/5`; `#/configurazione` senza numero equivale a `#/configurazione/1`; numero fuori 1..5 o non intero -> `1`. Il passo corrente è letto dall'hash (non salvato, specifiche 4.2).
 
 ```ts
 // ui/rotte.ts (aggiunte)
-export const passoCorrente: { readonly valore: 1 | 2 | 3 | 4 };   // $state, derivato dall'hash; 1 fuori da "configurazione"
-export function vaiAPasso(passo: 1 | 2 | 3 | 4, opz?: { sostituisci?: boolean }): void;   // Avanti/Modifica = push; Indietro dal riepilogo dopo "Modifica" = history normale
-export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4;        // GIOCATORI -> 1 ... RIEPILOGO -> 4 (in game/passi.ts)
+export const passoCorrente: { readonly valore: 1 | 2 | 3 | 4 | 5 };   // $state, derivato dall'hash; 1 fuori da "configurazione"
+export function vaiAPasso(passo: 1 | 2 | 3 | 4 | 5, opz?: { sostituisci?: boolean }): void;   // Avanti/Modifica = push; Indietro dal riepilogo dopo "Modifica" = history normale
+export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4 | 5;        // GIOCATORI -> 1, MODALITA -> 2, OPZIONI -> 3, CATEGORIE -> 4, RIEPILOGO -> 5 (in game/passi.ts)
 ```
-`vaiAConfigurazione()` apre `#/configurazione/1` (CA-99, 105). "Inizia" in barra: `const p = primoPassoNonValido(...)`; se `p === null` -> `iniziaPartita()` e `vai("distribuzione")`; altrimenti `vaiAPasso(passoDiPassoConfigurazione(p), { sostituisci: true })` e mostra l'errore del passo (resta nel passo corrente se coincide) (CA-102). Indietro del browser/freccia/tasto di sistema dai passi 2..4 = history normale, senza validare; dal passo 1 `salvaOra()` poi Home (CA-100). `StatoApp` espone `readonly riepilogo: RiepilogoConfigurazione` (`$derived` da `Passi.riepilogo(config, categorie)`) e `readonly opzioniAttive: number` (`contaOpzioniAttive(config)`); nessun'altra azione nuova (le `imposta*` esistenti bastano, `impostoriSorpresa` passa da `impostaOpzione`).
+`vaiAConfigurazione()` apre `#/configurazione/1` (CA-99, 105). "Inizia" in barra: `const p = primoPassoNonValido(...)`; se `p === null` -> `iniziaPartita()` e `vai("distribuzione")`; altrimenti `vaiAPasso(passoDiPassoConfigurazione(p), { sostituisci: true })` e mostra l'errore del passo (resta nel passo corrente se coincide) (CA-102). Indietro del browser/freccia/tasto di sistema dai passi 2..5 = history normale, senza validare; dal passo 1 `salvaOra()` poi Home (CA-100). `StatoApp` espone `readonly riepilogo: RiepilogoConfigurazione` (`$derived` da `Passi.riepilogo(config, categorie)`) e `readonly opzioniAttive: number` (`contaOpzioniAttive(config)`); oltre a `aggiungiGiocatore()` / `rimuoviGiocatore(indice)` nessun'altra azione nuova (le `imposta*` esistenti bastano, `impostoriSorpresa` passa da `impostaOpzione`; `impostaNome(indice, testo)` resta).

@@ -52,6 +52,8 @@ fun Avatar(
     modifier: Modifier = Modifier,
     misura: Dp = Spazio.avatarRiga,
     stato: StatoAvatar = StatoAvatar.NORMALE,
+    /** Iniziale da mostrare al posto di quella del nome (es. il numero del giocatore con nome vuoto). */
+    iniziale: String? = null,
 ) {
     val colore = ColoriAvatar[Math.floorMod(indice, ColoriAvatar.size)]
     val anello = MaterialTheme.colorScheme.primary
@@ -87,7 +89,7 @@ fun Avatar(
             // Iniziale al 42% del diametro, come sul web (non scala con la dimensione del testo).
             val corpo = with(LocalDensity.current) { (misura * 0.42f).toSp() }
             Text(
-                inizialeDi(nome),
+                iniziale ?: inizialeDi(nome),
                 style = MaterialTheme.typography.titleMedium.copy(fontSize = corpo, lineHeight = corpo),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -96,22 +98,25 @@ fun Avatar(
     }
 }
 
-/** Fila di avatar centrata sul corrente: gia' visti con spunta, corrente con anello, successivi attenuati. */
+/**
+ * Fila di avatar nell'ordine di parola [ordine] (indici in [giocatori]); [corrente] e' la posizione nella sequenza.
+ * Gia' visti con spunta, corrente con anello, successivi attenuati; il colore segue il giocatore.
+ */
 @Composable
-fun FilaAvatar(giocatori: List<String>, corrente: Int, modifier: Modifier = Modifier) {
-    fun statoDi(i: Int) = when {
-        i < corrente -> StatoAvatar.VISTO
-        i == corrente -> StatoAvatar.CORRENTE
+fun FilaAvatar(giocatori: List<String>, ordine: List<Int>, corrente: Int, modifier: Modifier = Modifier) {
+    fun statoDi(k: Int) = when {
+        k < corrente -> StatoAvatar.VISTO
+        k == corrente -> StatoAvatar.CORRENTE
         else -> StatoAvatar.SUCCESSIVO
     }
-    // Decorativa: l'informazione e' nel testo "Giocatore n di N".
+    // Decorativa: l'informazione e' nel testo "Giocatore k di N".
     val m = modifier.fillMaxWidth().clearAndSetSemantics { }
-    if (giocatori.size <= 6) {
+    if (ordine.size <= 6) {
         Row(
             modifier = m,
             horizontalArrangement = Arrangement.spacedBy(Spazio.s3, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
-        ) { giocatori.forEachIndexed { i, nome -> Avatar(nome, i, stato = statoDi(i)) } }
+        ) { ordine.forEachIndexed { k, g -> Avatar(giocatori[g], g, stato = statoDi(k)) } }
     } else {
         val lista = rememberLazyListState()
         val densita = LocalDensity.current
@@ -126,6 +131,6 @@ fun FilaAvatar(giocatori: List<String>, corrente: Int, modifier: Modifier = Modi
             horizontalArrangement = Arrangement.spacedBy(Spazio.s3),
             verticalAlignment = Alignment.CenterVertically,
             contentPadding = PaddingValues(horizontal = Spazio.s4, vertical = Spazio.s2),
-        ) { itemsIndexed(giocatori) { i, nome -> Avatar(nome, i, stato = statoDi(i)) } }
+        ) { itemsIndexed(ordine) { k, g -> Avatar(giocatori[g], g, stato = statoDi(k)) } }
     }
 }

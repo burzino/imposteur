@@ -2,10 +2,15 @@
   import Avatar from "../componenti/Avatar.svelte";
 
   // Decorativa: l'informazione e nel testo "Giocatore n di N". Solo l'iniziale, nessun ruolo.
-  let { giocatori, corrente }: { giocatori: readonly string[]; corrente: number } = $props();
+  // `ordine` = indici dei giocatori nell'ordine di parola; `corrente` = posizione nella sequenza.
+  let {
+    giocatori,
+    ordine,
+    corrente,
+  }: { giocatori: readonly string[]; ordine: readonly number[]; corrente: number } = $props();
 
   let contenitore: HTMLElement | undefined = $state();
-  const scorre = $derived(giocatori.length > 6);
+  const scorre = $derived(ordine.length > 6);
 
   $effect(() => {
     const i = corrente;
@@ -23,10 +28,10 @@
 </script>
 
 <div class="fila" class:scorre bind:this={contenitore} aria-hidden="true">
-  {#each giocatori as nome, i (i)}
+  {#each ordine as g, i (i)}
     <Avatar
-      {nome}
-      indice={i}
+      nome={giocatori[g] ?? ""}
+      indice={g}
       stato={i < corrente ? "fatto" : i === corrente ? "corrente" : "attesa"}
       dimensione={40}
     />

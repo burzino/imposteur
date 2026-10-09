@@ -252,6 +252,16 @@ export class StatoApp {
     );
   }
 
+  /** "+ Aggiungi giocatore": campo in fondo (il fuoco sul nuovo campo e' compito della UI). */
+  aggiungiGiocatore(): void {
+    this.#modificaConfig((c) => Passi.aggiungiGiocatore(c));
+  }
+
+  /** "x" del campo: rimuove il giocatore alla posizione `indice`. */
+  rimuoviGiocatore(indice: number): void {
+    this.#modificaConfig((c) => Passi.rimuoviGiocatore(c, indice));
+  }
+
   impostaNumeroImpostori(n: number): void {
     this.#modificaConfig((c) => ({
       ...c,

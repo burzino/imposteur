@@ -1,7 +1,7 @@
 import type { Categoria, Configurazione, ErroreConfigurazione, Modalita } from './modelli';
 import { Regole } from './regole';
 
-export type PassoConfigurazione = 'GIOCATORI' | 'OPZIONI' | 'CATEGORIE' | 'RIEPILOGO';
+export type PassoConfigurazione = 'GIOCATORI' | 'MODALITA' | 'OPZIONI' | 'CATEGORIE' | 'RIEPILOGO';
 
 export type OpzioneRiepilogo =
   | 'NON_PARLA_PER_PRIMO'
@@ -22,20 +22,19 @@ export interface RiepilogoConfigurazione {
   readonly numeroCategorie: number;
 }
 
-const ORDINE: readonly PassoConfigurazione[] = ['GIOCATORI', 'OPZIONI', 'CATEGORIE', 'RIEPILOGO'];
+const ORDINE: readonly PassoConfigurazione[] = ['GIOCATORI', 'MODALITA', 'OPZIONI', 'CATEGORIE', 'RIEPILOGO'];
 
 const TIPI_GIOCATORI: readonly ErroreConfigurazione['tipo'][] = [
   'TroppoPochiGiocatori',
   'TroppiGiocatori',
-  'TroppoPochiImpostori',
-  'TroppiImpostori',
   'NomeDuplicato',
   'NomeTroppoLungo',
 ];
+const TIPI_MODALITA: readonly ErroreConfigurazione['tipo'][] = ['TroppoPochiImpostori', 'TroppiImpostori'];
 const TIPI_CATEGORIE: readonly ErroreConfigurazione['tipo'][] = ['NessunaCategoria', 'PoolVuoto'];
 
-export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4 {
-  return (ORDINE.indexOf(p) + 1) as 1 | 2 | 3 | 4;
+export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4 | 5 {
+  return (ORDINE.indexOf(p) + 1) as 1 | 2 | 3 | 4 | 5;
 }
 
 function errorePasso(
@@ -43,7 +42,14 @@ function errorePasso(
   config: Configurazione,
   categorie: readonly Categoria[],
 ): ErroreConfigurazione | null {
-  const tipi = passo === 'GIOCATORI' ? TIPI_GIOCATORI : passo === 'CATEGORIE' ? TIPI_CATEGORIE : null;
+  const tipi =
+    passo === 'GIOCATORI'
+      ? TIPI_GIOCATORI
+      : passo === 'MODALITA'
+        ? TIPI_MODALITA
+        : passo === 'CATEGORIE'
+          ? TIPI_CATEGORIE
+          : null;
   if (tipi === null) return null;
   return Regole.valida(config, categorie).find((e) => tipi.includes(e.tipo)) ?? null;
 }
@@ -93,4 +99,48 @@ function contaOpzioniAttive(config: Configurazione): number {
   );
 }
 
-export const Passi = { errorePasso, primoPassoNonValido, riepilogo, contaOpzioniAttive } as const;
+function completaNomi(config: Configurazione): string[] {
+  const n = config.numeroGiocatori;
+  return Array.from({ length: n }, (_, i) => config.nomi[i] ?? '');
+}
+
+function puoAggiungereGiocatore(config: Configurazione): boolean {
+  return config.numeroGiocatori < Regole.MAX_GIOCATORI;
+}
+
+function puoRimuovereGiocatore(config: Configurazione): boolean {
+  return config.numeroGiocatori > Regole.MIN_GIOCATORI;
+}
+
+function aggiungiGiocatore(config: Configurazione): Configurazione {
+  if (!puoAggiungereGiocatore(config)) return config;
+  return {
+    ...config,
+    nomi: [...completaNomi(config), ''],
+    numeroGiocatori: config.numeroGiocatori + 1,
+  };
+}
+
+function rimuoviGiocatore(config: Configurazione, indice: number): Configurazione {
+  const n = config.numeroGiocatori;
+  if (!puoRimuovereGiocatore(config) || !Number.isInteger(indice) || indice < 0 || indice >= n) return config;
+  const nomi = completaNomi(config);
+  nomi.splice(indice, 1);
+  return {
+    ...config,
+    nomi,
+    numeroGiocatori: n - 1,
+    numeroImpostori: Math.min(config.numeroImpostori, Regole.maxImpostori(n - 1)),
+  };
+}
+
+export const Passi = {
+  errorePasso,
+  primoPassoNonValido,
+  aggiungiGiocatore,
+  rimuoviGiocatore,
+  puoAggiungereGiocatore,
+  puoRimuovereGiocatore,
+  riepilogo,
+  contaOpzioniAttive,
+} as const;

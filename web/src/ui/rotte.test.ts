@@ -176,8 +176,8 @@ describe("rotte: passi della configurazione (CA-99, CA-100, CA-102, CA-105)", ()
     expect(passoCorrente.valore).toBe(1);
   });
 
-  it("CA-99 #/configurazione/1..4 selezionano il passo", () => {
-    for (const n of [1, 2, 3, 4] as const) {
+  it("CA-99 #/configurazione/1..5 selezionano il passo", () => {
+    for (const n of [1, 2, 3, 4, 5] as const) {
       avvia(`#/configurazione/${n}`);
       expect(rottaCorrente.valore, `passo ${n}`).toBe("configurazione");
       expect(passoCorrente.valore, `passo ${n}`).toBe(n);
@@ -186,8 +186,8 @@ describe("rotte: passi della configurazione (CA-99, CA-100, CA-102, CA-105)", ()
     }
   });
 
-  it("CA-99 numero non valido (0, 5, -1, 2.5, abc, vuoto) = passo 1", () => {
-    for (const x of ["0", "5", "-1", "2.5", "abc", "", "99"]) {
+  it("CA-99 numero non valido (0, 6, -1, 2.5, abc, vuoto) = passo 1", () => {
+    for (const x of ["0", "6", "-1", "2.5", "abc", "", "99"]) {
       avvia(`#/configurazione/${x}`);
       expect(rottaCorrente.valore, x).toBe("configurazione");
       expect(passoCorrente.valore, x).toBe(1);
