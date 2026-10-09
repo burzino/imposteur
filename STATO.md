@@ -80,10 +80,16 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Facoltativa, salvata sul dispositivo e riusata nelle partite successive. Legata al NOME del giocatore (non alla posizione).
 - Sorgente: galleria e fotocamera (Android: Photo Picker senza permessi, fotocamera con permesso al primo scatto; PWA: input file con capture).
 
+## Dominio burzi.eu (2026-10-09, attivo)
+- burzi.eu = pagina principale "Giochi di gruppo" (repository `burzino/burzino.github.io`, cartella locale `Z:urzino.github.io`, HTML statico con `CNAME` e `.nojekyll`). Imposteur su burzi.eu/imposteur/ (dominio ereditato, BASE_PATH resta /imposteur/); burzino.github.io/imposteur e www.burzi.eu rimandano lì.
+- DNS Aruba: 4 A di GitHub su @, CNAME www → burzino.github.io, TXT `_github-pages-challenge-burzino`; record di posta e Aruba lasciati.
+- Un nuovo gioco: repository con Pages attivo + carta in `index.html` della pagina principale.
+- La PWA su burzi.eu ha un'origine nuova: installazione e salvataggi di burzino.github.io non si trasferiscono.
+
 ## Prossimi passi
 1. Installare l APK aggiornato (telefono scollegato al momento della build). Screenshot mancanti della PWA: Gioco, Rivedi, Rivela, Impostazioni.
 2. Collaudo su telefono: APK nuovo (restyling, 4 passi, 300 ms) e PWA secondo `docs/collaudo-pwa-telefono.md`. Su Android verificare medaglione Home, pesi 700/800 di Roboto Flex, "Inizia" sopra la tastiera con 20 giocatori.
-3. Dominio imposteur.burzi.eu (CNAME su Aruba, poi BASE_PATH=/).
+3. HTTPS su burzi.eu: quando GitHub ha emesso il certificato, spuntare "Enforce HTTPS" nel repository burzino.github.io (lo fa l'utente).
 4. Verificare a occhio, sul telefono, i nomi su una riga separata in Gioco e Rivela.
 
 ## Punti aperti
