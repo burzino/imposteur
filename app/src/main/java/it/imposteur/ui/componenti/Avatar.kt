@@ -84,9 +84,11 @@ fun Avatar(
         if (stato == StatoAvatar.VISTO) {
             Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
         } else {
+            // Iniziale al 42% del diametro, come sul web (non scala con la dimensione del testo).
+            val corpo = with(LocalDensity.current) { (misura * 0.42f).toSp() }
             Text(
                 inizialeDi(nome),
-                style = if (misura >= 64.dp) MaterialTheme.typography.displaySmall else MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = corpo, lineHeight = corpo),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
             )

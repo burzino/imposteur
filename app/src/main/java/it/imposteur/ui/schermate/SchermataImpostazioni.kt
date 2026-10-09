@@ -76,7 +76,7 @@ fun SchermataImpostazioni(
                 .fillMaxSize()
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(Spazio.margineSchermata),
+                .padding(start = Spazio.margineSchermata, end = Spazio.margineSchermata, top = Spazio.s2, bottom = Spazio.margineSchermata),
             verticalArrangement = Arrangement.spacedBy(Spazio.s3),
         ) {
             Scheda {

@@ -85,7 +85,7 @@
   .corpo { display: flex; flex-direction: column; gap: var(--spazio-4); padding-bottom: 96px; }
   .scheda {
     display: flex; flex-direction: column; gap: var(--spazio-1);
-    padding: var(--spazio-3) var(--spazio-4);
+    padding: var(--spazio-3) 20px;
     border: var(--spessore-contorno) solid var(--colore-bordo-livello);
     border-radius: var(--raggio-xl);
     background: var(--colore-contenitore-superficie-basso);
@@ -98,6 +98,6 @@
     background: var(--colore-contenitore-primario); color: var(--colore-su-contenitore-primario);
   }
   .giri { display: flex; flex-direction: column; gap: var(--spazio-2); padding: var(--spazio-2) 0; }
-  .g-titolo { font: var(--testo-corpo); color: var(--colore-su-superficie); }
+  .g-titolo { font: var(--testo-titolo); color: var(--colore-su-superficie); }
   .g-desc { font: var(--testo-corpo-piccolo); color: var(--colore-su-superficie-variante); }
 </style>

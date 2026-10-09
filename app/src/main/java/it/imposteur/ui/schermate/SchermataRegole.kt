@@ -30,7 +30,7 @@ fun SchermataRegole(onIndietro: () -> Unit, onHome: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(Spazio.margineSchermata),
+                .padding(start = Spazio.margineSchermata, end = Spazio.margineSchermata, top = Spazio.s2, bottom = Spazio.margineSchermata),
             verticalArrangement = Arrangement.spacedBy(Spazio.s3),
         ) {
             Sezione(R.string.regole_modalita_senza_parola_titolo, R.string.regole_modalita_senza_parola)

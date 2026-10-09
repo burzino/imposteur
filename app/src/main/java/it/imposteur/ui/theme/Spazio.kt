@@ -1,5 +1,8 @@
 package it.imposteur.ui.theme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /** Spaziature e misure di design.md 2.4. */
@@ -12,7 +15,9 @@ object Spazio {
     val s6 = 32.dp
     val s7 = 48.dp
 
-    val margineSchermata = s4
+    /** 16 dp, 24 dp da 600 dp di larghezza (design.md 2.4). */
+    val margineSchermata: Dp
+        @Composable get() = if (LocalConfiguration.current.screenWidthDp >= 600) s5 else s4
     val altezzaTocco = 48.dp
     val altezzaPulsante = 56.dp
     val altezzaPulsanteGrande = 72.dp

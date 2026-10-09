@@ -2,6 +2,8 @@ package it.imposteur.ui.componenti
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import it.imposteur.ui.theme.DURATA_VELOCE_MS
+import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 import it.imposteur.ui.theme.Spazio
 
 private val RaggioRiposo = 28.dp // meta' di 56 dp: pillola
@@ -37,14 +40,16 @@ private class MorphPulsante(val forma: RoundedCornerShape, val scala: Float)
 @Composable
 private fun morphPulsante(sorgente: MutableInteractionSource, altezza: androidx.compose.ui.unit.Dp): MorphPulsante {
     val premuto by sorgente.collectIsPressedAsState()
+    val ridotto = rilevaRiduciAnimazioni()
+    val durata: AnimationSpec<Float> = if (ridotto) snap() else tween(DURATA_VELOCE_MS)
     val raggio by animateDpAsState(
         targetValue = if (premuto) RaggioPremuto else altezza / 2,
-        animationSpec = tween(DURATA_VELOCE_MS),
+        animationSpec = if (ridotto) snap() else tween(DURATA_VELOCE_MS),
         label = "raggioPulsante",
     )
     val scala by animateFloatAsState(
         targetValue = if (premuto) 0.97f else 1f,
-        animationSpec = tween(DURATA_VELOCE_MS),
+        animationSpec = durata,
         label = "scalaPulsante",
     )
     return MorphPulsante(RoundedCornerShape(raggio), scala)
@@ -146,6 +151,6 @@ fun PulsanteTesto(
             Icon(icona, contentDescription = null, modifier = Modifier.size(18.dp))
             androidx.compose.foundation.layout.Spacer(Modifier.width(Spazio.s2))
         }
-        Text(testo, style = MaterialTheme.typography.labelLarge)
+        Text(testo, style = MaterialTheme.typography.titleMedium)
     }
 }

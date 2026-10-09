@@ -30,7 +30,7 @@ fun OpzioniAvanzate(
     onCambia: ((Configurazione) -> Configurazione) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spazio.s3)) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spazio.s4)) {
         SchedaGruppo(stringResource(R.string.opz_gruppo_ruoli)) {
             if (config.modalita == Modalita.SENZA_PAROLA) {
                 RigaInterruttore(

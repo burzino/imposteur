@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -98,7 +97,6 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
                 PulsanteTesto(
                     testo = stringResource(R.string.segnala_pulsante),
                     onClick = { segnalando = true },
-                    icona = Icons.Filled.Warning,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                 )
             }

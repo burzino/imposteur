@@ -162,7 +162,7 @@
   .piede {
     display: flex;
     flex-direction: column;
-    gap: var(--spazio-1);
+    gap: var(--spazio-2);
     align-items: center;
   }
 </style>

@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -65,7 +63,6 @@ fun SchermataGioco(
                     PulsanteTesto(
                         testo = stringResource(R.string.gioco_rivedi),
                         onClick = onRivedi,
-                        icona = Icons.Filled.Info,
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     )
                     PulsantePieno(

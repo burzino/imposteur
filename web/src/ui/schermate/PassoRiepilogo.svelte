@@ -95,8 +95,8 @@
     display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .badge {
-    flex: none; padding: 2px 10px; border-radius: var(--raggio-pieno); white-space: nowrap;
-    font: var(--testo-didascalia);
+    flex: none; padding: 4px 12px; border-radius: var(--raggio-pieno); white-space: nowrap;
+    font: var(--testo-etichetta);
     background: var(--colore-contenitore-primario); color: var(--colore-su-contenitore-primario);
   }
   .modifica { flex: none; padding: 0 var(--spazio-3); font: var(--testo-titolo); color: var(--colore-primario); }

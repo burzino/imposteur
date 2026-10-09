@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
@@ -353,12 +354,12 @@ private fun RigaRiepilogo(
 /** Badge "N attive" (primaryContainer). */
 @Composable
 fun BadgeAttive(n: Int) {
-    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.primaryContainer) {
+    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer) {
         Text(
             pluralStringResource(R.plurals.opz_attive, n, n),
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = Spazio.s1),
+            modifier = Modifier.padding(horizontal = Spazio.s3, vertical = Spazio.s1),
         )
     }
 }

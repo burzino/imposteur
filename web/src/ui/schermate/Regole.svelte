@@ -36,13 +36,14 @@
     display: flex;
     flex-direction: column;
     gap: var(--spazio-2);
-    padding: var(--spazio-5) 20px;
+    padding: 20px;
     border: var(--spessore-contorno) solid var(--colore-bordo-livello);
     border-radius: var(--raggio-xl);
     background: var(--colore-contenitore-superficie-basso);
   }
   h2 {
     font: var(--testo-titolo-sezione);
+    color: var(--colore-primario);
   }
   p {
     font: var(--testo-corpo);

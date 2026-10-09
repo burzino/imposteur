@@ -84,7 +84,9 @@
       </section>
       {#if partita.promemoriaUltimaPossibilita && !trappola}
         <div class="promemoria" role="note">
-          <span aria-hidden="true">ⓘ</span>
+          <svg class="info" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+          </svg>
           <span>{t.rivelaPromemoria}</span>
         </div>
       {/if}
@@ -129,7 +131,7 @@
     font-weight: 700;
   }
   .corpo :global(.rivela-trappola) {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
     font-weight: 700;
   }
   .carta {
@@ -146,9 +148,10 @@
     overflow-wrap: anywhere;
   }
   .media {
-    font: var(--testo-corpo);
+    font: var(--testo-titolo);
     color: var(--colore-su-superficie-variante);
   }
+  .info { flex: none; }
   .promemoria {
     display: flex;
     align-items: center;

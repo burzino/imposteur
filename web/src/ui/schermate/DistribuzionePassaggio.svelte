@@ -93,6 +93,7 @@
   }
   .passa {
     font: var(--testo-corpo);
+    color: var(--colore-su-superficie-variante);
   }
   .centro :global(.dist-nome) {
     width: 100%;
