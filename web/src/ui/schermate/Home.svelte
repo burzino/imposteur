@@ -23,17 +23,26 @@
 
 <div class="home">
   <div class="contenuto">
-    <h1>{t.homeTitolo}</h1>
+    <div class="hero">
+      <img class="medaglione" src="{import.meta.env.BASE_URL}icona.svg" alt="" width="120" height="120" />
+      <h1>{t.homeTitolo}</h1>
+    </div>
     {#if stato.erroreCaricamento}
       <p class="errore">{t.erroreCaricamentoParole}</p>
     {/if}
-    {#if stato.ripristinabile !== null}
-      <Pulsante variante="pieno" onClick={riprendi}>{t.riprendiPartita}</Pulsante>
-    {/if}
-    <Pulsante variante="pieno" disabilitato={stato.caricamento || stato.erroreCaricamento} onClick={toccaNuova}>
-      {t.nuovaPartita}
-    </Pulsante>
-    <Pulsante variante="contorno" onClick={() => vai("regole")}>{t.comeSiGioca}</Pulsante>
+    <div class="azioni">
+      {#if stato.ripristinabile !== null}
+        <Pulsante variante="pieno" onClick={riprendi}>{t.riprendiPartita}</Pulsante>
+      {/if}
+      <Pulsante
+        variante={stato.ripristinabile !== null ? "tonale" : "pieno"}
+        disabilitato={stato.caricamento || stato.erroreCaricamento}
+        onClick={toccaNuova}
+      >
+        {t.nuovaPartita}
+      </Pulsante>
+      <Pulsante variante="contorno" onClick={() => vai("regole")}>{t.comeSiGioca}</Pulsante>
+    </div>
   </div>
   <!-- Dopo il contenuto, così sta sopra e riceve i tocchi -->
   <button class="impostazioni" type="button" aria-label={t.impostazioniApri} onclick={() => vai("impostazioni")}>
@@ -61,9 +70,7 @@
     min-height: 100dvh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: var(--spazio-5);
-    box-sizing: border-box;
+    padding: env(safe-area-inset-top) var(--margine-schermata) 0;
     background: var(--colore-sfondo);
     color: var(--colore-su-sfondo);
   }
@@ -72,24 +79,42 @@
     max-width: var(--larghezza-max);
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: var(--spazio-4);
     text-align: center;
   }
+  /* medaglione e titolo centrati nello spazio sopra i pulsanti */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spazio-5);
+    padding: var(--spazio-7) 0 var(--spazio-5);
+  }
+  .medaglione {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--raggio-xxl);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+  }
   h1 {
-    margin: 0;
-    font-size: 2.8rem;
-    font-weight: 400;
+    font: var(--testo-display);
     color: var(--colore-primario);
   }
   .errore {
-    margin: 0;
+    padding-bottom: var(--spazio-3);
     color: var(--colore-errore);
-    font-size: 1rem;
+    font: var(--testo-corpo);
+  }
+  .azioni {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-3);
+    padding-bottom: calc(var(--spazio-6) + env(safe-area-inset-bottom));
   }
   .impostazioni {
     position: absolute;
-    top: var(--spazio-2);
+    top: calc(var(--spazio-2) + env(safe-area-inset-top));
     right: var(--spazio-2);
     width: var(--altezza-tocco);
     height: var(--altezza-tocco);
@@ -101,7 +126,7 @@
     color: var(--colore-su-sfondo);
     cursor: pointer;
   }
-  .impostazioni:focus-visible {
-    outline: 2px solid var(--colore-primario);
+  .impostazioni:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
   }
 </style>

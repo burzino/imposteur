@@ -52,9 +52,6 @@ export const t = {
   configDiminuisci: "Diminuisci",
   configAumenta: "Aumenta",
   opzTitolo: "Opzioni avanzate",
-  opzRegoleClassiche: "Regole classiche",
-  opzEspandi: "Espandi",
-  opzComprimi: "Comprimi",
   opzAttive: (n: number): string => scegliPlurale(n, {
     one: `${n} attiva`,
     other: `${n} attive`,
@@ -65,7 +62,7 @@ export const t = {
   opzDescVedeCategoria: "Aiuta l'impostore a bluffare.",
   opzNonPrimo: "L'impostore non parla per primo",
   opzDescNonPrimo: "Chi inizia è sempre un civile.",
-  opzSorpresa: "Numero di impostori a sorpresa",
+  opzSorpresa: "Impostori a sorpresa",
   opzDescSorpresa: "Il numero di impostori è casuale, da 1 al massimo scelto.",
   opzTrappola: "Partita trappola",
   opzDescTrappola: "1 partita su 10 non ha nessun impostore.",
@@ -76,7 +73,6 @@ export const t = {
   opzPromemoria: "Promemoria: ultima possibilità",
   opzDescPromemoria: "Alla fine ricorda che l'impostore può ancora vincere indovinando la parola.",
   opzBreveNonPrimo: "Non parla per primo",
-  opzBreveSorpresa: "Impostori a sorpresa",
   opzBreveTrappola: "Trappola",
   opzBreveOrdineCasuale: "Ordine casuale",
   opzBreveGiri: (n: number): string => `${n} giri`,
@@ -157,6 +153,43 @@ export const t = {
   segnalazioniCancellaConferma: "Cancellare tutte le segnalazioni salvate?",
   segnalazioniCancellaSi: "Cancella",
   segnalazioniLocale: "Restano solo su questo telefono.",
+
+  // Configurazione in 4 passi (specifiche 4.2, design 5)
+  modalitaSenzaParolaDesc: "I civili conoscono la parola, l'impostore deve bluffare.",
+  modalitaAffineDesc: "L'impostore riceve una parola simile ma diversa.",
+  passoAvanti: "Avanti",
+  passoModifica: "Modifica",
+  passoGiocatori: "Giocatori",
+  passoOpzioni: "Opzioni",
+  passoRiepilogo: "Riepilogo",
+  passoEtichetta: (p1: number, p2: number, p3: string): string => `Passo ${p1} di ${p2} · ${p3}`,
+  passoEtichettaCd: (p1: number, p2: number, p3: string): string => `Passo ${p1} di ${p2}: ${p3}`,
+  passo1Titolo: "Chi gioca?",
+  passo1Sottotitolo: "Quanti siete e come vi chiamate.",
+  passo2Sottotitolo: "Sono tutte facoltative: puoi andare avanti senza toccarle.",
+  passo3Sottotitolo: "Da quali argomenti pescare le parole.",
+  passo4Titolo: "Tutto pronto?",
+  passo4Sottotitolo: "Controlla e inizia.",
+  riepGiocatori: (n: number): string => scegliPlurale(n, {
+    one: `${n} giocatore`,
+    other: `${n} giocatori`,
+  }),
+  riepImpostori: (n: number): string => scegliPlurale(n, {
+    one: "1 impostore",
+    other: `${n} impostori`,
+  }),
+  riepFinoA: (p1: number): string => `fino a ${p1} impostori`,
+  riepGiocatoriImpostori: (p1: string, p2: string): string => `${p1}, ${p2}`,
+  riepCategorie: (n: number): string => scegliPlurale(n, {
+    one: "1 categoria",
+    other: `${n} categorie`,
+  }),
+  riepNessunaOpzione: "Nessuna opzione attiva",
+  riepSenzaCategoria: "senza categoria",
+
+  // Chiavi web senza equivalente Android
+  passo2Titolo: "Opzioni avanzate",
+  passo3Titolo: "Categorie",
 
   // Testi nuovi del web
   esportaSegnalazioni: "Esporta segnalazioni",

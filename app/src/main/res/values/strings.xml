@@ -53,12 +53,42 @@
     <string name="config_azzera_conferma">Rimettere in gioco tutte le parole delle categorie scelte?</string>
     <string name="config_diminuisci">Diminuisci</string>
     <string name="config_aumenta">Aumenta</string>
+    <string name="modalita_senza_parola_desc">I civili conoscono la parola, l\'impostore deve bluffare.</string>
+    <string name="modalita_affine_desc">L\'impostore riceve una parola simile ma diversa.</string>
+
+    <!-- Configurazione a passi -->
+    <string name="passo_avanti">Avanti</string>
+    <string name="passo_modifica">Modifica</string>
+    <string name="passo_giocatori">Giocatori</string>
+    <string name="passo_opzioni">Opzioni</string>
+    <string name="passo_riepilogo">Riepilogo</string>
+    <string name="passo_etichetta">Passo %1$d di %2$d · %3$s</string>
+    <string name="passo_etichetta_cd">Passo %1$d di %2$d: %3$s</string>
+    <string name="passo1_titolo">Chi gioca?</string>
+    <string name="passo1_sottotitolo">Quanti siete e come vi chiamate.</string>
+    <string name="passo2_sottotitolo">Sono tutte facoltative: puoi andare avanti senza toccarle.</string>
+    <string name="passo3_sottotitolo">Da quali argomenti pescare le parole.</string>
+    <string name="passo4_titolo">Tutto pronto?</string>
+    <string name="passo4_sottotitolo">Controlla e inizia.</string>
+    <plurals name="riep_giocatori">
+        <item quantity="one">%d giocatore</item>
+        <item quantity="other">%d giocatori</item>
+    </plurals>
+    <plurals name="riep_impostori">
+        <item quantity="one">1 impostore</item>
+        <item quantity="other">%d impostori</item>
+    </plurals>
+    <string name="riep_fino_a">fino a %d impostori</string>
+    <string name="riep_giocatori_impostori">%1$s, %2$s</string>
+    <plurals name="riep_categorie">
+        <item quantity="one">1 categoria</item>
+        <item quantity="other">%d categorie</item>
+    </plurals>
+    <string name="riep_nessuna_opzione">Nessuna opzione attiva</string>
+    <string name="riep_senza_categoria">senza categoria</string>
 
     <!-- Opzioni avanzate -->
     <string name="opz_titolo">Opzioni avanzate</string>
-    <string name="opz_regole_classiche">Regole classiche</string>
-    <string name="opz_espandi">Espandi</string>
-    <string name="opz_comprimi">Comprimi</string>
     <plurals name="opz_attive">
         <item quantity="one">%d attiva</item>
         <item quantity="other">%d attive</item>
@@ -69,7 +99,7 @@
     <string name="opz_desc_vede_categoria">Aiuta l\'impostore a bluffare.</string>
     <string name="opz_non_primo">L\'impostore non parla per primo</string>
     <string name="opz_desc_non_primo">Chi inizia è sempre un civile.</string>
-    <string name="opz_sorpresa">Numero di impostori a sorpresa</string>
+    <string name="opz_sorpresa">Impostori a sorpresa</string>
     <string name="opz_desc_sorpresa">Il numero di impostori è casuale, da 1 al massimo scelto.</string>
     <string name="opz_trappola">Partita trappola</string>
     <string name="opz_desc_trappola">1 partita su 10 non ha nessun impostore.</string>
@@ -80,7 +110,6 @@
     <string name="opz_promemoria">Promemoria: ultima possibilità</string>
     <string name="opz_desc_promemoria">Alla fine ricorda che l\'impostore può ancora vincere indovinando la parola.</string>
     <string name="opz_breve_non_primo">Non parla per primo</string>
-    <string name="opz_breve_sorpresa">Impostori a sorpresa</string>
     <string name="opz_breve_trappola">Trappola</string>
     <string name="opz_breve_ordine_casuale">Ordine casuale</string>
     <string name="opz_breve_giri">%d giri</string>

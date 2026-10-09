@@ -2,17 +2,17 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#1c1b1f" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#141218" />
     <link rel="icon" type="image/png" href="/icona-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Imposteur</title>
     <style>
       /* sfondo prima del caricamento di tema.css (evita il lampo) */
-      html { background: #fffbfe; }
-      html[data-tema="scuro"] { background: #1c1b1f; }
+      html { background: #fef7ff; }
+      html[data-tema="scuro"] { background: #141218; }
       html[data-tema="alto-contrasto"] { background: #000; }
-      @media (prefers-color-scheme: dark) { html[data-tema="sistema"] { background: #1c1b1f; } }
+      @media (prefers-color-scheme: dark) { html[data-tema="sistema"] { background: #141218; } }
     </style>
     <script>
       // Tema scelto, applicato prima del primo paint (stessa chiave di data/archivio.ts).
@@ -30,7 +30,7 @@
             tema === "scuro" ||
             tema === "alto-contrasto" ||
             (tema === "sistema" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-          var colore = tema === "alto-contrasto" ? "#000000" : scuro ? "#1c1b1f" : "#fffbfe";
+          var colore = tema === "alto-contrasto" ? "#000000" : scuro ? "#141218" : "#fef7ff";
           document.querySelector('meta[name="theme-color"]').setAttribute("content", colore);
         } catch (e) {
           document.documentElement.setAttribute("data-tema", "sistema");

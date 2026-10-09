@@ -147,7 +147,7 @@
   .sfondo {
     position: fixed; left: 0; right: 0; margin: 0; padding: var(--spazio-4); box-sizing: border-box;
     width: 100%; max-width: none; max-height: none; border: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--colore-scrim);
     align-items: center; justify-content: center;
     overflow: hidden;
   }
@@ -156,27 +156,37 @@
   .scheda {
     display: flex; flex-direction: column; box-sizing: border-box;
     width: 100%; max-width: 560px; max-height: 100%;
-    padding: var(--spazio-5, 24px); border-radius: var(--raggio-l);
-    background: var(--colore-superficie); color: var(--colore-su-superficie);
+    padding: var(--spazio-5); border-radius: var(--raggio-xl);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    background: var(--colore-contenitore-superficie-alto); color: var(--colore-su-superficie);
+    animation: entra var(--molla-spaziale) both;
   }
-  h2 { margin: 0 0 var(--spazio-4); font-size: 1.5rem; font-weight: 400; }
+  h2 { margin: 0 0 var(--spazio-4); font: var(--testo-titolo-sezione); }
   .scorri { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: var(--spazio-2); }
-  .coppia { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
-  .cat { margin: 0; font-size: 0.875rem; }
-  .riga { display: flex; align-items: center; gap: var(--spazio-3); min-height: var(--altezza-tocco); cursor: pointer; }
+  .coppia { margin: 0; font: var(--testo-titolo); overflow-wrap: anywhere; }
+  .cat { margin: 0; font: var(--testo-corpo-piccolo); color: var(--colore-su-superficie-variante); }
+  .riga { display: flex; align-items: center; gap: var(--spazio-3); min-height: var(--altezza-tocco); font: var(--testo-corpo); cursor: pointer; }
   .riga input { width: 22px; height: 22px; accent-color: var(--colore-primario); flex: none; }
-  .sezione { margin: var(--spazio-2) 0 0; font-size: 0.875rem; font-weight: 600; }
+  .sezione { margin: var(--spazio-2) 0 0; font: var(--testo-etichetta); }
   .campo { display: flex; flex-direction: column; gap: 2px; }
-  .et { font-size: 0.75rem; color: var(--colore-su-superficie-variante); }
+  .et { font: var(--testo-didascalia); color: var(--colore-su-superficie-variante); }
   textarea, input[type="text"] {
     box-sizing: border-box; width: 100%; padding: var(--spazio-3);
-    border: 1px solid var(--colore-contorno); border-radius: var(--raggio-m);
-    background: transparent; color: inherit; font: inherit; font-size: 1rem; /* niente zoom su iOS */
+    border: 0; border-bottom: 2px solid var(--colore-su-superficie-variante);
+    border-radius: var(--raggio-s) var(--raggio-s) 0 0;
+    background: var(--colore-contenitore-superficie-massimo); color: inherit; font: inherit; font-size: 1rem; /* niente zoom su iOS */
+  }
+  :global([data-tema="alto-contrasto"]) textarea, :global([data-tema="alto-contrasto"]) input[type="text"] {
+    border: 2px solid var(--colore-contorno); border-radius: var(--raggio-s);
   }
   input[type="text"] { min-height: var(--altezza-tocco); }
   textarea { resize: vertical; }
-  textarea:focus, input[type="text"]:focus { outline: 2px solid var(--colore-primario); outline-offset: 0; }
-  .conta { align-self: flex-end; font-size: 0.75rem; color: var(--colore-su-superficie-variante); }
-  .errore { margin: 0; font-size: 0.75rem; color: var(--colore-errore); }
+  textarea:focus, input[type="text"]:focus { outline: none; border-bottom-color: var(--colore-primario); box-shadow: 0 1px 0 0 var(--colore-primario); }
+  .conta { align-self: flex-end; font: var(--testo-didascalia); color: var(--colore-su-superficie-variante); }
+  .errore { margin: 0; font: var(--testo-didascalia); color: var(--colore-errore); }
   .azioni { display: flex; justify-content: flex-end; gap: var(--spazio-2); padding-top: var(--spazio-4); }
+  @keyframes entra {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
 </style>

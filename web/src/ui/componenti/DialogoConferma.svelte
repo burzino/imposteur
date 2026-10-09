@@ -71,29 +71,27 @@
     width: min(calc(100vw - 2 * var(--spazio-5)), 400px);
     max-height: calc(100dvh - 2 * var(--spazio-5));
     padding: 0;
-    border: 0;
-    border-radius: 28px;
-    background: var(--colore-superficie-variante);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-alto);
     color: var(--colore-su-superficie);
     overflow: auto;
   }
-  .dialogo::backdrop {
-    background: rgb(0 0 0 / 0.5);
+  .dialogo[open] {
+    animation: entra var(--molla-spaziale) both;
   }
-  :global([data-tema="alto-contrasto"]) .dialogo {
-    background: var(--colore-superficie);
-    border: 2px solid var(--colore-contorno);
+  .dialogo::backdrop {
+    background: var(--colore-scrim);
   }
   .contenuto {
     padding: var(--spazio-5);
   }
   h2 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    line-height: 1.3;
+    font: var(--testo-titolo-sezione);
   }
   p {
     margin-top: var(--spazio-3);
+    font: var(--testo-corpo);
     color: var(--colore-su-superficie-variante);
   }
   .azioni {
@@ -105,15 +103,25 @@
   }
   .azione {
     min-height: var(--altezza-tocco);
-    padding: 0 var(--spazio-3);
+    padding: 0 var(--spazio-4);
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--raggio-pieno);
     background: transparent;
     color: var(--colore-primario);
-    font-weight: 500;
+    font: var(--testo-titolo);
     cursor: pointer;
   }
   .azione:hover {
     background: color-mix(in srgb, var(--colore-primario) 10%, transparent);
+  }
+  @keyframes entra {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 </style>

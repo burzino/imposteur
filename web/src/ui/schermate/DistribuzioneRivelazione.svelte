@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { contenutoPer, type Partita } from "../../game/partita";
+  import CartaGirevole from "../componenti/CartaGirevole.svelte";
   import Pagina from "../componenti/Pagina.svelte";
   import Pulsante from "../componenti/Pulsante.svelte";
   import TestoAdattivo from "../componenti/TestoAdattivo.svelte";
   import { vibra } from "../browser";
   import { t } from "../testi";
+  import DistribuzioneFilaAvatar from "./DistribuzioneFilaAvatar.svelte";
 
   // Montato con {#key indice}. Layout, colori e animazione identici per ogni ruolo e modalita'.
   let {
@@ -13,6 +15,7 @@
     partita,
     indice,
     etichettaPulsante,
+    mostraFila = true,
     onNascondi,
     onHome,
     onIndietro,
@@ -21,13 +24,14 @@
     partita: Partita;
     indice: number;
     etichettaPulsante?: string;
+    mostraFila?: boolean;
     onNascondi: () => void;
     onHome: () => void;
     onIndietro: () => void;
   } = $props();
 
   const RITARDO_MS = 600;
-  const META_FLIP_MS = 225;
+  const META_FLIP_MS = 90; // meta rotazione della carta (molla lenta)
   let abilitato = $state(false);
   const contenuto = $derived(contenutoPer(partita, indice));
   const ultimo = $derived(indice === partita.giocatori.length - 1);
@@ -61,25 +65,29 @@
 
 <Pagina {titolo} {onHome} {onIndietro}>
   <div class="scena">
-    <p class="indicatore">{t.distribuzioneIndicatore(indice + 1, partita.giocatori.length)}</p>
-    <div class="prospettiva">
-      <div class="carta">
-        <div class="faccia dorso" aria-hidden="true">{@render icona(160)}</div>
-        <div class="faccia fronte">
+    <div class="testata">
+      {#if mostraFila}
+        <DistribuzioneFilaAvatar giocatori={partita.giocatori} corrente={indice} />
+      {/if}
+      <p class="indicatore">{t.distribuzioneIndicatore(indice + 1, partita.giocatori.length)}</p>
+    </div>
+    <div class="centro">
+      <CartaGirevole>
+        {#snippet fronte()}
           {#if contenuto.tipo === "ParolaSegreta"}
             <p class="intro">
               {partita.modalita === "PAROLA_AFFINE" ? t.ruoloLaTuaParolaE : t.ruoloLaParolaE}
             </p>
             <TestoAdattivo testo={contenuto.testo} classe="dist-parola" />
           {:else}
-            {@render icona(120)}
+            {@render icona(96)}
             <TestoAdattivo testo={t.ruoloSeiImpostore} classe="dist-impostore" />
             {#if contenuto.categoria !== null}
               <p class="categoria">{t.ruoloCategoria(contenuto.categoria)}</p>
             {/if}
           {/if}
-        </div>
-      </div>
+        {/snippet}
+      </CartaGirevole>
     </div>
   </div>
   {#snippet piede()}
@@ -94,102 +102,42 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: var(--spazio-5);
+    gap: var(--spazio-4);
     min-height: 60vh;
-    padding: var(--spazio-4);
-    border-radius: var(--raggio-l);
-    background: linear-gradient(
-      to bottom,
-      var(--colore-contenitore-secondario),
-      var(--colore-superficie)
-    );
-    color: var(--colore-su-superficie);
   }
-  .indicatore {
-    margin: 0;
-    font-size: 1.125rem;
-  }
-  .prospettiva {
-    width: 80%;
-    perspective: 1200px;
-  }
-  .carta {
-    position: relative;
-    min-height: 300px;
-    transform-style: preserve-3d;
-    animation: gira 450ms ease-in-out both;
-  }
-  .faccia {
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 300px;
-    border-radius: 28px;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  .dorso {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--colore-primario);
-    color: var(--colore-su-primario);
-    transform: rotateY(180deg);
-  }
-  .fronte {
-    position: relative;
+  .testata {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: var(--spazio-4);
-    padding: 20px;
-    background: var(--colore-terziario);
-    color: var(--colore-su-terziario);
-    text-align: center;
-  }
-  .intro,
-  .categoria {
-    margin: 0;
-    font-size: 1.125rem;
-  }
-  .categoria {
-    font-size: 1.375rem;
-  }
-  .fronte :global(.dist-parola) {
     width: 100%;
-    font-size: 3.25rem;
-    font-weight: 500;
   }
-  .fronte :global(.dist-impostore) {
+  .indicatore {
+    font: var(--testo-didascalia);
+    color: var(--colore-su-superficie-variante);
+  }
+  .centro {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  .intro {
+    font: var(--testo-titolo-sezione);
+  }
+  .categoria {
+    font: var(--testo-titolo-sezione);
+  }
+  .scena :global(.dist-parola) {
     width: 100%;
     font-size: 2.25rem;
-    font-weight: 500;
+    font-weight: 800;
+  }
+  .scena :global(.dist-impostore) {
+    width: 100%;
+    font-size: 2.25rem;
+    font-weight: 800;
   }
   .piede {
     width: 100%;
-  }
-  .piede :global(button) {
-    width: 100%;
-    min-height: 64px;
-    font-size: 1.25rem;
-  }
-  @keyframes gira {
-    from {
-      transform: rotateY(180deg);
-    }
-    to {
-      transform: rotateY(0deg);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .carta {
-      animation: none;
-    }
   }
 </style>

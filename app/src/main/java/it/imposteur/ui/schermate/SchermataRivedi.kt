@@ -1,51 +1,42 @@
 package it.imposteur.ui.schermate
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import it.imposteur.R
 import it.imposteur.game.Partita
 import it.imposteur.ui.Revisione
+import it.imposteur.ui.componenti.Avatar
+import it.imposteur.ui.componenti.BarraAzioni
+import it.imposteur.ui.componenti.PulsanteContorno
+import it.imposteur.ui.componenti.ScaffoldConBarra
+import it.imposteur.ui.theme.Spazio
+import it.imposteur.ui.theme.bordoLivello
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchermataRivedi(
     partita: Partita?,
@@ -81,9 +72,9 @@ fun SchermataRivedi(
     if (partita == null) return
 
     if (revisione != null && revisione.indice in partita.giocatori.indices) {
-        ScaffoldConHome(titolo = R.string.rivedi_titolo, onHome = onHome) {
+        ScaffoldConBarra(titolo = stringResource(R.string.rivedi_titolo), onHome = onHome) {
             if (revisione.rivelato) {
-                Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi) { onChiudi() }
+                Rivelazione(partita, revisione.indice, R.string.rivedi_nascondi, mostraFila = false) { onChiudi() }
             } else {
                 Passaggio(partita, revisione.indice, mostraAvanzamento = false) { onSono() }
             }
@@ -91,83 +82,67 @@ fun SchermataRivedi(
         return
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.rivedi_titolo)) },
-                navigationIcon = {
-                    IconButton(onClick = onChiudi) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
-                    }
-                },
-                actions = { AzioneHome(onHome) },
-            )
+    ScaffoldConBarra(
+        titolo = stringResource(R.string.rivedi_titolo),
+        onIndietro = onChiudi,
+        onHome = onHome,
+        bottomBar = {
+            BarraAzioni {
+                PulsanteContorno(
+                    testo = stringResource(R.string.rivedi_torna_gioco),
+                    onClick = onChiudi,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         },
-    ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.padding(horizontal = Spazio.margineSchermata, vertical = Spazio.s2)) {
                 Text(
                     stringResource(R.string.rivedi_intestazione),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     stringResource(R.string.rivedi_sottotitolo),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(Spazio.margineSchermata),
+                verticalArrangement = Arrangement.spacedBy(Spazio.s2),
             ) {
                 itemsIndexed(partita.giocatori) { i, nome ->
                     val descrizione = stringResource(R.string.rivedi_cd_giocatore, nome)
-                    ElevatedCard(
+                    Surface(
                         onClick = { onScegli(i) },
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        border = bordoLivello(),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 112.dp)
+                            .heightIn(min = 64.dp)
                             .semantics(mergeDescendants = true) { contentDescription = descrizione },
                     ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 64.dp)
+                                .padding(horizontal = Spazio.s4, vertical = Spazio.s2),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spazio.s3),
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    nome.trim().take(1).uppercase(),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
-                            }
-                            Spacer(Modifier.height(8.dp))
+                            Avatar(nome, i)
                             TestoAdattivo(
                                 testo = nome,
                                 stile = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.weight(1f),
                                 maxRighe = 2,
                             )
                         }
                     }
                 }
-            }
-            OutlinedButton(
-                onClick = onChiudi,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                    .height(56.dp),
-            ) {
-                Text(stringResource(R.string.rivedi_torna_gioco))
             }
         }
     }

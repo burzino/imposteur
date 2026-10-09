@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { onMount } from "svelte";
   import { t } from "../testi";
 
@@ -6,8 +7,12 @@
     titolo: string;
     onHome?: () => void;
     onIndietro?: () => void;
+    /** True quando il contenuto e' scorso sotto la barra: sfondo tonale (nessuna ombra). */
+    sollevata?: boolean;
+    /** Azione facoltativa a destra (es. "Inizia"). */
+    azione?: Snippet;
   }
-  let { titolo, onHome, onIndietro }: Props = $props();
+  let { titolo, onHome, onIndietro, sollevata = false, azione }: Props = $props();
 
   let intestazione: HTMLHeadingElement | undefined = $state();
 
@@ -17,7 +22,7 @@
   });
 </script>
 
-<header class="barra">
+<header class="barra" class:sollevata>
   <div class="interno">
     {#if onIndietro}
       <button type="button" class="icona" aria-label={t.indietro} onclick={() => onIndietro?.()}>
@@ -27,6 +32,7 @@
       </button>
     {/if}
     <h1 bind:this={intestazione} tabindex="-1" class:senza-freccia={!onIndietro}>{titolo}</h1>
+    {#if azione}{@render azione()}{/if}
     {#if onHome}
       <button type="button" class="icona" aria-label={t.tornaHome} onclick={() => onHome?.()}>
         <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
@@ -45,22 +51,25 @@
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+    transition: background-color var(--molla-effetti);
+  }
+  .barra.sollevata {
+    background: var(--colore-contenitore-superficie);
+    border-bottom: var(--spessore-contorno) solid var(--colore-bordo-livello);
   }
   .interno {
     display: flex;
     align-items: center;
     gap: var(--spazio-1);
     max-width: var(--larghezza-max);
-    min-height: 56px;
+    min-height: 64px;
     margin: 0 auto;
     padding: 0 var(--spazio-2);
   }
   h1 {
     flex: 1;
     min-width: 0;
-    font-size: 1.375rem;
-    font-weight: 500;
-    line-height: 1.3;
+    font: var(--testo-titolo-schermata);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

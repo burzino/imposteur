@@ -72,12 +72,16 @@
 <Pagina titolo={t.rivelaTitolo} onHome={vaiAHome}>
   {#if partita}
     <div class="corpo">
-      <TestoAdattivo testo={testoImpostori} classe={trappola ? "rivela-trappola" : "rivela-impostori"} maxRighe={3} />
-      <p class="grande">{t.rivelaParola(partita.voce.parola)}</p>
-      {#if partita.modalita === "PAROLA_AFFINE" && partita.voce.affine !== null}
-        <p class="grande">{t.rivelaAffine(partita.voce.affine)}</p>
-      {/if}
-      <p class="media">{t.rivelaCategoria(partita.voce.categoriaNome)}</p>
+      <section class="hero">
+        <TestoAdattivo testo={testoImpostori} classe={trappola ? "rivela-trappola" : "rivela-impostori"} maxRighe={3} />
+      </section>
+      <section class="carta">
+        <p class="grande">{t.rivelaParola(partita.voce.parola)}</p>
+        {#if partita.modalita === "PAROLA_AFFINE" && partita.voce.affine !== null}
+          <p class="grande">{t.rivelaAffine(partita.voce.affine)}</p>
+        {/if}
+        <p class="media">{t.rivelaCategoria(partita.voce.categoriaNome)}</p>
+      </section>
       {#if partita.promemoriaUltimaPossibilita && !trappola}
         <div class="promemoria" role="note">
           <span aria-hidden="true">ⓘ</span>
@@ -90,7 +94,7 @@
   {#snippet piede()}
     <div class="piede">
       <Pulsante variante="pieno" onClick={rigioca}>{t.rivelaRigioca}</Pulsante>
-      <Pulsante variante="contorno" onClick={cambia}>{t.rivelaCambiaImpostazioni}</Pulsante>
+      <Pulsante variante="tonale" onClick={cambia}>{t.rivelaCambiaImpostazioni}</Pulsante>
       <Pulsante variante="testo" onClick={() => (segnalando = true)}>{t.segnalaPulsante}</Pulsante>
     </div>
   {/snippet}
@@ -108,18 +112,59 @@
 
 <style>
   .corpo {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: var(--spazio-4); padding: var(--spazio-5, 24px) var(--spazio-4); min-height: 100%; box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-3);
+  }
+  .hero {
+    padding: var(--spazio-6) var(--spazio-5);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xxl);
+    background: var(--colore-contenitore-primario);
+    color: var(--colore-su-contenitore-primario);
     text-align: center;
   }
-  .corpo :global(.rivela-impostori) { font-size: 1.75rem; font-weight: 600; }
-  .corpo :global(.rivela-trappola) { font-size: 1.5rem; font-weight: 600; color: var(--colore-terziario); }
-  .grande { margin: 0; font-size: 1.375rem; overflow-wrap: anywhere; }
-  .media { margin: 0; font-size: 1rem; }
-  .promemoria {
-    display: flex; align-items: center; gap: var(--spazio-3); width: 100%; box-sizing: border-box;
-    padding: var(--spazio-4); border-radius: var(--raggio-l); text-align: left; font-size: 0.875rem;
-    background: var(--colore-contenitore-secondario); color: var(--colore-su-contenitore-secondario);
+  .corpo :global(.rivela-impostori) {
+    font-size: 1.75rem;
+    font-weight: 700;
   }
-  .piede { display: flex; flex-direction: column; gap: var(--spazio-3); padding: var(--spazio-4); }
+  .corpo :global(.rivela-trappola) {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .carta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+    padding: var(--spazio-5) 20px;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-basso);
+  }
+  .grande {
+    font: var(--testo-titolo-sezione);
+    overflow-wrap: anywhere;
+  }
+  .media {
+    font: var(--testo-corpo);
+    color: var(--colore-su-superficie-variante);
+  }
+  .promemoria {
+    display: flex;
+    align-items: center;
+    gap: var(--spazio-3);
+    padding: var(--spazio-4);
+    border: var(--spessore-contorno) solid var(--colore-su-contenitore-terziario);
+    border-radius: var(--raggio-xl);
+    text-align: left;
+    font: var(--testo-corpo-piccolo);
+    background: var(--colore-contenitore-terziario);
+    color: var(--colore-su-contenitore-terziario);
+  }
+  .piede {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+    align-items: center;
+  }
 </style>

@@ -2,70 +2,69 @@ package it.imposteur.ui.schermate
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.semantics.Role
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import it.imposteur.data.FormatoSegnalazioni
-import it.imposteur.data.MotivoSegnalazione
-import it.imposteur.data.Segnalazione
-import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import it.imposteur.R
+import it.imposteur.data.FormatoSegnalazioni
+import it.imposteur.data.MotivoSegnalazione
+import it.imposteur.data.Segnalazione
 import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
+import it.imposteur.ui.componenti.BarraAzioni
+import it.imposteur.ui.componenti.PulsantePieno
+import it.imposteur.ui.componenti.PulsanteTesto
+import it.imposteur.ui.componenti.PulsanteTonale
+import it.imposteur.ui.componenti.ScaffoldConBarra
+import it.imposteur.ui.componenti.ingressoDialogo
+import it.imposteur.ui.theme.Forme
+import it.imposteur.ui.theme.Spazio
+import it.imposteur.ui.theme.bordoLivello
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, onNuovaPartita: () -> Unit, onCambiaImpostazioni: () -> Unit, onHome: () -> Unit) {
     BackHandler(onBack = onCambiaImpostazioni)
@@ -79,103 +78,112 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
     val scope = rememberCoroutineScope()
     var segnalando by rememberSaveable { mutableStateOf(false) }
     val messaggioSalvata = stringResource(R.string.segnala_salvata)
-    Scaffold(
+    val colori = MaterialTheme.colorScheme
+    ScaffoldConBarra(
+        titolo = stringResource(R.string.rivela_titolo),
+        onHome = onHome,
         snackbarHost = { SnackbarHost(snackbar) },
-        topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = { Text(stringResource(R.string.rivela_titolo)) },
-                actions = { AzioneHome(onHome) },
-            )
+        bottomBar = {
+            BarraAzioni {
+                PulsantePieno(
+                    testo = stringResource(R.string.rivela_rigioca),
+                    onClick = onNuovaPartita,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                PulsanteTonale(
+                    testo = stringResource(R.string.rivela_cambia_impostazioni),
+                    onClick = onCambiaImpostazioni,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                PulsanteTesto(
+                    testo = stringResource(R.string.segnala_pulsante),
+                    onClick = { segnalando = true },
+                    icona = Icons.Filled.Warning,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+            }
         },
-    ) { innerPadding ->
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        val testoImpostori = if (nomiImpostori.isEmpty()) {
-            stringResource(R.string.rivela_trappola)
-        } else if (nomiImpostori.size == 1) {
-            stringResource(R.string.rivela_impostore, nomiImpostori.first())
-        } else {
-            stringResource(R.string.rivela_impostori, nomiImpostori.joinToString(", "))
-        }
-        if (partita.trappola) {
-            TestoAdattivo(
-                testoImpostori,
-                MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.tertiary,
-                maxRighe = 3,
-            )
-        } else {
-            TestoAdattivo(testoImpostori, MaterialTheme.typography.headlineMedium, maxRighe = 3)
-        }
-        Text(
-            stringResource(R.string.rivela_parola, partita.voce.parola),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-        )
-        if (partita.modalita == Modalita.PAROLA_AFFINE && partita.voce.affine != null) {
-            Text(
-                stringResource(R.string.rivela_affine, partita.voce.affine!!),
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-            )
-        }
-        Text(
-            stringResource(R.string.rivela_categoria, partita.voce.categoriaNome),
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-        )
-        if (partita.promemoriaUltimaPossibilita && !partita.trappola) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(Spazio.margineSchermata),
+            verticalArrangement = Arrangement.spacedBy(Spazio.s3),
+        ) {
+            val testoImpostori = if (nomiImpostori.isEmpty()) {
+                stringResource(R.string.rivela_trappola)
+            } else if (nomiImpostori.size == 1) {
+                stringResource(R.string.rivela_impostore, nomiImpostori.first())
+            } else {
+                stringResource(R.string.rivela_impostori, nomiImpostori.joinToString(", "))
+            }
+            Surface(
+                shape = Forme.XXL,
+                color = colori.primaryContainer,
+                contentColor = colori.onPrimaryContainer,
+                border = bordoLivello(colori.primary),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp),
+                Box(
+                    Modifier.fillMaxWidth().padding(Spazio.s5),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Filled.Info, contentDescription = null)
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        stringResource(R.string.rivela_promemoria),
-                        style = MaterialTheme.typography.bodyMedium,
+                    TestoAdattivo(
+                        testoImpostori,
+                        if (partita.trappola) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium,
+                        color = colori.onPrimaryContainer,
+                        maxRighe = 3,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge,
+                color = colori.surfaceContainerLow,
+                border = bordoLivello(),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(Spazio.s2)) {
+                    Text(
+                        stringResource(R.string.rivela_parola, partita.voce.parola),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    if (partita.modalita == Modalita.PAROLA_AFFINE && partita.voce.affine != null) {
+                        Text(
+                            stringResource(R.string.rivela_affine, partita.voce.affine!!),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.rivela_categoria, partita.voce.categoriaNome),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colori.onSurfaceVariant,
+                    )
+                }
+            }
+            if (partita.promemoriaUltimaPossibilita && !partita.trappola) {
+                Surface(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = colori.tertiaryContainer,
+                    contentColor = colori.onTertiaryContainer,
+                    border = bordoLivello(colori.tertiary),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(Spazio.s4),
+                    ) {
+                        Icon(Icons.Filled.Info, contentDescription = null)
+                        Spacer(Modifier.width(Spazio.s3))
+                        Text(
+                            stringResource(R.string.rivela_promemoria),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            }
         }
-    }
-    Column(
-        modifier = Modifier.padding(top = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Button(onClick = onNuovaPartita, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Text(stringResource(R.string.rivela_rigioca), style = MaterialTheme.typography.titleMedium)
-        }
-        OutlinedButton(onClick = onCambiaImpostazioni, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Text(stringResource(R.string.rivela_cambia_impostazioni), style = MaterialTheme.typography.titleMedium)
-        }
-        TextButton(onClick = { segnalando = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Icon(Icons.Filled.Warning, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.segnala_pulsante), style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-    }
     }
     if (segnalando) {
         DialogoSegnalaCoppia(
@@ -237,10 +245,11 @@ private fun DialogoSegnalaCoppia(
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
         Surface(
-            shape = AlertDialogDefaults.shape,
-            color = AlertDialogDefaults.containerColor,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            border = bordoLivello(),
             modifier = Modifier
+                .ingressoDialogo()
                 .imePadding()
                 .padding(horizontal = 24.dp, vertical = 24.dp)
                 .widthIn(max = 560.dp)
@@ -249,7 +258,7 @@ private fun DialogoSegnalaCoppia(
         Column(Modifier.padding(24.dp)) {
             Text(
                 stringResource(R.string.segnala_titolo),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
             Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
@@ -323,9 +332,10 @@ private fun DialogoSegnalaCoppia(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
-            TextButton(onClick = onAnnulla) { Text(stringResource(R.string.annulla)) }
-            TextButton(
-                enabled = (motivi.isNotEmpty() || nota.isNotBlank() || propostaValida) && !propostaMezza && !propostaUguale,
+            PulsanteTesto(stringResource(R.string.annulla), onAnnulla)
+            PulsanteTesto(
+                testo = stringResource(R.string.segnala_salva),
+                abilitato = (motivi.isNotEmpty() || nota.isNotBlank() || propostaValida) && !propostaMezza && !propostaUguale,
                 onClick = {
                     onSalva(
                         MotivoSegnalazione.entries.filter { it.name in motivi },
@@ -334,7 +344,7 @@ private fun DialogoSegnalaCoppia(
                         proposta.propostaAffine,
                     )
                 },
-            ) { Text(stringResource(R.string.segnala_salva)) }
+            )
             }
         }
         }

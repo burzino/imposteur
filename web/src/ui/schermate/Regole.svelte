@@ -15,8 +15,10 @@
 <Pagina titolo={t.comeSiGioca} onIndietro={indietro} onHome={vaiAHome}>
   <div class="regole">
     {#each sezioni as s}
-      <h2>{s.titolo}</h2>
-      <p>{s.testo}</p>
+      <section class="carta">
+        <h2>{s.titolo}</h2>
+        <p>{s.testo}</p>
+      </section>
     {/each}
     {#if mostraIos}
       <p class="ios">{t.installaIos}</p>
@@ -28,23 +30,27 @@
   .regole {
     display: flex;
     flex-direction: column;
+    gap: var(--spazio-3);
+  }
+  .carta {
+    display: flex;
+    flex-direction: column;
     gap: var(--spazio-2);
-    padding: var(--spazio-4);
+    padding: var(--spazio-5) 20px;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-basso);
   }
   h2 {
-    margin: 0;
-    font-size: 1.375rem;
-    font-weight: 400;
-    color: var(--colore-primario);
+    font: var(--testo-titolo-sezione);
   }
   p {
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.5;
+    font: var(--testo-corpo);
     white-space: pre-line;
   }
   .ios {
-    margin-top: var(--spazio-2);
+    padding: 0 var(--spazio-2);
+    font: var(--testo-corpo-piccolo);
     color: var(--colore-su-superficie-variante);
   }
 </style>

@@ -19,6 +19,7 @@ import {
   type SessioneSalvata,
   type StatoDistribuzione,
 } from "../game/partita";
+import { Passi, type RiepilogoConfigurazione } from "../game/passi";
 import { Regole } from "../game/regole";
 import { applicaTema } from "./tema";
 
@@ -79,6 +80,8 @@ export class StatoApp {
   #errori = $derived.by<readonly ErroreConfigurazione[]>(() =>
     this.#ui.categorie.length === 0 ? [] : Regole.valida(this.#ui.config, this.#ui.categorie),
   );
+  #riepilogo = $derived(Passi.riepilogo(this.#ui.config, this.#ui.categorie));
+  #opzioniAttive = $derived(Passi.contaOpzioniAttive(this.#ui.config));
   #puoIniziare = $derived(!this.#ui.caricamento && !this.#ui.erroreCaricamento && this.#errori.length === 0);
 
   constructor(dip: Dipendenze) {
@@ -130,6 +133,12 @@ export class StatoApp {
   }
   get errori(): readonly ErroreConfigurazione[] {
     return this.#errori;
+  }
+  get riepilogo(): RiepilogoConfigurazione {
+    return this.#riepilogo;
+  }
+  get opzioniAttive(): number {
+    return this.#opzioniAttive;
   }
   get puoIniziare(): boolean {
     return this.#puoIniziare;

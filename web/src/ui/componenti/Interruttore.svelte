@@ -28,7 +28,11 @@
     {/if}
   </span>
   <span class="binario" class:acceso={valore} aria-hidden="true">
-    <span class="pallino"></span>
+    <span class="pollice">
+      <svg class="spunta" viewBox="0 0 24 24" width="16" height="16" focusable="false">
+        <path fill="currentColor" d="m9.55 17.65-4.4-4.4 1.4-1.4 3 3 7.9-7.9 1.4 1.4z" />
+      </svg>
+    </span>
   </span>
 </button>
 
@@ -39,7 +43,7 @@
     justify-content: space-between;
     gap: var(--spazio-4);
     width: 100%;
-    min-height: var(--altezza-tocco);
+    min-height: 64px;
     padding: var(--spazio-2) 0;
     border: 0;
     background: transparent;
@@ -49,7 +53,7 @@
   }
   .riga:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.38;
   }
   .testi {
     display: flex;
@@ -57,10 +61,10 @@
     min-width: 0;
   }
   .etichetta {
-    font-size: 1rem;
+    font: var(--testo-titolo);
   }
   .descrizione {
-    font-size: 0.875rem;
+    font: var(--testo-corpo-piccolo);
     color: var(--colore-su-superficie-variante);
   }
   .binario {
@@ -69,34 +73,48 @@
     width: 52px;
     height: 32px;
     border: 2px solid var(--colore-contorno);
-    border-radius: 16px;
-    background: var(--colore-superficie-variante);
-    transition: background 120ms;
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-contenitore-superficie-massimo);
+    transition:
+      background-color var(--molla-effetti),
+      border-color var(--molla-effetti);
   }
   .binario.acceso {
     background: var(--colore-primario);
     border-color: var(--colore-primario);
   }
-  .pallino {
+  .pollice {
     position: absolute;
     top: 50%;
     left: 4px;
+    display: grid;
+    place-items: center;
     width: 16px;
     height: 16px;
     border-radius: 50%;
     background: var(--colore-contorno);
+    color: transparent;
     transform: translateY(-50%);
     transition:
-      left 120ms,
-      width 120ms,
-      height 120ms,
-      background 120ms;
+      left var(--molla-spaziale),
+      width var(--molla-spaziale),
+      height var(--molla-spaziale),
+      background-color var(--molla-effetti),
+      color var(--molla-effetti);
   }
-  .acceso .pallino {
+  .acceso .pollice {
     left: 18px;
     width: 24px;
     height: 24px;
     margin-left: -2px;
     background: var(--colore-su-primario);
+    color: var(--colore-primario);
+  }
+  .spunta {
+    opacity: 0;
+    transition: opacity var(--molla-effetti);
+  }
+  .acceso .spunta {
+    opacity: 1;
   }
 </style>

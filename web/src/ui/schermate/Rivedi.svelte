@@ -41,6 +41,7 @@
           {partita}
           indice={revisione.indice}
           etichettaPulsante={t.rivediNascondi}
+          mostraFila={false}
           onNascondi={indietro}
           onHome={home}
           onIndietro={freccia}
@@ -65,16 +66,16 @@
         <h2>{t.rivediIntestazione}</h2>
         <p>{t.rivediSottotitolo}</p>
       </div>
-      <ul class="griglia">
+      <ul class="elenco">
         {#each partita.giocatori as nome, i (i)}
           <li>
             <button
               type="button"
-              class="scheda"
+              class="riga"
               aria-label={t.rivediCdGiocatore(nome)}
               onclick={() => stato.scegliRevisione(i)}
             >
-              <Avatar {nome} indice={i} dimensione={48} />
+              <Avatar {nome} indice={i} stato="pieno" dimensione={40} />
               <TestoAdattivo testo={nome} classe="rivedi-nome" maxRighe={2} />
             </button>
           </li>
@@ -88,50 +89,50 @@
 {/if}
 
 <style>
+  .intestazione {
+    padding: var(--spazio-2) var(--spazio-1) var(--spazio-3);
+  }
   .intestazione h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 400;
+    font: var(--testo-titolo-sezione);
   }
   .intestazione p {
-    margin: var(--spazio-1) 0 0;
-    font-size: 1rem;
+    margin-top: var(--spazio-1);
+    font: var(--testo-corpo-piccolo);
     color: var(--colore-su-superficie-variante);
   }
-  .griglia {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--spazio-3);
-    margin: var(--spazio-4) 0;
-    padding: 0;
-    list-style: none;
-  }
-  .scheda {
+  .elenco {
     display: flex;
     flex-direction: column;
+    margin: 0 0 var(--spazio-4);
+    padding: var(--spazio-2);
+    list-style: none;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-basso);
+  }
+  .riga {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: var(--spazio-2);
-    box-sizing: border-box;
+    gap: var(--spazio-4);
     width: 100%;
-    min-height: 112px;
-    padding: var(--spazio-3);
+    min-height: 64px;
+    padding: 0 var(--spazio-3);
     border: 0;
-    border-radius: var(--raggio-m);
-    background: var(--colore-superficie-variante);
-    color: var(--colore-su-superficie-variante);
-    box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
-    font: inherit;
+    border-radius: var(--raggio-l);
+    background: transparent;
+    color: var(--colore-su-superficie);
+    font: var(--testo-titolo);
+    text-align: left;
     cursor: pointer;
   }
-  .scheda :global(.rivedi-nome) {
-    width: 100%;
-    text-align: center;
-    font-size: 1.125rem;
-    font-weight: 500;
+  .riga:hover {
+    background: color-mix(in srgb, var(--colore-su-superficie) 8%, transparent);
   }
-  .scheda:focus-visible {
-    outline: 3px solid var(--colore-primario);
-    outline-offset: 2px;
+  .riga :global(.rivedi-nome) {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    font-size: 1.125rem;
+    font-weight: 600;
   }
 </style>

@@ -1,6 +1,8 @@
 import { createSubscriber } from "svelte/reactivity";
 import type { StatoApp } from "./stato.svelte";
 
+export type Passo = 1 | 2 | 3 | 4;
+
 export type Rotta =
   | "home"
   | "regole"
@@ -64,6 +66,14 @@ function segnale<T>(iniziale: T): { leggi(): T; scrivi(v: T): void } {
 
 const sRotta = segnale<Rotta>("home");
 const sInterruzione = segnale(false);
+const sPasso = segnale<Passo>(1);
+
+/** Passo della configurazione letto dall'hash (`#/configurazione/1..4`); 1 fuori da "configurazione". */
+export const passoCorrente: { readonly valore: Passo } = {
+  get valore() {
+    return sPasso.leggi();
+  },
+};
 
 export const rottaCorrente: { readonly valore: Rotta } = {
   get valore() {
@@ -97,8 +107,13 @@ function daHash(hash: string): Rotta {
   return ROTTE.find((r) => r === nome) ?? "home";
 }
 
-function aHash(r: Rotta): string {
-  return `#/${r}`;
+function passoDaHash(hash: string): Passo {
+  const m = /^#\/?configurazione\/([^/?]*)/.exec(hash);
+  return m !== null && /^[1-4]$/.test(m[1]) ? (Number(m[1]) as Passo) : 1;
+}
+
+function aHash(r: Rotta, passo: Passo = 1): string {
+  return r === "configurazione" ? `#/configurazione/${passo}` : `#/${r}`;
 }
 
 function indiceDa(stato: unknown): number | null {
@@ -109,8 +124,25 @@ function indiceDa(stato: unknown): number | null {
   return null;
 }
 
-function imposta(r: Rotta): void {
+function imposta(r: Rotta, passo: Passo = 1): void {
+  sPasso.scrivi(r === "configurazione" ? passo : 1);
   sRotta.scrivi(r);
+}
+
+/** Cambia passo dentro la configurazione: push (Avanti, Modifica) o sostituzione della voce corrente. */
+export function vaiAPasso(passo: Passo, opz?: { sostituisci?: boolean }): void {
+  if (sRotta.leggi() !== "configurazione" || inAttesa !== null) return;
+  if (passo === sPasso.leggi()) return;
+  if (ambiente !== null) {
+    if (opz?.sostituisci) {
+      ambiente.history.replaceState({ i: indice }, "", aHash("configurazione", passo));
+    } else {
+      indice += 1;
+      pila = [...pila.slice(0, indice), "configurazione"];
+      ambiente.history.pushState({ i: indice }, "", aHash("configurazione", passo));
+    }
+  }
+  sPasso.scrivi(passo);
 }
 
 export function vai(rotta: Rotta, opz?: { sostituisci?: boolean }): void {
@@ -172,8 +204,15 @@ export function indietro(): void {
     return;
   }
   if (ambiente === null) return;
+  const p = sPasso.leggi();
+  if (r === "configurazione" && p > 1 && (indice <= 0 || pila[indice - 1] !== "configurazione")) {
+    // passo aperto senza passo precedente nella history: si scala di uno sul posto
+    vaiAPasso((p - 1) as Passo, { sostituisci: true });
+    return;
+  }
   if (indice <= 0) {
     // niente history sotto di noi (apertura diretta): si va in Home senza uscire dal sito
+    if (r === "configurazione") statoApp?.salvaOra();
     if (r !== "home") vai("home", { sostituisci: true });
     return;
   }
@@ -200,7 +239,7 @@ function allaNavigazione(): void {
   } else {
     // voce senza indice (hash digitato a mano): le si assegna una posizione
     indice += 1;
-    env.history.replaceState({ i: indice }, "", aHash(nuova));
+    env.history.replaceState({ i: indice }, "", aHash(nuova, passoDaHash(env.location.hash)));
   }
 
   if (atteso === null && !dallApp && (precedente === "distribuzione" || precedente === "gioco")) {
@@ -213,16 +252,17 @@ function allaNavigazione(): void {
   }
 
   pila[indice] = nuova;
+  const passoNuovo = passoDaHash(env.location.hash);
   if (atteso === null) {
     if (precedente === "rivedi") s?.chiudiRevisione();
-    else if (precedente === "configurazione") s?.salvaOra();
+    else if (precedente === "configurazione" && nuova !== "configurazione") s?.salvaOra();
   }
   if (s !== null && !s.caricamento && s.partita === null && RICHIEDONO_PARTITA.includes(nuova)) {
     pila[indice] = "home";
     env.history.replaceState({ i: indice }, "", aHash("home"));
     imposta("home");
   } else {
-    imposta(nuova);
+    imposta(nuova, passoNuovo);
   }
   atteso?.dopo?.();
 }
@@ -244,7 +284,11 @@ export function avviaRotte(s: StatoApp, env?: AmbienteRotte): () => void {
   indice = i ?? 0;
   pila = [];
   pila[indice] = r;
-  if (i === null || e.location.hash !== aHash(r)) e.history.replaceState({ i: indice }, "", aHash(r));
+  const passo = passoDaHash(e.location.hash);
+  if (i === null || e.location.hash !== aHash(r, passo)) {
+    e.history.replaceState({ i: indice }, "", aHash(r, passo));
+  }
+  sPasso.scrivi(r === "configurazione" ? passo : 1);
   sRotta.scrivi(r);
 
   let attiva = true;

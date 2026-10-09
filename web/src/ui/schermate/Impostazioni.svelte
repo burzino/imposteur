@@ -54,44 +54,48 @@
 
 <Pagina titolo={t.impostazioniTitolo} onIndietro={indietro} onHome={vaiAHome}>
   <div class="impostazioni">
-    <h2>{t.temaTitolo}</h2>
-    <Selettore
-      opzioni={opzioniTema}
-      valore={stato.aspetto.tema}
-      onCambia={(v) => stato.impostaAspetto({ ...stato.aspetto, tema: v as Tema })}
-      etichetta={t.temaTitolo}
-    />
-    <hr />
-    <h2>{t.segnalazioniTitolo}</h2>
-    <CampoTesto
-      valore={suggerimento}
-      onCambia={(v) => (suggerimento = v.slice(0, MAX))}
-      etichetta={t.segnalazioniSuggerimenti}
-      maxLunghezza={MAX}
-      multilinea
-      righe={3}
-    />
-    <p class="contatore">{t.segnalaContatore(suggerimento.length, MAX)}</p>
-    <div class="destra">
-      <Pulsante variante="pieno" disabilitato={suggerimento.trim() === ""} onClick={invia}>
-        {t.segnalazioniInvia}
-      </Pulsante>
-    </div>
-    <div class="riga">
-      <span class="salvate">{t.segnalazioniSalvateN(stato.segnalazioniSalvate)}</span>
-      <Pulsante variante="contorno" disabilitato={stato.segnalazioniSalvate === 0} onClick={() => (chiediCancella = true)}>
-        {t.segnalazioniCancella}
-      </Pulsante>
-    </div>
-    {#if stato.segnalazioniSalvate > 0}
-      <div class="riga esporta">
-        <Pulsante variante="tonale" onClick={() => esporta("scarica")}>{t.esportaSegnalazioni}</Pulsante>
-        {#if puoCondividere}
-          <Pulsante variante="tonale" onClick={() => esporta("condividi")}>{t.condividiSegnalazioni}</Pulsante>
-        {/if}
+    <section class="carta">
+      <h2>{t.temaTitolo}</h2>
+      <Selettore
+        opzioni={opzioniTema}
+        valore={stato.aspetto.tema}
+        onCambia={(v) => stato.impostaAspetto({ ...stato.aspetto, tema: v as Tema })}
+        etichetta={t.temaTitolo}
+        colonne={2}
+      />
+    </section>
+    <section class="carta">
+      <h2>{t.segnalazioniTitolo}</h2>
+      <CampoTesto
+        valore={suggerimento}
+        onCambia={(v) => (suggerimento = v.slice(0, MAX))}
+        etichetta={t.segnalazioniSuggerimenti}
+        maxLunghezza={MAX}
+        multilinea
+        righe={3}
+      />
+      <p class="contatore">{t.segnalaContatore(suggerimento.length, MAX)}</p>
+      <div class="destra">
+        <Pulsante variante="pieno" disabilitato={suggerimento.trim() === ""} onClick={invia}>
+          {t.segnalazioniInvia}
+        </Pulsante>
       </div>
-    {/if}
-    <p class="nota">{t.segnalazioniLocale}</p>
+      <div class="riga">
+        <span class="salvate">{t.segnalazioniSalvateN(stato.segnalazioniSalvate)}</span>
+        <Pulsante variante="contorno" disabilitato={stato.segnalazioniSalvate === 0} onClick={() => (chiediCancella = true)}>
+          {t.segnalazioniCancella}
+        </Pulsante>
+      </div>
+      {#if stato.segnalazioniSalvate > 0}
+        <div class="riga esporta">
+          <Pulsante variante="tonale" onClick={() => esporta("scarica")}>{t.esportaSegnalazioni}</Pulsante>
+          {#if puoCondividere}
+            <Pulsante variante="tonale" onClick={() => esporta("condividi")}>{t.condividiSegnalazioni}</Pulsante>
+          {/if}
+        </div>
+      {/if}
+      <p class="nota">{t.segnalazioniLocale}</p>
+    </section>
   </div>
 </Pagina>
 
@@ -111,25 +115,24 @@
   .impostazioni {
     display: flex;
     flex-direction: column;
-    gap: var(--spazio-2);
-    padding: var(--spazio-4);
+    gap: var(--spazio-3);
+  }
+  .carta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-3);
+    padding: var(--spazio-4) 20px;
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xl);
+    background: var(--colore-contenitore-superficie-basso);
   }
   h2 {
-    margin: 0;
-    font-size: 1.375rem;
-    font-weight: 400;
-    color: var(--colore-primario);
-  }
-  hr {
-    width: 100%;
-    margin: var(--spazio-2) 0;
-    border: none;
-    border-top: 1px solid var(--colore-contorno-variante);
+    font: var(--testo-titolo-sezione);
   }
   .contatore {
-    margin: 0;
+    margin-top: calc(-1 * var(--spazio-2));
     text-align: end;
-    font-size: 0.75rem;
+    font: var(--testo-didascalia);
     color: var(--colore-su-superficie-variante);
   }
   .destra {
@@ -142,17 +145,19 @@
     align-items: center;
     gap: var(--spazio-2);
   }
+  .riga :global(.pulsante) {
+    flex: 1 1 10rem;
+  }
   .salvate {
     flex: 1;
     min-width: 8rem;
-    font-size: 1rem;
+    font: var(--testo-corpo);
   }
   .esporta {
     justify-content: flex-end;
   }
   .nota {
-    margin: 0;
-    font-size: 0.75rem;
+    font: var(--testo-corpo-piccolo);
     color: var(--colore-su-superficie-variante);
   }
 </style>

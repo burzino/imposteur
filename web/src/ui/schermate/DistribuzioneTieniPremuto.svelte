@@ -60,23 +60,24 @@
   ondragstart={(e) => e.preventDefault()}
   onclick={clic}
 >
-  <span class="riempimento" class:premuto aria-hidden="true"></span>
+  <!-- Due livelli di testo identici: sotto su binario, sopra su riempimento, ritagliato alla stessa larghezza -->
+  <span class="riempimento riempimento-info" class:premuto aria-hidden="true"></span>
   <span class="etichetta">{t.distribuzioneTieniPremuto}</span>
+  <span class="etichetta sopra riempimento-info" class:premuto aria-hidden="true">{t.distribuzioneTieniPremuto}</span>
 </button>
 
 <style>
   .tieni {
     position: relative;
     overflow: hidden;
+    display: block;
     width: 100%;
-    min-height: 64px;
-    border: 0;
-    border-radius: 32px;
-    background: var(--colore-primario);
-    color: var(--colore-su-primario);
-    font: inherit;
-    font-size: 1.25rem;
-    font-weight: 500;
+    min-height: var(--altezza-pulsante-grande);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
+    border-radius: var(--raggio-xxl);
+    background: var(--colore-contenitore-primario);
+    color: var(--colore-su-contenitore-primario);
+    font: var(--testo-titolo-sezione);
     cursor: pointer;
     touch-action: none;
     user-select: none;
@@ -85,24 +86,37 @@
     -webkit-tap-highlight-color: transparent;
   }
   .spento {
-    opacity: 0.5;
+    opacity: 0.38;
   }
   .riempimento {
     position: absolute;
     inset: 0;
-    background: var(--colore-su-primario);
-    opacity: 0.3;
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: none;
+    background: var(--colore-primario);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--durata-rilascio-barra) ease-out;
     pointer-events: none;
-  }
-  .riempimento.premuto {
-    transform: scaleX(1);
-    transition: transform 300ms linear;
   }
   .etichetta {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--altezza-pulsante-grande) - 2 * var(--spessore-contorno));
+    padding: 0 var(--spazio-5);
+    text-align: center;
     pointer-events: none;
+  }
+  .etichetta.sopra {
+    position: absolute;
+    inset: 0;
+    color: var(--colore-su-primario);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--durata-rilascio-barra) ease-out;
+  }
+  /* il riempimento avanza in 300 ms lineari, in sincronia con il timer di rivelazione */
+  .riempimento.premuto,
+  .etichetta.sopra.premuto {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path var(--durata-barra) linear;
   }
 </style>

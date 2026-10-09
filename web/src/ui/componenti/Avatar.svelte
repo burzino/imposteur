@@ -2,7 +2,9 @@
   interface Props {
     nome: string;
     indice: number;
-    stato?: "attesa" | "corrente" | "fatto";
+    /** attesa = opacita 38%; corrente = anello + scala 1,15; fatto = spunta; pieno = nessun decoro */
+    stato?: "attesa" | "corrente" | "fatto" | "pieno";
+    /** 40 (riga) o 96 (grande, senza anello) */
     dimensione?: number;
   }
   let { nome, indice, stato = "attesa", dimensione = 40 }: Props = $props();
@@ -24,8 +26,8 @@
   <span class="iniziale" aria-hidden="true">{iniziale}</span>
   {#if stato === "fatto"}
     <svg class="spunta" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12" r="12" fill="var(--colore-sfondo)" />
-      <path fill="var(--colore-primario)" d="m9.55 17.65-4.4-4.4 1.4-1.4 3 3 7.9-7.9 1.4 1.4z" />
+      <circle cx="12" cy="12" r="12" fill="var(--colore-primario)" />
+      <path fill="var(--colore-su-primario)" d="m9.55 17.65-4.4-4.4 1.4-1.4 3 3 7.9-7.9 1.4 1.4z" />
     </svg>
   {/if}
 </span>
@@ -38,27 +40,33 @@
     place-items: center;
     width: var(--d);
     height: var(--d);
-    border-radius: 50%;
+    border-radius: var(--raggio-pieno);
     color: var(--colore-su-avatar);
-    font-size: calc(var(--d) * 0.45);
-    font-weight: 600;
+    font-size: calc(var(--d) * 0.42);
+    font-weight: 700;
     line-height: 1;
     user-select: none;
     -webkit-user-select: none;
+    transition:
+      transform var(--molla-spaziale),
+      opacity var(--molla-effetti),
+      box-shadow var(--molla-effetti);
   }
   .attesa {
-    opacity: 0.75;
+    opacity: 0.38;
   }
+  /* anello da 3 px, staccato di 3 px dall'avatar */
   .corrente {
+    transform: scale(1.15);
     box-shadow:
-      0 0 0 2px var(--colore-sfondo),
-      0 0 0 5px var(--colore-primario);
+      0 0 0 3px var(--colore-sfondo),
+      0 0 0 6px var(--colore-primario);
   }
   .spunta {
     position: absolute;
-    right: -2px;
-    bottom: -2px;
-    width: 40%;
-    height: 40%;
+    right: -3px;
+    bottom: -3px;
+    width: max(16px, 40%);
+    height: max(16px, 40%);
   }
 </style>

@@ -23,8 +23,8 @@
     width: 100%;
     border: 0;
     padding: var(--spazio-5);
-    background: var(--colore-contenitore-primario);
-    color: var(--colore-su-contenitore-primario);
+    background: var(--colore-contenitore-terziario);
+    color: var(--colore-su-contenitore-terziario);
     font: inherit;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -34,14 +34,13 @@
     flex-direction: column;
     gap: var(--spazio-2);
     text-align: center;
-    animation: entra 400ms ease-out both;
+    animation: entra var(--molla-spaziale) both;
   }
   .titolo {
-    font-size: 2.25rem;
-    font-weight: 500;
+    font: var(--testo-display);
   }
   .sotto {
-    font-size: 1.125rem;
+    font: var(--testo-titolo);
   }
   @keyframes entra {
     from {

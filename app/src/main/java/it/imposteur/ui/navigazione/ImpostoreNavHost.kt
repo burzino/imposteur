@@ -1,6 +1,22 @@
 package it.imposteur.ui.navigazione
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import it.imposteur.ui.theme.DURATA_VELOCE_MS
+import it.imposteur.ui.theme.mollaSpaziale
+import it.imposteur.ui.theme.rilevaRiduciAnimazioni
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
@@ -13,6 +29,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import it.imposteur.game.PassoConfigurazione
 import it.imposteur.ui.ImpostoreViewModel
 import it.imposteur.ui.schermate.SchermataConfigurazione
 import it.imposteur.ui.schermate.SchermataDistribuzione
@@ -26,7 +43,7 @@ import it.imposteur.ui.schermate.SchermataRivedi
 object Rotte {
     const val HOME = "home"
     const val REGOLE = "regole"
-    const val CONFIGURAZIONE = "configurazione"
+    const val CONFIGURAZIONE = "configurazione/{passo}"
     const val DISTRIBUZIONE = "distribuzione"
     const val GIOCO = "gioco"
     const val RIVELA = "rivela"
@@ -34,10 +51,19 @@ object Rotte {
     const val IMPOSTAZIONI = "impostazioni"
 }
 
+/** Rotta del passo n (1..4) della Configurazione. */
+private fun rottaPasso(passo: Int) = "configurazione/$passo"
+
+private const val ARG_PASSO = "passo"
+
+/** Numero del passo di una voce della Configurazione, o null per le altre destinazioni. */
+private fun NavBackStackEntry.passo(): Int? =
+    if (destination.route == Rotte.CONFIGURAZIONE) arguments?.getInt(ARG_PASSO) else null
+
+/** Apre sempre il passo 1 (specifiche 4.2). */
 private fun NavHostController.vaiAConfigurazione() {
-    navigate(Rotte.CONFIGURAZIONE) {
+    navigate(rottaPasso(1)) {
         popUpTo(Rotte.HOME)
-        launchSingleTop = true
     }
 }
 
@@ -78,13 +104,38 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
         }
     }
 
+    // Cambio passo: scorrimento orizzontale di 48 dp con dissolvenza (solo dissolvenza breve con "Riduci animazioni").
+    val ridotto = rilevaRiduciAnimazioni()
+    val scostamento = with(LocalDensity.current) { 48.dp.roundToPx() }
+    fun direzione(iniziale: NavBackStackEntry, finale: NavBackStackEntry): Int? {
+        val da = iniziale.passo() ?: return null
+        val a = finale.passo() ?: return null
+        return if (a >= da) 1 else -1
+    }
+    val ingressoPasso: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
+        val d = direzione(initialState, targetState)
+        when {
+            d == null -> null
+            ridotto -> fadeIn(tween(DURATA_VELOCE_MS))
+            else -> slideInHorizontally(mollaSpaziale()) { d * scostamento } + fadeIn()
+        }
+    }
+    val uscitaPasso: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
+        val d = direzione(initialState, targetState)
+        when {
+            d == null -> null
+            ridotto -> fadeOut(tween(DURATA_VELOCE_MS))
+            else -> slideOutHorizontally(mollaSpaziale()) { -d * scostamento } + fadeOut()
+        }
+    }
+
     NavHost(navController = navController, startDestination = Rotte.HOME) {
         composable(Rotte.HOME) {
             SchermataHome(
                 stato = stato,
                 onNuovaPartita = {
                     if (navController.inRotta(Rotte.HOME)) {
-                        navController.navigate(Rotte.CONFIGURAZIONE) { launchSingleTop = true }
+                        navController.navigate(rottaPasso(1)) { launchSingleTop = true }
                     }
                 },
                 onRiprendi = {
@@ -126,23 +177,49 @@ fun ImpostoreNavHost(viewModel: ImpostoreViewModel, navController: NavHostContro
                 onHome = { navController.vaiAHome(Rotte.REGOLE) },
             )
         }
-        composable(Rotte.CONFIGURAZIONE) {
+        composable(
+            route = Rotte.CONFIGURAZIONE,
+            arguments = listOf(navArgument(ARG_PASSO) { type = NavType.IntType; defaultValue = 1 }),
+            enterTransition = ingressoPasso,
+            exitTransition = uscitaPasso,
+            popEnterTransition = ingressoPasso,
+            popExitTransition = uscitaPasso,
+        ) { voce ->
+            val passo = (voce.arguments?.getInt(ARG_PASSO) ?: 1).coerceIn(1, 4)
+            // Guardia contro il doppio tocco: si agisce solo se questo passo e' ancora quello in cima.
+            fun inQuestoPasso() = navController.currentBackStackEntry?.passo() == passo
+            fun vaiAPasso(n: Int) {
+                if (!inQuestoPasso()) return
+                viewModel.salvaOra()
+                navController.navigate(rottaPasso(n.coerceIn(1, 4)))
+            }
             SchermataConfigurazione(
+                passo = passo,
                 stato = stato,
                 viewModel = viewModel,
                 onIndietro = {
-                    viewModel.salvaOra()
-                    navController.popBackStack(Rotte.HOME, inclusive = false)
-                },
-                onHome = {
-                    if (navController.inRotta(Rotte.CONFIGURAZIONE)) {
+                    if (inQuestoPasso()) {
                         viewModel.salvaOra()
-                        navController.vaiAHome(Rotte.CONFIGURAZIONE)
+                        if (passo == 1) navController.popBackStack(Rotte.HOME, inclusive = false)
+                        else navController.popBackStack()
                     }
                 },
+                onVaiAPasso = ::vaiAPasso,
+                onAvanti = { if (stato.errorePasso(PassoConfigurazione.entries[passo - 1]) == null) vaiAPasso(passo + 1) },
                 onInizia = {
-                    if (navController.inRotta(Rotte.CONFIGURAZIONE) && viewModel.iniziaPartita()) {
-                        navController.navigate(Rotte.DISTRIBUZIONE) { launchSingleTop = true }
+                    if (inQuestoPasso()) {
+                        val primo = stato.primoPassoNonValido
+                        if (primo == null) {
+                            if (viewModel.iniziaPartita()) {
+                                navController.navigate(Rotte.DISTRIBUZIONE) { launchSingleTop = true }
+                            }
+                        } else if (primo.ordinal + 1 != passo) {
+                            // Porta al primo passo non valido sostituendo quello corrente (CA-102).
+                            viewModel.salvaOra()
+                            navController.navigate(rottaPasso(primo.ordinal + 1)) {
+                                popUpTo(Rotte.CONFIGURAZIONE) { inclusive = true }
+                            }
+                        }
                     }
                 },
             )

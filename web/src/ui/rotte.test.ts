@@ -7,6 +7,8 @@ import {
   vai,
   vaiAConfigurazione,
   vaiAHome,
+  vaiAPasso,
+  passoCorrente,
   type AmbienteRotte,
 } from "./rotte";
 import type { StatoApp } from "./stato.svelte";
@@ -134,8 +136,8 @@ describe("rotte", () => {
     vaiAConfigurazione();
     expect(rottaCorrente.valore).toBe("configurazione");
     expect(richiestaInterruzione.aperta).toBe(false);
-    expect(voci.map((v) => v.hash)).toEqual(["#/home", "#/configurazione"]);
-    expect(env.location.hash).toBe("#/configurazione");
+    expect(voci.map((v) => v.hash)).toEqual(["#/home", "#/configurazione/1"]);
+    expect(env.location.hash).toBe("#/configurazione/1");
   });
 
   it("vaiAHome: indietro non riporta alla schermata lasciata", () => {
@@ -164,5 +166,108 @@ describe("rotte", () => {
     indietro();
     expect(rottaCorrente.valore).toBe("home");
     expect(voci[0].hash).toBe("#/home");
+  });
+});
+
+describe("rotte: passi della configurazione (CA-99, CA-100, CA-102, CA-105)", () => {
+  it("CA-99 #/configurazione senza numero equivale al passo 1", () => {
+    avvia("#/configurazione");
+    expect(rottaCorrente.valore).toBe("configurazione");
+    expect(passoCorrente.valore).toBe(1);
+  });
+
+  it("CA-99 #/configurazione/1..4 selezionano il passo", () => {
+    for (const n of [1, 2, 3, 4] as const) {
+      avvia(`#/configurazione/${n}`);
+      expect(rottaCorrente.valore, `passo ${n}`).toBe("configurazione");
+      expect(passoCorrente.valore, `passo ${n}`).toBe(n);
+      rimuovi?.();
+      rimuovi = null;
+    }
+  });
+
+  it("CA-99 numero non valido (0, 5, -1, 2.5, abc, vuoto) = passo 1", () => {
+    for (const x of ["0", "5", "-1", "2.5", "abc", "", "99"]) {
+      avvia(`#/configurazione/${x}`);
+      expect(rottaCorrente.valore, x).toBe("configurazione");
+      expect(passoCorrente.valore, x).toBe(1);
+      rimuovi?.();
+      rimuovi = null;
+    }
+  });
+
+  it("CA-99 fuori da configurazione passoCorrente e 1", () => {
+    avvia("#/home");
+    expect(passoCorrente.valore).toBe(1);
+    vai("regole");
+    expect(passoCorrente.valore).toBe(1);
+  });
+
+  it("CA-99 vaiAConfigurazione apre il passo 1", () => {
+    const { env } = avvia("#/home");
+    vaiAConfigurazione();
+    expect(env.location.hash).toBe("#/configurazione/1");
+    expect(passoCorrente.valore).toBe(1);
+  });
+
+  it("CA-100 vaiAPasso aggiunge una voce alla history e aggiorna l hash", () => {
+    const { env, voci } = avvia("#/home");
+    vaiAConfigurazione();
+    vaiAPasso(2);
+    expect(passoCorrente.valore).toBe(2);
+    expect(rottaCorrente.valore).toBe("configurazione");
+    expect(env.location.hash).toBe("#/configurazione/2");
+    expect(voci.map((v) => v.hash)).toEqual(["#/home", "#/configurazione/1", "#/configurazione/2"]);
+  });
+
+  it("CA-100 indietro del browser dal passo 3 torna al 2 senza validare", () => {
+    const { env } = avvia("#/home");
+    vaiAConfigurazione();
+    vaiAPasso(2);
+    vaiAPasso(3);
+    env.history.go(-1);
+    expect(rottaCorrente.valore).toBe("configurazione");
+    expect(passoCorrente.valore).toBe(2);
+  });
+
+  it("CA-100 indietro in app dal passo 2 torna al passo 1 e dal passo 1 salva e va in home", () => {
+    const { s } = avvia("#/home");
+    vaiAConfigurazione();
+    vaiAPasso(2);
+    indietro();
+    expect(rottaCorrente.valore).toBe("configurazione");
+    expect(passoCorrente.valore).toBe(1);
+    expect(s.salvaOra).not.toHaveBeenCalled();
+    indietro();
+    expect(s.salvaOra).toHaveBeenCalledTimes(1);
+    expect(rottaCorrente.valore).toBe("home");
+  });
+
+  it("CA-102 vaiAPasso con sostituisci non aggiunge voci", () => {
+    const { env, voci } = avvia("#/home");
+    vaiAConfigurazione();
+    vaiAPasso(3);
+    const n = voci.length;
+    vaiAPasso(1, { sostituisci: true });
+    expect(voci.length).toBe(n);
+    expect(passoCorrente.valore).toBe(1);
+    expect(env.location.hash).toBe("#/configurazione/1");
+    expect(voci[voci.length - 1].hash).toBe("#/configurazione/1");
+  });
+
+  it("CA-99 vaiAPasso verso il passo corrente e un no-op", () => {
+    const { voci } = avvia("#/home");
+    vaiAConfigurazione();
+    const n = voci.length;
+    vaiAPasso(1);
+    expect(voci.length).toBe(n);
+    expect(passoCorrente.valore).toBe(1);
+  });
+
+  it("CA-105 passoCorrente si legge dall hash anche dopo vai(configurazione) da un altra rotta", () => {
+    avvia("#/home");
+    vai("configurazione");
+    expect(rottaCorrente.valore).toBe("configurazione");
+    expect(passoCorrente.valore).toBe(1);
   });
 });

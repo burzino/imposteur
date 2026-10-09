@@ -1,7 +1,7 @@
 <script lang="ts">
   import Avatar from "../componenti/Avatar.svelte";
 
-  // Decorativa: l'informazione e' nel testo "Giocatore n di N". Solo l'iniziale, nessun ruolo.
+  // Decorativa: l'informazione e nel testo "Giocatore n di N". Solo l'iniziale, nessun ruolo.
   let { giocatori, corrente }: { giocatori: readonly string[]; corrente: number } = $props();
 
   let contenitore: HTMLElement | undefined = $state();
@@ -28,20 +28,21 @@
       {nome}
       indice={i}
       stato={i < corrente ? "fatto" : i === corrente ? "corrente" : "attesa"}
-      dimensione={i === corrente ? 36 : 30}
+      dimensione={40}
     />
   {/each}
 </div>
 
 <style>
+  /* il padding verticale lascia posto all'anello e alla scala 1,15 dell'avatar corrente */
   .fila {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spazio-2);
+    gap: var(--spazio-3);
     width: 100%;
-    min-height: 40px;
+    padding-block: 10px;
   }
   .fila.scorre {
     justify-content: flex-start;

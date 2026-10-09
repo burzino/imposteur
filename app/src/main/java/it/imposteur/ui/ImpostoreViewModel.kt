@@ -18,6 +18,9 @@ import it.imposteur.game.ErroreConfigurazione
 import it.imposteur.game.GestorePartite
 import it.imposteur.game.Modalita
 import it.imposteur.game.Partita
+import it.imposteur.game.Passi
+import it.imposteur.game.PassoConfigurazione
+import it.imposteur.game.RiepilogoConfigurazione
 import it.imposteur.game.Regole
 import it.imposteur.game.RisultatoNuovaPartita
 import it.imposteur.game.SessioneSalvata
@@ -50,6 +53,17 @@ data class UiState(
     val errori: List<ErroreConfigurazione>
         get() = if (categorie.isEmpty()) emptyList() else Regole.valida(config, categorie)
     val puoIniziare: Boolean get() = !caricamento && !erroreCaricamento && errori.isEmpty()
+
+    /** Errore del passo (null se valido o se le categorie non sono ancora caricate). */
+    fun errorePasso(passo: PassoConfigurazione): ErroreConfigurazione? =
+        if (categorie.isEmpty()) null else Passi.errorePasso(passo, config, categorie)
+
+    /** Primo passo non valido, per "Inizia" in barra; null se la configurazione e' valida. */
+    val primoPassoNonValido: PassoConfigurazione?
+        get() = if (categorie.isEmpty()) null else Passi.primoPassoNonValido(config, categorie)
+
+    val riepilogo: RiepilogoConfigurazione get() = Passi.riepilogo(config, categorie)
+    val opzioniAttive: Int get() = Passi.contaOpzioniAttive(config)
 }
 
 /** Stato di "Rivedi la parola": giocatore scelto e ruolo visibile o no. Locale, mai salvato. */

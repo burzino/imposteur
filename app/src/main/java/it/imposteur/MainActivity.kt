@@ -1,6 +1,7 @@
 package it.imposteur
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -42,6 +43,8 @@ class MainActivity : ComponentActivity() {
                         SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
                     },
                 )
+                // Barra di navigazione a 3 pulsanti trasparente: lo sfondo passa sotto (edge-to-edge).
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
                 onDispose {}
             }
             ImpostoreTheme(aspetto) {

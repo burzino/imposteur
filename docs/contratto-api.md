@@ -698,3 +698,65 @@ export function eIosSafariNonInstallato(): boolean;       // iOS Safari e non st
 - `esportaSegnalazioni`: `Blob([jsonl], { type: "application/x-ndjson" })`, file `segnalazioni.jsonl`; "scarica" con `<a download>` + `URL.createObjectURL` (revoca dopo); "condividi" con `navigator.share({ files })`, `AbortError` = "annullato". Non cancella le segnalazioni.
 - B mostra in Impostazioni "Esporta segnalazioni" (e "Condividi" se `condivisioneFileDisponibile()`) solo se `stato.segnalazioniSalvate > 0`, con il contatore e il pulsante di cancellazione già presente su Android. B mostra `t.installaIos` come ultima riga di "Come si gioca" (Regole) solo se `eIosSafariNonInstallato()`. C salva la segnalazione da Rivela con `stato.salvaSegnalazione`.
 - Ogni funzione è in `try/catch` e degrada senza `window`/`navigator` (test in Node).
+
+## Configurazione in 4 passi (v1.7 Kotlin, v2.2 TS)
+
+Solo funzioni pure, senza stato di navigazione (il passo corrente non è salvato, specifiche 4.2). Stesse firme e stessa semantica in `game/` (Kotlin, file `Passi.kt`) e in `web/src/game/passi.ts` (TS, unioni di stringhe letterali con gli stessi nomi, `T?` come `T | null`). Nessuna modifica a `Configurazione` né al formato salvato.
+
+```kotlin
+enum class PassoConfigurazione { GIOCATORI, OPZIONI, CATEGORIE, RIEPILOGO }    // ordinale + 1 = numero del passo (1..4)
+
+object Passi {
+    /** Errore del passo, o null se valido. Riusa Regole.valida; ritorna il PRIMO errore di Regole.valida appartenente al passo.
+     *  GIOCATORI: TroppoPochiGiocatori, TroppiGiocatori, TroppoPochiImpostori, TroppiImpostori, NomeDuplicato, NomeTroppoLungo.
+     *  OPZIONI e RIEPILOGO: sempre null (nessuna validazione aggiuntiva, 4.2.1).
+     *  CATEGORIE: NessunaCategoria, PoolVuoto. */
+    fun errorePasso(passo: PassoConfigurazione, config: Configurazione, categorie: List<Categoria>): ErroreConfigurazione?
+
+    /** Primo passo, in ordine GIOCATORI, OPZIONI, CATEGORIE, con errorePasso != null; null se la configurazione è valida
+     *  (equivale a Regole.valida(...).isEmpty()). Usato da "Inizia" in barra (4.2). */
+    fun primoPassoNonValido(config: Configurazione, categorie: List<Categoria>): PassoConfigurazione?
+
+    /** Riepilogo come dati: nessuna stringa localizzata, la UI sceglie i testi. */
+    fun riepilogo(config: Configurazione, categorie: List<Categoria>): RiepilogoConfigurazione
+
+    /** Badge "N attive" (CA-81). */
+    fun contaOpzioniAttive(config: Configurazione): Int
+}
+
+enum class OpzioneRiepilogo { NON_PARLA_PER_PRIMO, TRAPPOLA, ORDINE_CASUALE, PROMEMORIA, SENZA_CATEGORIA, GIRI }   // questo è l'ordine di 4.2.1
+
+data class RiepilogoConfigurazione(
+    val numeroGiocatori: Int,
+    val nomi: List<String>,              // Regole.nomiEffettivi(config)
+    val numeroImpostori: Int,            // config.numeroImpostori limitato a 1..max(1, maxImpostori(N)); con fino a = true è il massimo
+    val finoA: Boolean,                  // impostoriSorpresa && numeroImpostori > 1 (CA-92, CA-104)
+    val modalita: Modalita,
+    val opzioni: List<OpzioneRiepilogo>, // solo non predefinite, nell'ordine dell'enum, senza duplicati; vuota = "Nessuna opzione attiva" (CA-89)
+    val giriIndizi: Int,                 // 1..3 (limitato); "N giri" nel testo solo se GIRI in opzioni
+    val numeroCategorie: Int,            // categorieSelezionate che esistono in `categorie`
+)
+```
+
+Regole di `riepilogo.opzioni`: NON_PARLA_PER_PRIMO se `impostoreNonPrimo`; TRAPPOLA se `partitaTrappola`; ORDINE_CASUALE se `ordineCasuale`; PROMEMORIA se `promemoriaUltimaPossibilita`; SENZA_CATEGORIA se `!mostraCategoria` e `modalita == SENZA_PAROLA` (mai in PAROLA_AFFINE); GIRI se `giriIndizi` > 1. Né il numero di impostori né `impostoriSorpresa` entrano in `opzioni` (CA-93). `contaOpzioniAttive` = interruttori attivi tra `impostoreNonPrimo`, `partitaTrappola`, `ordineCasuale`, `promemoriaUltimaPossibilita`, più 1 se `giriIndizi` > 1; NON conta `mostraCategoria` né `impostoriSorpresa`, né SENZA_CATEGORIA (CA-81). Il badge del passo 2 e quello della riga del passo 4 usano la stessa funzione; con 0 non compare.
+
+Il conteggio "Parole ancora da giocare: X / Y" non è nel riepilogo: dipende dalla sessione, la UI lo prende da `GestorePartite.rimanenti(Regole.pool(...))` (v1.2) come nel passo 3.
+
+| Funzione | CA verificati | Casi limite |
+|---|---|---|
+| `errorePasso` | CA-25, 100, 101 | nome duplicato (anche con "Giocatore n" di default) -> GIOCATORI e CATEGORIE null; categorie vuote -> CATEGORIE `NessunaCategoria`; selezione non vuota ma pool vuoto (PAROLA_AFFINE senza affini) -> `PoolVuoto`; OPZIONI null con qualunque combinazione (trappola + sorpresa incluse); RIEPILOGO null; più errori nello stesso passo -> il primo di `Regole.valida`; tipi non del passo non compaiono mai (es. `NessunaCategoria` in GIOCATORI) |
+| `primoPassoNonValido` | CA-102, 101, 25 | nome duplicato e categorie vuote -> GIOCATORI; solo categorie vuote -> CATEGORIE; configurazione valida -> null; non restituisce mai OPZIONI né RIEPILOGO |
+| `riepilogo` | CA-92, 93, 94, 103, 104, 89 | sorpresa attiva con massimo 1 (N = 3 o 4) -> `finoA` false, "1 impostore"; sorpresa attiva con 5 giocatori e 2 -> `finoA` true; nomi vuoti -> "Giocatore n"; PAROLA_AFFINE con `mostraCategoria` false -> niente SENZA_CATEGORIA; tutte le opzioni spente -> `opzioni` vuota, `giriIndizi` 1; esempio "Ordine casuale, 2 giri" -> [ORDINE_CASUALE, GIRI] e `giriIndizi` 2; selezione con id inesistenti non contati; riflette sempre la config corrente (funzione pura, nessuna cache) |
+| `contaOpzioniAttive` | CA-81, 89, 94 | tutte spente -> 0; solo `mostraCategoria` false -> 0; solo `impostoriSorpresa` -> 0; `giriIndizi` 2 o 3 -> 1; tutte le cinque contate attive -> 5 |
+
+### UI web: rotte dei passi (v2.2)
+
+Aggiornamento di §3 "Rotte": `Rotta` diventa `... | "configurazione" | ...` invariato, ma la rotta `configurazione` ha un sotto-percorso. Hash `#/configurazione/1` .. `#/configurazione/4`; `#/configurazione` senza numero equivale a `#/configurazione/1`; numero fuori 1..4 o non intero -> `1`. Il passo corrente è letto dall'hash (non salvato, specifiche 4.2).
+
+```ts
+// ui/rotte.ts (aggiunte)
+export const passoCorrente: { readonly valore: 1 | 2 | 3 | 4 };   // $state, derivato dall'hash; 1 fuori da "configurazione"
+export function vaiAPasso(passo: 1 | 2 | 3 | 4, opz?: { sostituisci?: boolean }): void;   // Avanti/Modifica = push; Indietro dal riepilogo dopo "Modifica" = history normale
+export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4;        // GIOCATORI -> 1 ... RIEPILOGO -> 4 (in game/passi.ts)
+```
+`vaiAConfigurazione()` apre `#/configurazione/1` (CA-99, 105). "Inizia" in barra: `const p = primoPassoNonValido(...)`; se `p === null` -> `iniziaPartita()` e `vai("distribuzione")`; altrimenti `vaiAPasso(passoDiPassoConfigurazione(p), { sostituisci: true })` e mostra l'errore del passo (resta nel passo corrente se coincide) (CA-102). Indietro del browser/freccia/tasto di sistema dai passi 2..4 = history normale, senza validare; dal passo 1 `salvaOra()` poi Home (CA-100). `StatoApp` espone `readonly riepilogo: RiepilogoConfigurazione` (`$derived` da `Passi.riepilogo(config, categorie)`) e `readonly opzioniAttive: number` (`contaOpzioniAttive(config)`); nessun'altra azione nuova (le `imposta*` esistenti bastano, `impostoriSorpresa` passa da `impostaOpzione`).

@@ -27,7 +27,9 @@
         <path fill="currentColor" d="M5 11h14v2H5z" />
       </svg>
     </button>
-    <span class="valore" aria-live="polite">{valore}</span>
+    <span class="valore" aria-live="polite">
+      {#key valore}<span class="num">{valore}</span>{/key}
+    </span>
     <button
       type="button"
       class="tasto"
@@ -52,6 +54,7 @@
   }
   .etichetta {
     min-width: 0;
+    font: var(--testo-titolo);
   }
   .controlli {
     flex: none;
@@ -65,20 +68,37 @@
     width: var(--altezza-tocco);
     height: var(--altezza-tocco);
     padding: 0;
-    border: 1px solid var(--colore-contorno);
+    border: var(--spessore-contorno) solid var(--colore-bordo-livello);
     border-radius: 50%;
-    background: transparent;
-    color: var(--colore-primario);
+    background: var(--colore-contenitore-secondario);
+    color: var(--colore-su-contenitore-secondario);
     cursor: pointer;
+    transition: transform var(--durata-veloce) ease-out;
+  }
+  .tasto:not(:disabled):active {
+    transform: scale(0.92);
   }
   .tasto:disabled {
     cursor: not-allowed;
-    opacity: 0.4;
+    background: color-mix(in srgb, var(--colore-su-superficie) 12%, transparent);
+    color: color-mix(in srgb, var(--colore-su-superficie) 38%, transparent);
   }
   .valore {
-    min-width: 2.5ch;
+    min-width: 40px;
     text-align: center;
-    font-size: 1.25rem;
+    font: var(--testo-titolo-sezione);
     font-variant-numeric: tabular-nums;
+  }
+  .num {
+    display: inline-block;
+    animation: rimbalzo var(--molla-spaziale) both;
+  }
+  @keyframes rimbalzo {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
   }
 </style>
