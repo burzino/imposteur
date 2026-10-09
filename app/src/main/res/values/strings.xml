@@ -136,7 +136,7 @@
 
     <!-- Gioco -->
     <string name="gioco_titolo">Si gioca!</string>
-    <string name="gioco_inizia">Parla per primo: %1$s</string>
+    <string name="gioco_inizia">Parla per primo:</string>
     <string name="gioco_istruzioni">Discutete a voce, poi votate. Quando avete deciso, premete Rivela.</string>
     <string name="gioco_ordine_titolo">Ordine di parola</string>
     <string name="gioco_rivela">Rivela</string>
@@ -157,8 +157,8 @@
 
     <!-- Rivela -->
     <string name="rivela_titolo">Il risultato</string>
-    <string name="rivela_impostore">L\'impostore era: %1$s</string>
-    <string name="rivela_impostori">Gli impostori erano: %1$s</string>
+    <string name="rivela_impostore">L\'impostore era:</string>
+    <string name="rivela_impostori">Gli impostori erano:</string>
     <string name="rivela_trappola">Nessun impostore: era una partita trappola!</string>
     <string name="rivela_promemoria">L\'impostore scoperto può provare a indovinare la parola: se ci riesce, vince lui!</string>
     <string name="rivela_parola">La parola era: %1$s</string>

@@ -26,7 +26,7 @@ describe("testi", () => {
     expect(t.configGiocatoreN(3)).toBe("Giocatore 3");
     expect(t.configParoleRimanenti(2, 9)).toBe("Parole ancora da giocare: 2 / 9");
     expect(t.distribuzionePassa("Anna")).toBe("Passa il telefono a Anna");
-    expect(t.rivelaImpostore("Bea")).toBe("L'impostore era: Bea");
+    expect(t.rivelaImpostore).toBe("L'impostore era:");
     expect(t.opzAttive(1)).toBe("1 attiva");
     expect(t.opzAttive(3)).toBe("3 attive");
     expect(t.opzBreveGiri(2)).toBe("2 giri");
@@ -148,6 +148,6 @@ describe("testi: stesso testo di strings.xml (CA-36, CA-W18)", () => {
     expect(t.regoleModalitaSenzaParola).toContain("l'impostore");
     expect(t.regoleModalitaSenzaParola).not.toContain("\\");
     expect(t.regoleFine).toContain("l'impostore");
-    expect(t.rivelaImpostore("Bea")).toBe("L'impostore era: Bea");
+    expect(t.rivelaImpostore).toBe("L'impostore era:");
   });
 });

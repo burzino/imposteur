@@ -66,12 +66,16 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 - Test: Android 198/198, PWA 345/345. APK con cursore installato sul OnePlus 9. Da verificare a occhio: allineamento tacche/maniglia del cursore Android (Slider stabile + Canvas).
 - Collaudo headless (09-10): tema persistente, localStorage bloccato, rotazione, visibilitychange OK. Export segnalazioni non verificato (script instabile): resta nella scaletta del telefono.
 
+## Passi del 2026-10-09 (sera)
+- Nomi su una riga separata in Gioco e Rivela: gioco_inizia, rivela_impostore e rivela_impostori sono ora etichette senza segnaposto ("Parla per primo:", ecc.), con il nome sotto. Android e PWA.
+- Workflow Pages: checkout@v7, setup-node@v7, configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5 (Node 24).
+- Test: Android 198/198, PWA 345/345, build verdi.
+
 ## Prossimi passi
 1. Installare l APK aggiornato (telefono scollegato al momento della build). Screenshot mancanti della PWA: Gioco, Rivedi, Rivela, Impostazioni.
 2. Collaudo su telefono: APK nuovo (restyling, 4 passi, 300 ms) e PWA secondo `docs/collaudo-pwa-telefono.md`. Su Android verificare medaglione Home, pesi 700/800 di Roboto Flex, "Inizia" sopra la tastiera con 20 giocatori.
-3. Nomi su riga separata in Gioco e Rivela (richiede testi divisi).
-4. Dominio imposteur.burzi.eu (CNAME su Aruba, poi BASE_PATH=/).
-5. Action di Pages su Node 20: aggiornarle.
+3. Dominio imposteur.burzi.eu (CNAME su Aruba, poi BASE_PATH=/).
+4. Verificare a occhio, sul telefono, i nomi su una riga separata in Gioco e Rivela.
 
 ## Punti aperti
 - Build release firmata: la chiave la crea l utente.

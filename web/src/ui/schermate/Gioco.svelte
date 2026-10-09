@@ -37,7 +37,8 @@
   {#if partita}
     <div class="corpo">
       <section class="hero">
-        <TestoAdattivo testo={t.giocoInizia(partita.giocatori[partita.primoGiocatore])} classe="gioco-primo" maxRighe={3} />
+        <p class="etichetta-hero">{t.giocoInizia}</p>
+        <TestoAdattivo testo={partita.giocatori[partita.primoGiocatore]} classe="gioco-primo" maxRighe={3} />
       </section>
       <p class="istruzioni">{t.giocoIstruzioni}</p>
       <section class="carta">
@@ -91,6 +92,13 @@
     border-radius: var(--raggio-xl);
     background: var(--colore-contenitore-primario);
     color: var(--colore-su-contenitore-primario);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+    text-align: center;
+  }
+  .etichetta-hero {
+    font: var(--testo-titolo);
   }
   .corpo :global(.gioco-primo) {
     font-size: 2.25rem;

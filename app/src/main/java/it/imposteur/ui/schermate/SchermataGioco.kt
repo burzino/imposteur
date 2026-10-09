@@ -86,9 +86,19 @@ fun SchermataGioco(
                     border = bordoLivello(MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Box(Modifier.padding(Spazio.s5), contentAlignment = Alignment.Center) {
+                    Column(
+                        Modifier.fillMaxWidth().padding(Spazio.s5),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spazio.s2),
+                    ) {
+                        Text(
+                            stringResource(R.string.gioco_inizia),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
                         TestoAdattivo(
-                            testo = stringResource(R.string.gioco_inizia, partita.giocatori[partita.primoGiocatore]),
+                            testo = partita.giocatori[partita.primoGiocatore],
                             stile = MaterialTheme.typography.displaySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.fillMaxWidth(),

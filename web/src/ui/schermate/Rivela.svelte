@@ -22,12 +22,8 @@
       ? [...partita.impostori].sort((a, b) => a - b).map((i) => partita.giocatori[i])
       : [],
   );
-  const testoImpostori = $derived(
-    nomiImpostori.length === 0
-      ? t.rivelaTrappola
-      : nomiImpostori.length === 1
-        ? t.rivelaImpostore(nomiImpostori[0])
-        : t.rivelaImpostori(nomiImpostori.join(", ")),
+  const etichettaImpostori = $derived(
+    nomiImpostori.length === 0 ? null : nomiImpostori.length === 1 ? t.rivelaImpostore : t.rivelaImpostori,
   );
   const trappola = $derived(partita !== null && partita.impostori.size === 0);
   let segnalando = $state(false);
@@ -73,7 +69,12 @@
   {#if partita}
     <div class="corpo">
       <section class="hero">
-        <TestoAdattivo testo={testoImpostori} classe={trappola ? "rivela-trappola" : "rivela-impostori"} maxRighe={3} />
+        {#if etichettaImpostori === null}
+          <TestoAdattivo testo={t.rivelaTrappola} classe="rivela-trappola" maxRighe={3} />
+        {:else}
+          <p class="etichetta-hero">{etichettaImpostori}</p>
+          <TestoAdattivo testo={nomiImpostori.join(", ")} classe="rivela-impostori" maxRighe={3} />
+        {/if}
       </section>
       <section class="carta">
         <p class="grande">{t.rivelaParola(partita.voce.parola)}</p>
@@ -125,6 +126,12 @@
     background: var(--colore-contenitore-primario);
     color: var(--colore-su-contenitore-primario);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+  }
+  .etichetta-hero {
+    font: var(--testo-titolo);
   }
   .corpo :global(.rivela-impostori) {
     font-size: 1.75rem;

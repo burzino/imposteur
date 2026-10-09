@@ -109,12 +109,10 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
                 .padding(Spazio.margineSchermata),
             verticalArrangement = Arrangement.spacedBy(Spazio.s3),
         ) {
-            val testoImpostori = if (nomiImpostori.isEmpty()) {
-                stringResource(R.string.rivela_trappola)
-            } else if (nomiImpostori.size == 1) {
-                stringResource(R.string.rivela_impostore, nomiImpostori.first())
-            } else {
-                stringResource(R.string.rivela_impostori, nomiImpostori.joinToString(", "))
+            val etichettaImpostori = when (nomiImpostori.size) {
+                0 -> null
+                1 -> stringResource(R.string.rivela_impostore)
+                else -> stringResource(R.string.rivela_impostori)
             }
             Surface(
                 shape = Forme.XXL,
@@ -123,17 +121,34 @@ fun SchermataRivela(partitaViva: Partita?, onSegnala: (Segnalazione) -> Unit, on
                 border = bordoLivello(colori.primary),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(
+                Column(
                     Modifier.fillMaxWidth().padding(Spazio.s5),
-                    contentAlignment = Alignment.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spazio.s2),
                 ) {
-                    TestoAdattivo(
-                        testoImpostori,
-                        if (partita.trappola) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium,
-                        color = colori.onPrimaryContainer,
-                        maxRighe = 3,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    if (etichettaImpostori == null) {
+                        TestoAdattivo(
+                            stringResource(R.string.rivela_trappola),
+                            MaterialTheme.typography.titleLarge,
+                            color = colori.onPrimaryContainer,
+                            maxRighe = 3,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        Text(
+                            etichettaImpostori,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colori.onPrimaryContainer,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                        TestoAdattivo(
+                            nomiImpostori.joinToString(", "),
+                            MaterialTheme.typography.headlineMedium,
+                            color = colori.onPrimaryContainer,
+                            maxRighe = 3,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
             Surface(

@@ -18,6 +18,7 @@ Regole:
 - Non eseguire `gradlew build`/`test`/`assemble`: la build la esegue l'agente `esecutore-build`. Puoi usare grep e letture mirate.
 - Non scrivere né modificare file di test (`*.test.ts`, `src/test/`): li scrive solo il tester, anche in parallelo a te; sovrascriverli ne distrugge il lavoro.
 - Non modificare test esistenti per farli passare: se un test sembra sbagliato, segnalalo nel resoconto.
+- Tocca solo le chiavi e le righe indicate nel compito; nel resoconto elenca ogni chiave di stringa modificata. Togliere un segnaposto `%1$s` da una stringa usata con argomenti non rompe la build: `stringResource` ignora l argomento e il valore sparisce in silenzio. Prima di togliere un segnaposto, cerca con grep tutti gli usi della chiave.
 
 PWA (`web/`): Svelte 5 (runes) + TypeScript strict + Vite + vite-plugin-pwa, test Vitest.
 - `web/src/game/` e `web/src/data/` sono TS puro (niente DOM, niente Svelte): porting fedele di `game/` e `data/` Kotlin, con le firme della sezione TS di `docs/contratto-api.md`. Casualità tramite un generatore iniettato.
