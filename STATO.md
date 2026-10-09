@@ -78,7 +78,9 @@ Vengono caricati solo all'avvio di una nuova sessione. L'ondata 1 ha usato agent
 
 ## Foto degli avatar (decisa il 2026-10-09, ondata successiva ai 5 passi)
 - Facoltativa, salvata sul dispositivo e riusata nelle partite successive. Legata al NOME del giocatore (non alla posizione).
-- Sorgente: galleria e fotocamera (Android: Photo Picker senza permessi, fotocamera con permesso al primo scatto; PWA: input file con capture).
+- Sorgente: galleria e fotocamera (Android: Photo Picker e ACTION_IMAGE_CAPTURE, nessun permesso; PWA: input file con capture).
+- Fatto: specifiche §4.8 e CA-123..140, contratto v1.10/v2.5 (IndiceFoto, ChiaveFoto, RitaglioFoto, RepositoryFoto, ArchivioFoto IndexedDB). Scelte: chiave = trim + minuscole; nomi "Giocatore <cifre>" senza foto; limite 50 con eliminazione della meno usata; lato min(256, lato minore); errore come snackbar.
+- Da fare: design.md (avatar toccabile, foglio, gruppo Impostazioni), specifiche-web W19 esteso a CA-123..140, test, codice Android e PWA, build, collaudo.
 
 ## Dominio burzi.eu (2026-10-09, attivo)
 - burzi.eu = pagina principale "Giochi di gruppo" (repository `burzino/burzino.github.io`, cartella locale `Z:urzino.github.io`, HTML statico con `CNAME` e `.nojekyll`). Imposteur su burzi.eu/imposteur/ (dominio ereditato, BASE_PATH resta /imposteur/); burzino.github.io/imposteur e www.burzi.eu rimandano lì.

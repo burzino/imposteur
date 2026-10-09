@@ -865,3 +865,150 @@ export function vaiAPasso(passo: 1 | 2 | 3 | 4 | 5, opz?: { sostituisci?: boolea
 export function passoDiPassoConfigurazione(p: PassoConfigurazione): 1 | 2 | 3 | 4 | 5;        // GIOCATORI -> 1, MODALITA -> 2, OPZIONI -> 3, CATEGORIE -> 4, RIEPILOGO -> 5 (in game/passi.ts)
 ```
 `vaiAConfigurazione()` apre `#/configurazione/1` (CA-99, 105). "Inizia" in barra: `const p = primoPassoNonValido(...)`; se `p === null` -> `iniziaPartita()` e `vai("distribuzione")`; altrimenti `vaiAPasso(passoDiPassoConfigurazione(p), { sostituisci: true })` e mostra l'errore del passo (resta nel passo corrente se coincide) (CA-102). Indietro del browser/freccia/tasto di sistema dai passi 2..5 = history normale, senza validare; dal passo 1 `salvaOra()` poi Home (CA-100). `StatoApp` espone `readonly riepilogo: RiepilogoConfigurazione` (`$derived` da `Passi.riepilogo(config, categorie)`) e `readonly opzioniAttive: number` (`contaOpzioniAttive(config)`); oltre a `aggiungiGiocatore()` / `rimuoviGiocatore(indice)` nessun'altra azione nuova (le `imposta*` esistenti bastano, `impostoriSorpresa` passa da `impostaOpzione`; `impostaNome(indice, testo)` resta).
+
+## Foto dei giocatori (v1.10 Kotlin, v2.5 TS)
+
+Decisione utente 2026-10-09. Specifiche 4.8, 4.2, 4.3, 4.7, 6; CA-123…CA-140. Nessuna modifica a `Configurazione`, `Partita`, `SessioneSalvata` né ai loro JSON: le foto stanno in un archivio separato, cercate per NOME al momento di disegnare un avatar. Un salvataggio v1.9 / v2.4 si legge invariato.
+
+### Logica pura (Kotlin `it.imposteur.game`, file `FotoGiocatori.kt`; TS `web/src/game/fotoGiocatori.ts`)
+
+Nessun import `android.*`, nessun accesso a file o orologio: l'istante (`ora`, millisecondi, `Long`; in TS `number` intero) è un parametro. Le funzioni non lanciano mai eccezioni.
+
+```kotlin
+const val MAX_FOTO = 50            // TS: MAX_FOTO
+const val LATO_FOTO_PX = 256       // TS: LATO_FOTO_PX
+const val QUALITA_JPEG = 85        // TS: QUALITA_JPEG (0..100; il web passa QUALITA_JPEG / 100 a toBlob)
+
+object ChiaveFoto {
+    /** Chiave di archivio del nome: trim + lowercase() (Kotlin) / toLowerCase() (TS), spazi interni mantenuti.
+     *  null se il risultato è vuoto o se è "giocatore" seguito da sole cifre, con o senza spazi in mezzo (nome riservato al default). CA-123 */
+    fun daNome(nome: String): String?
+}
+
+/** Una foto archiviata. `file` è un nome opaco scelto dal chiamante (Android: "<uuid>.jpg"; web: uguale alla chiave). */
+data class VoceFoto(val chiave: String, val file: String, val ultimoUso: Long)
+
+/** Invariante: nessuna chiave ripetuta; `voci` ordinate per chiave crescente (confronto per unità UTF-16: `compareTo` / `<` di JS). */
+data class IndiceFoto(val voci: List<VoceFoto> = emptyList()) {
+    val dimensione: Int
+    /** Voce del nome (via ChiaveFoto.daNome), null se nome non valido o assente. CA-124 */
+    fun trova(nome: String): VoceFoto?
+    /** Aggiunge o sostituisce la voce del nome con (file, ora); poi elimina le eccedenti oltre MAX_FOTO, mai la voce appena registrata.
+     *  daEliminare = file della voce sostituita (se il file era diverso) + file delle eccedenti. Nome non valido -> indice invariato, daEliminare vuoto. CA-125, CA-126 */
+    fun registra(nome: String, file: String, ora: Long): EsitoIndice
+    /** Per ogni nome con voce (chiave valida, ripetuti ammessi) imposta ultimoUso = ora; ignora gli altri; non aggiunge né toglie voci. CA-127 */
+    fun segnaUso(nomi: List<String>, ora: Long): IndiceFoto
+    /** Toglie la voce del nome; il suo file è in daEliminare. Nome senza voce -> invariato. CA-127, CA-136 */
+    fun rimuovi(nome: String): EsitoIndice
+    /** Indice vuoto; tutti i file in daEliminare (ordine dell'indice). CA-127, CA-135 */
+    fun svuota(): EsitoIndice
+    /** Voci da eliminare per rispettare `massimo`: le meno recenti per ultimoUso, a parità la chiave minore; vuoto se dimensione <= massimo (massimo < 0 trattato come 0). CA-126 */
+    fun eccedenti(massimo: Int = MAX_FOTO): List<VoceFoto>
+}
+data class EsitoIndice(val indice: IndiceFoto, val daEliminare: List<String>)   // TS: interface con campi readonly
+
+object RitaglioFoto {
+    data class Riquadro(val x: Int, val y: Int, val lato: Int)
+    /** Quadrato centrato più grande: lato = min(w, h); x = (w - lato) / 2, y = (h - lato) / 2 (divisione intera). w o h <= 0 -> null. CA-131 */
+    fun quadratoCentrato(larghezza: Int, altezza: Int): Riquadro?
+    /** Lato del risultato: min(LATO_FOTO_PX, lato del quadrato) (nessun ingrandimento). 0 se non valido. CA-131 */
+    fun latoRisultato(larghezza: Int, altezza: Int): Int
+}
+```
+TS: `ChiaveFoto.daNome` → `chiaveFoto(nome: string): string | null`; `IndiceFoto` è `interface { readonly voci: readonly VoceFoto[] }` con le funzioni libere `trovaFoto(indice, nome)`, `registraFoto(indice, nome, file, ora)`, `segnaUsoFoto(indice, nomi, ora)`, `rimuoviFoto(indice, nome)`, `svuotaFoto(indice)`, `fotoEccedenti(indice, massimo = MAX_FOTO)`, `quadratoCentrato(w, h): Riquadro | null`, `latoRisultato(w, h): number`, costante `indiceFotoVuoto`. Nei CA la forma `f(indice, …)` vale per entrambe (in Kotlin `indice.f(…)`).
+
+Tabella di casi (JUnit e Vitest identici):
+
+| Funzione | CA | Casi |
+|---|---|---|
+| `daNome` | 123 | "Marco" -> "marco"; "  MARCO " -> "marco"; "Ma rco" -> "ma rco"; "" e "   " -> null; "Giocatore 3" -> null; "giocatore12" -> null; "GIOCATORE  7" -> null; "Giocatore" -> "giocatore"; "Giocatore 3a" -> "giocatore 3a"; "Élodie" -> "élodie" |
+| `trova` | 124 | indice con "marco": "Marco", " MARCO", "marco" -> la voce; "Marcos", "", "Giocatore 2" -> null; indice vuoto -> null; dopo `registra("Marco")`, `trova("Marcello")` -> null |
+| `registra` | 125 | su indice vuoto, ("Marco","a.jpg",100) -> 1 voce ("marco","a.jpg",100), daEliminare vuoto; poi ("MARCO","b.jpg",200) -> 1 voce ("marco","b.jpg",200), daEliminare ["a.jpg"]; di nuovo con file "b.jpg" -> daEliminare vuoto; ("", ...) e ("Giocatore 2", ...) -> indice invariato; nomi "Zoe" poi "Anna" -> voci ordinate ["anna","zoe"] |
+| `registra` con limite, `eccedenti` | 126 | 50 voci con ultimoUso 1..50 (chiavi k01..k50), nuova "nuova" ora 60 -> 50 voci, "k01" assente, daEliminare = [file di k01]; 3 voci ultimoUso 10, 20, 30 e massimo 2 -> `eccedenti(2)` = [la voce 10]; due voci con ultimoUso 5 (chiavi "b","a"), massimo 1 -> eccedenti = ["a"]; registra con ora minore di tutte le altre a 50 voci -> la nuova resta, esce la meno recente tra le altre; 50 voci -> `eccedenti()` vuoto; 52 voci -> le 2 meno recenti |
+| `segnaUso` | 127, 134 | nomi ["Marco","Sconosciuto","","Giocatore 1","MARCO"] con ora 500 -> solo "marco" ha ultimoUso 500; dimensione invariata; lista vuota -> indice uguale |
+| `rimuovi`, `svuota` | 127, 136 | rimuovi("Marco") -> voce tolta e il suo file in daEliminare, le altre invariate; rimuovi("Nessuno") -> invariato, daEliminare vuoto; svuota con 3 voci -> indice vuoto, 3 file |
+| `quadratoCentrato`, `latoRisultato` | 131 | (1000,2000) -> (0,500,1000), lato 256; (2000,1000) -> (500,0,1000), lato 256; (100,100) -> (0,0,100), lato 100; (257,256) -> (0,0,256), lato 256; (301,300) -> (0,0,300), lato 256; (0,10) e (10,-1) -> null, lato 0 |
+
+### Formato dell'indice (Kotlin `it.imposteur.data`, `FormatoIndiceFoto.kt`; TS `web/src/data/formatoIndiceFoto.ts`; puro)
+
+```kotlin
+object FormatoIndiceFoto {
+    fun scrivi(indice: IndiceFoto): String
+    /** Testo vuoto/null, non JSON o radice di tipo errato -> IndiceFoto(). Altrimenti normalizza (CA-128):
+     *  scarta le voci con chiave diversa da ChiaveFoto.daNome(chiave) (non normalizzata, vuota, riservata), `file` vuoto o con "/", "\" o "..", `ultimoUso` non intero;
+     *  due voci con la stessa chiave -> resta quella con ultimoUso maggiore (a parità, l'ultima nel testo); poi tiene le MAX_FOTO più recenti; ordina per chiave. Campi sconosciuti ignorati. */
+    fun leggi(testo: String?): IndiceFoto
+}
+```
+TS: `scriviIndiceFoto(indice): string`, `leggiIndiceFoto(testo: string | null): IndiceFoto`. JSON: `{"versione":1,"foto":[{"chiave":"marco","file":"3f2a.jpg","ultimoUso":1760000000000}]}`. `versione` mancante o diversa da 1 non è un errore (si legge `foto` se è un array). Casi: scrivi→leggi identico; "" / "{" / "[]" / `{"foto":5}` -> vuoto; voce con chiave "Marco" (non normalizzata) scartata e le altre restano; `file` "../x.jpg" scartata; `ultimoUso` "x" scartata; due "marco" con 10 e 20 -> resta 20; 52 voci -> le 50 più recenti.
+
+### Android: archivio e sistema (`it.imposteur.data`)
+
+```kotlin
+/** Archivio delle foto su file. Le scritture sono serializzate (Mutex interno); le funzioni sospese girano su Dispatchers.IO e non lanciano: un errore di I/O = nessuna modifica visibile (salva -> false). */
+interface RepositoryFoto {
+    /** Indice corrente (aggiornato a ogni scrittura). Al primo accesso legge `indice.json` con FormatoIndiceFoto.leggi e cancella da `avatar/` i file orfani (CA-138). */
+    val indice: StateFlow<IndiceFoto>
+    /** File JPEG della foto del nome; null se non c'è la voce o il file manca (CA-133). */
+    fun fileDi(nome: String): File?
+    /** Scrive `jpeg` in un nuovo file `<uuid>.jpg`, poi indice.registra(nome, file, ora), poi cancella i file in daEliminare e salva l'indice (scrittura atomica: file temporaneo + rinomina). false se nome non valido o I/O fallito. CA-125, 126, 137 */
+    suspend fun salva(nome: String, jpeg: ByteArray): Boolean
+    suspend fun rimuovi(nome: String)                       // CA-136
+    suspend fun segnaUso(nomi: List<String>)                // CA-127, 134; non scrive se nessun nome ha foto
+    suspend fun eliminaTutte()                              // CA-135
+}
+class RepositoryFotoFile(directory: File, orologio: () -> Long = System::currentTimeMillis) : RepositoryFoto
+// directory = File(context.filesDir, "avatar"); indice in File(directory, "indice.json")
+```
+Elaborazione immagine (UI/piattaforma, non in `game/`; usa `RitaglioFoto`): `suspend fun elaboraFoto(context: Context, uri: Uri): ByteArray?` in `ui/` (`ElaboraFoto.kt`): decodifica con campionamento (`inSampleSize`) per restare intorno a 2048 px, applica l'orientamento EXIF, ritaglia con `quadratoCentrato`, scala a `latoRisultato`, comprime JPEG a `QUALITA_JPEG`; null se non decodificabile (CA-131, 137).
+
+Sistema Android (nessun permesso):
+- Galleria: `ActivityResultContracts.PickVisualMedia` con `PickVisualMediaRequest(PickVisualMedia.ImageOnly)`; nessun permesso `READ_MEDIA_*` / `READ_EXTERNAL_STORAGE`.
+- Fotocamera: `ActivityResultContracts.TakePicture` (ACTION_IMAGE_CAPTURE) con uri di `FileProvider` su un file temporaneo in `cacheDir/foto-temp/` (cancellato dopo l'elaborazione o all'annullamento). Manifest: `<provider>` FileProvider con authority `${applicationId}.fileprovider`, `grantUriPermissions="true"`, `res/xml/percorsi_file.xml` con `<cache-path name="foto_temp" path="foto-temp/"/>`; `<queries>` con l'intent `android.media.action.IMAGE_CAPTURE` (per sapere se esiste un'app fotocamera: "Scatta una foto" nascosta altrimenti). NON dichiarare `android.permission.CAMERA` (se dichiarato, andrebbe chiesto a runtime).
+- Backup: escludere `avatar/` in `data_extraction_rules.xml` e in `fullBackupContent` (`<exclude domain="file" path="avatar/"/>`) (CA-139).
+
+`ImpostoreViewModel` (aggiunte):
+```kotlin
+val foto: StateFlow<IndiceFoto>                      // = repositoryFoto.indice
+val fotoDisponibile: Boolean                          // sempre true su Android
+fun fileFoto(nome: String): File?                     // = repositoryFoto.fileDi(nome)
+fun salvaFoto(nome: String, jpeg: ByteArray)          // se salva() dà false emette l'evento "Impossibile usare questa foto"
+fun rimuoviFoto(nome: String)
+fun eliminaTutteLeFoto()
+// iniziaPartita() / rigioca(): dopo aver creato la partita chiama repositoryFoto.segnaUso(partita.giocatori) (nomi effettivi) (CA-134)
+```
+`nome` è il nome del campo al momento del tocco sull'avatar, conservato (`rememberSaveable`) mentre l'app esterna è aperta (CA-129, 130). Componente comune `AvatarGiocatore(nome, colore, dimensione, foto: File?)`: se `foto` è decodificabile mostra l'immagine ritagliata a cerchio, altrimenti l'iniziale. Nessun parametro di ruolo: la resa non può dipenderne (CA-133).
+
+### PWA: archivio IndexedDB (`web/src/data/archivioFoto.ts`)
+
+```ts
+export interface ArchivioFoto {
+  /** Indice corrente (file = chiave). */
+  leggiIndice(): Promise<IndiceFoto>;
+  /** Immagine del nome; null se assente o illeggibile. */
+  leggiFoto(nome: string): Promise<Blob | null>;
+  /** `jpeg` è già elaborato (type "image/jpeg"). Registra con registraFoto(…, ora), elimina le eccedenti nella stessa transazione. true se salvato; mai eccezioni (errore -> false). */
+  salvaFoto(nome: string, jpeg: Blob): Promise<boolean>;
+  rimuoviFoto(nome: string): Promise<void>;
+  segnaUso(nomi: readonly string[]): Promise<void>;
+  eliminaTutte(): Promise<void>;
+}
+/** null se `indexedDB` non esiste o l'apertura fallisce (modalità privata, blocco): la funzione è allora nascosta (CA-140). */
+export function creaArchivioFotoIdb(orologio?: () => number): Promise<ArchivioFoto | null>;
+/** Per i test: stessa semantica, in memoria. */
+export function creaArchivioFotoInMemoria(orologio?: () => number): ArchivioFoto;
+```
+IndexedDB: database `impostore-foto` v1, object store `foto` con `keyPath: "chiave"`, record `{ chiave, blob, ultimoUso }` (l'indice si ricava dai record: nessun altro store). Ogni scrittura è una sola transazione `readwrite`. Record non validi (chiave non normalizzata, `blob` non Blob) sono scartati e cancellati. `FormatoIndiceFoto` non serve sul web.
+
+`StatoApp` (aggiunte): `readonly fotoDisponibile: boolean`; `readonly foto: IndiceFoto` ($state); `urlFoto(nome: string): string | null` (object URL in cache, `URL.revokeObjectURL` quando la voce cambia o sparisce); `salvaFoto(nome: string, file: Blob): Promise<void>` (elabora con `elaboraFoto` e salva; errore -> evento "Impossibile usare questa foto"); `rimuoviFoto(nome)`; `eliminaTutteLeFoto()`; `iniziaPartita()` chiama `segnaUso`. `ui/browser.ts` (aggiunta): `elaboraFoto(file: Blob): Promise<Blob | null>` con `createImageBitmap(file, { imageOrientation: "from-image" })`, `quadratoCentrato` / `latoRisultato` su canvas, `canvas.toBlob(cb, "image/jpeg", QUALITA_JPEG / 100)`; null se non decodificabile. Campi file nascosti: galleria `<input type="file" accept="image/*">`; fotocamera `<input type="file" accept="image/*" capture="user">`.
+
+### Dove si usa l'avatar (UI)
+
+`AvatarGiocatore` (Android) / `.avatar` (web) disegnano la foto del nome al posto dell'iniziale in: `RigaGiocatore` (passo 1, unico punto toccabile: 48 x 48 dp, nome accessibile "Foto di <nome>", menu "Scegli dalla galleria" / "Scatta una foto" / "Rimuovi foto"), fila e cerchio grande di Distribuzione, elenco e Passaggio di Rivedi, avatar piccoli di Rivela e ogni altro uso. Il gruppo "Foto dei giocatori" delle Impostazioni (visibile se `foto.dimensione >= 1` e `fotoDisponibile`) mostra "Foto salvate: N" e "Elimina tutte le foto" con la conferma di 4.8. Gli stili restano a `docs/design.md`, da aggiornare (3 "Riga giocatore" dice che l'area dell'avatar non è interattiva).
+
+| Verifica | CA | Dove |
+|---|---|---|
+| `ChiaveFoto`, `IndiceFoto`, `RitaglioFoto`, `FormatoIndiceFoto` | 123-128, 131 (geometria) | JUnit (`FotoGiocatoriTest`) e Vitest (`fotoGiocatori.test.ts`), tabelle sopra |
+| `RepositoryFotoFile` su cartella temporanea e orologio finto (salva, sostituisci, limite 50 con file, rimuovi, eliminaTutte, orfani) | 125, 126, 134-138 | JUnit con `TemporaryFolder` |
+| `creaArchivioFotoInMemoria` (stessa semantica) | 125, 126, 134-136, 140 | Vitest |
+| UI: passo 1, menu, impostazioni, indistinguibilità, errori, manifest | 129-133, 135, 137, 139, 140 | strumentati/manuali |
